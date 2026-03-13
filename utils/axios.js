@@ -1,47 +1,51 @@
 import axios from "axios";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL;
+const baseURL = process.env.NEXT_PUBLIC_BASE_API_URL;
 
-const axiosInstance = axios.create({
+const defaultAxios = axios.create({
   baseURL,
-  headers: { "Content-Type": "application/json" },
+  headers: {
+    Accept: "application/json",
+  },
 });
 
 export const authAxios = axios.create({
   baseURL,
-  headers: { "Content-Type": "application/json" },
+  headers: {
+    Accept: "application/json",
+  },
+  timeout: 20000,
 });
 
-// Request Interceptor: Har bir so'rovga tokenni qo'shish
-authAxios.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+authAxios.interceptors.request.use(
+  (config) => {
+    if (typeof window !== "undefined") {
+      const accessToken = localStorage.getItem("access");
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 
-// Response Interceptor: 401 xatolikda tokenni yangilash
 authAxios.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        const refresh = localStorage.getItem("refresh");
-        const res = await axios.post(`${baseURL}/auth/token/refresh/`, {
-          refresh,
-        });
-        localStorage.setItem("access", res.data.access);
-        return authAxios(originalRequest);
-      } catch (err) {
-        localStorage.clear();
-        window.location.href = "/login";
+    if (!error.response || error.code === "ECONNABORTED") {
+      return Promise.reject(error);
+    }
+
+    if (error.response.status === 401) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
       }
     }
+
     return Promise.reject(error);
   },
 );
 
-export default axiosInstance;
+export default defaultAxios;

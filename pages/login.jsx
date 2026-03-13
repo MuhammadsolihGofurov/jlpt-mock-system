@@ -23,20 +23,14 @@ function Login({ info }) {
   } = useForm();
 
   const onSubmit = async (data) => {
-    const loginPromise = dispatch(loginUser(data)).unwrap();
-
-    toast.promise(loginPromise, {
-      loading: "Tizimga kirilmoqda...",
-      success: (user) => {
-        router.push("/");
-        return `Xush kelibsiz!`;
-      },
-      error: (err) => {
-        return err?.detail || "Email yoki parol xato!";
-      },
-    });
+    try {
+      await dispatch(loginUser(data)).unwrap();
+      toast.success("Xush kelibsiz!");
+      router.push("/dashboard");
+    } catch (err) {
+      toast.error(err?.detail || "Xatolik!");
+    }
   };
-
   return (
     <>
       <Seo

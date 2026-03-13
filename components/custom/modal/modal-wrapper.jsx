@@ -21,7 +21,7 @@ const ModalWrapper = ({ children, onClose, size = "big" }) => {
   const modalSizeClass = sizes[size] || sizes.default;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-center items-start overflow-y-auto custom-scrollbar bg-black/50 backdrop-blur-sm sm:px-0 px-3 py-10">
+    <div className="fixed inset-0 z-[999] flex justify-center items-start overflow-y-auto custom-scrollbar bg-black/50 backdrop-blur-sm sm:px-0 px-3 py-10">
       {/* Backdrop - orqa fon */}
       <motion.div
         initial={{ opacity: 0 }}

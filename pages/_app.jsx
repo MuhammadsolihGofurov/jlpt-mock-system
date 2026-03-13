@@ -66,15 +66,15 @@ export default function App({ Component, pageProps }) {
           <OffcanvasProvider>
             <ModalProvider>
               <Layout>
-                <SWRConfig
+                {/* <SWRConfig
                   value={{
                     revalidateOnFocus: false, // Oynaga qaytganda yangilamaslik
                     dedupingInterval: 10000, // Bir xil so'rovni 10 soniya ichida qayta yubormaslik
                     shouldRetryOnError: false, // xato bo'lsa qayta urinmaslik
                   }}
-                >
-                  <Component {...pageProps} />
-                </SWRConfig>
+                > */}
+                <Component {...pageProps} />
+                {/* </SWRConfig> */}
               </Layout>
               <ToastContainer
                 position="top-right"

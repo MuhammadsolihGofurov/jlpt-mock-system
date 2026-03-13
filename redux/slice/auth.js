@@ -1,16 +1,36 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axiosInstance from "../../utils/axios";
+import defaultAxios, { authAxios } from "../../utils/axios";
 
 export const loginUser = createAsyncThunk(
   "auth/login",
   async (data, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.post("/auth/login/", data);
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
+      const res = await defaultAxios.post("auth/login/", data);
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("access", res.data.access);
+        localStorage.setItem("refresh", res.data.refresh);
+      }
+
       return res.data.user;
     } catch (err) {
       return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+// getMe thunk
+export const getMe = createAsyncThunk(
+  "auth/getMe",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await authAxios.get("auth/me/");
+
+      await new Promise((resolve) => setTimeout(resolve, 350));
+
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Sessiya muddati tugadi");
     }
   },
 );
@@ -43,6 +63,16 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      .addCase(getMe.fulfilled, (state, action) => {
+        state.isAuthenticated = true;
+        state.user = action.payload;
+        state.loading = false;
+      })
+      .addCase(getMe.rejected, (state) => {
+        state.isAuthenticated = false;
+        state.user = null;
       });
   },
 });
