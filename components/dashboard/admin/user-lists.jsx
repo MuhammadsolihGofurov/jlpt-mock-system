@@ -3,27 +3,45 @@ import fetcher from "@/utils/fetcher";
 import { useEffect } from "react";
 import Pagination from "@/components/ui/pagination";
 import { useRouter } from "next/router";
-import useSWR from "swr";
-import { useIntl } from "react-intl";
-import { Users } from "lucide-react";
+import useSWR, { mutate } from "swr";
 import { UserCard } from "@/components/custom/cards/user-card";
+import { EmptyMessage } from "@/components/custom/message";
 
 const UserLists = () => {
   const router = useRouter();
-  const intl = useIntl();
   const { modalClosed } = useModal();
+  const { role, is_active, is_approved, page = 1, search } = router.query;
 
-  const currentPage = router.query.page || 1;
-
-  const { data, mutate, isLoading } = useSWR(
-    [`users/`, router.locale, currentPage],
-    (url, locale, p) =>
-      fetcher(`${url}`, { headers: { "Accept-Language": locale } }, {}, true),
+  const { data, isLoading } = useSWR(
+    [`users/`, router.locale, page, search, role, is_active, is_approved],
+    (url, locale, p, q, r, active, approved) => {
+      const queryParams = new URLSearchParams({
+        page: p,
+        ...(q && { search: q }),
+        ...(r && { role: r }),
+        ...(active && { is_active: active }),
+        ...(approved && { is_approved: approved }),
+      });
+      return fetcher(
+        `${url}?${queryParams}`,
+        { headers: { "Accept-Language": locale } },
+        {},
+        true,
+      );
+    },
   );
 
   useEffect(() => {
     if (modalClosed?.refresh) {
-      mutate();
+      mutate([
+        `users/`,
+        router.locale,
+        page,
+        search,
+        role,
+        is_active,
+        is_approved,
+      ]);
     }
   }, [modalClosed, mutate]);
 
@@ -51,35 +69,17 @@ const UserLists = () => {
             onDelete={(id) => console.log("Delete User:", id)}
           />
         ))}
-        <UserCard
-          item={{
-            id: 0,
-            email: "user@example.com",
-            first_name: "string",
-            last_name: "string",
-            avatar: "string",
-            role: "OWNER",
-            center: 0,
-            center_avatar: "string",
-            is_approved: true,
-            created_at: "2026-03-14T17:47:59.384Z",
-          }}
-          onDelete={(id) => console.log("Delete User:", id)}
-        />
       </div>
 
       {/* Empty State */}
-      {data?.results?.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 bg-white/40 backdrop-blur-sm rounded-[2.5rem] border-2 border-dashed border-slate-100">
-          <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
-            <Users size={32} />
-          </div>
-          <h3 className="text-lg font-black text-heading">Userlar topilmadi</h3>
-          <p className="text-muted text-sm font-medium mt-1">
-            Hozircha ro'yxatda hech kim yo'q.
-          </p>
-        </div>
-      )}
+      {!data ||
+        (data?.results?.length === 0 && (
+          <EmptyMessage
+            titleKey="Foydalanuvchilar topilmadi"
+            descriptionKey="Hozircha ro'yxatda hech kim yo'q"
+            iconKey="users"
+          />
+        ))}
 
       {/* Pagination */}
       {data?.count > 0 && (

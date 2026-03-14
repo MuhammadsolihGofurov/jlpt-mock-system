@@ -35,7 +35,8 @@ const ConfirmModal = ({
         render:
           response?.data?.message ||
           response?.data?.status ||
-          response?.data?.detail,
+          response?.data?.detail ||
+          intl.formatMessage({ id: "Muvaffaqiyatli..." }),
         type: "success",
         isLoading: false,
         autoClose: 3000,
@@ -51,7 +52,7 @@ const ConfirmModal = ({
         localStorage.removeItem("access");
         localStorage.removeItem("refresh");
 
-        router.push("/login")
+        router.push("/login");
       }
 
       closeModal("CONFIRM_MODAL", { refresh: true });

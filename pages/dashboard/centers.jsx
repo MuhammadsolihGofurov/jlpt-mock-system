@@ -24,6 +24,7 @@ function CentersPage({ info }) {
           description="centers_desc"
           badge="Faol"
           buttonLabel="Markaz qo'shish"
+          roles={["OWNER"]}
           onButtonClick={() => openModal("centerForm", {}, "middle")}
           //   extraActions={
           //     <>

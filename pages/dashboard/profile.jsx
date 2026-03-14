@@ -4,11 +4,14 @@ import { AuthGuard } from "@/components/guard";
 import { PageHeader } from "@/components/layout";
 import {
   AppearanceSettings,
+  CenterProfileForm,
   ProfileForm,
 } from "@/components/dashboard/settings";
+import { useSelector } from "react-redux";
 
 function ProfilePage({ info }) {
   const intl = useIntl();
+  const { user } = useSelector((state) => state.auth);
 
   return (
     <>
@@ -24,6 +27,9 @@ function ProfilePage({ info }) {
           badge="Faol"
         />
         <ProfileForm />
+        {user?.role === "CENTER_ADMIN" && user?.center_info?.id && (
+          <CenterProfileForm centerId={user.center_info.id} />
+        )}
       </AuthGuard>
     </>
   );

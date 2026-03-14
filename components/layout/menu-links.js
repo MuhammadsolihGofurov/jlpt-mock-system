@@ -2,12 +2,13 @@ import {
   BarChart3,
   BookOpen,
   Building2,
-  CircleDollarSign,
+  Files,
   Home,
   Settings,
+  Ticket,
   User2,
-  UserRoundKey,
   Users2,
+  Users2Icon,
 } from "lucide-react";
 
 export const menus = [
@@ -35,13 +36,25 @@ export const menus = [
   {
     label: "Taklif kodlari",
     href: "/dashboard/invitations",
-    icon: UserRoundKey,
+    icon: Ticket,
     roles: ["CENTER_ADMIN"],
   },
   {
     label: "user_title",
     href: "/dashboard/users",
     icon: Users2,
+    roles: ["CENTER_ADMIN"],
+  },
+  {
+    label: "groups_title",
+    href: "/dashboard/groups",
+    icon: Users2Icon,
+    roles: ["CENTER_ADMIN"],
+  },
+  {
+    label: "materials_title",
+    href: "/dashboard/materials",
+    icon: Files,
     roles: ["CENTER_ADMIN"],
   },
   {

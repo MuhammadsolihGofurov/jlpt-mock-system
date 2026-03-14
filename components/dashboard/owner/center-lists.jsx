@@ -6,6 +6,7 @@ import Pagination from "@/components/ui/pagination"; // import qilish
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import { useIntl } from "react-intl";
+import { EmptyMessage } from "@/components/custom/message";
 
 const CenterLists = () => {
   const router = useRouter();
@@ -40,11 +41,11 @@ const CenterLists = () => {
       </div>
 
       {data?.results?.length === 0 && (
-        <div className="text-center py-20 bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-100">
-          <p className="text-muted font-bold">
-            {intl.formatMessage({ id: "Hech qanday markaz topilmadi." })}
-          </p>
-        </div>
+        <EmptyMessage
+          titleKey="Markazlar topilmadi"
+          descriptionKey="Hozircha ro'yxatda hech narsa yo'q"
+          iconKey="default"
+        />
       )}
 
       {data?.count > 0 && <Pagination totalCount={data.count} pageSize={6} />}

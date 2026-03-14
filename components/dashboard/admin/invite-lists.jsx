@@ -7,6 +7,7 @@ import useSWR from "swr";
 import { useIntl } from "react-intl";
 import { UserPlus } from "lucide-react";
 import { InvitationCard } from "@/components/custom/cards";
+import { EmptyMessage } from "@/components/custom/message";
 
 const InvitationLists = () => {
   const router = useRouter();
@@ -62,17 +63,11 @@ const InvitationLists = () => {
 
       {/* Empty State */}
       {data?.results?.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-24 bg-white/40 backdrop-blur-sm rounded-[3rem] border-2 border-dashed border-orange-100">
-          <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center text-primary mb-4">
-            <UserPlus size={40} />
-          </div>
-          <h3 className="text-xl font-black text-heading">
-            Ma'lumot topilmadi
-          </h3>
-          <p className="text-muted font-medium mt-1">
-            Hozircha hech qanday taklifnomalar yo'q.
-          </p>
-        </div>
+        <EmptyMessage
+          titleKey="Takliflar topilmadi"
+          descriptionKey="Hozircha ro'yxatda hech narsa yo'q"
+          iconKey="invitations"
+        />
       )}
 
       {/* Pagination Container */}

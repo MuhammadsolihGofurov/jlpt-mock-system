@@ -1,6 +1,7 @@
 import React from "react";
 import { Plus } from "lucide-react";
 import { useIntl } from "react-intl";
+import { useSelector } from "react-redux";
 
 const PageHeader = ({
   title,
@@ -9,15 +10,17 @@ const PageHeader = ({
   buttonLabel,
   onButtonClick,
   extraActions,
+  roles = [],
 }) => {
   const intl = useIntl();
+  const { user } = useSelector((state) => state.auth);
   return (
     <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-      <div className="relative">
+      <div className="relative w-full flex-1">
         <div className="absolute -left-5 top-1/2 -translate-y-1/2 w-1.5 h-10 bg-primary rounded-r-full hidden md:block shadow-[0_0_15px_rgba(245,166,35,0.4)]" />
 
         <div className="flex items-center gap-3 mb-1.5">
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-heading">
+          <h1 className="text-xl sm:text-2xl md:text-4xl font-bold sm:font-black tracking-tight text-heading">
             {intl.formatMessage({ id: title })}
           </h1>
           {badge && (
@@ -30,17 +33,21 @@ const PageHeader = ({
         {description && (
           <p className="text-muted font-medium flex items-center gap-2 text-sm md:text-base">
             <span className="flex h-2 w-2 rounded-full bg-primary/40 animate-pulse" />
-            {intl.formatMessage({ id: description })}
+            <span className="flex-1">
+              {intl.formatMessage({ id: description })}
+            </span>
           </p>
         )}
       </div>
 
       <div className="flex items-center gap-3">
         {extraActions && (
-          <div className="flex items-center gap-2">{extraActions}</div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {extraActions}
+          </div>
         )}
 
-        {buttonLabel && (
+        {roles.includes(user?.role) && buttonLabel && (
           <button
             onClick={onButtonClick}
             className="group bg-heading hover:bg-primary text-white font-bold px-6 py-3.5 rounded-[1.4rem] shadow-xl shadow-gray-200 hover:shadow-orange-200 transition-all duration-300 active:scale-95 flex items-center gap-2"

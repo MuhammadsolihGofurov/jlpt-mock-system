@@ -4,17 +4,22 @@ import {
   Mail,
   ShieldCheck,
   ShieldAlert,
-  Calendar,
   Clock,
-  ArrowRight,
+  Edit,
+  Trash2,
 } from "lucide-react";
 import { useIntl } from "react-intl";
 import { ActionDropdown } from "@/components/ui";
 import { DropdownItem } from "@/components/ui/action-dropdown";
 import { useSelector } from "react-redux";
+import { useModal } from "@/context/modal-context";
+import { authAxios } from "@/utils/axios";
+import { useRouter } from "next/router";
 
-export const UserCard = ({ item, DropdownMenu, onDelete }) => {
+export const UserCard = ({ item }) => {
   const intl = useIntl();
+  const router = useRouter();
+  const { openModal } = useModal();
   const { user } = useSelector((state) => state.auth);
   const formatDate = (dateStr) => {
     if (!dateStr) return { full: "---", time: "--:--" };
@@ -33,6 +38,23 @@ export const UserCard = ({ item, DropdownMenu, onDelete }) => {
   };
 
   const dateInfo = formatDate(item.created_at);
+
+  const handleDelete = (id) => {
+    openModal(
+      "CONFIRM_MODAL",
+      {
+        title: "Foydalanuvchini o'chirish",
+        body: "Ushbu foydalanuvchini o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
+        confirmText: "Ha, o'chirilsin",
+        variant: "danger",
+        mutateKey: ["users/", router.locale],
+        onConfirm: async () => {
+          return await authAxios.delete(`/users/${id}/`);
+        },
+      },
+      "small",
+    );
+  };
 
   return (
     <div className="group relative bg-white border border-slate-100 rounded-[1.25rem] p-4 hover:border-orange-200 hover:shadow-xl hover:shadow-orange-900/5 transition-all duration-300">
@@ -125,9 +147,18 @@ export const UserCard = ({ item, DropdownMenu, onDelete }) => {
             {user?.role === "CENTER_ADMIN" ? (
               <ActionDropdown>
                 <DropdownItem
-                  icon={ShieldCheck}
-                  label="Qabul qilish"
-                  onClick={() => console.log(item?.code)}
+                  icon={Edit}
+                  label="Tahrirlash"
+                  onClick={() =>
+                    openModal("USER_FORM", { user: item }, "middle")
+                  }
+                />
+                <div className="h-[1px] bg-gray-100 mx-2 my-1" />
+                <DropdownItem
+                  icon={Trash2}
+                  label="O'chirish"
+                  variant="danger"
+                  onClick={() => handleDelete(item?.id)}
                 />
               </ActionDropdown>
             ) : (

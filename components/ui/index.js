@@ -3,3 +3,4 @@ export { default as Button } from "./button";
 export { default as ActionDropdown } from "./action-dropdown";
 export { default as Select } from "./select";
 export { default as Pagination } from "./pagination";
+export { default as SearchInput } from "./search-input";

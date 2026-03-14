@@ -2,30 +2,38 @@ import { useIntl } from "react-intl";
 import Seo from "@/components/seo/seo";
 import { AuthGuard } from "@/components/guard";
 import { PageHeader } from "@/components/layout";
-import { InvitationLists } from "@/components/dashboard/admin";
 import { useModal } from "@/context/modal-context";
+import { UserLists } from "@/components/dashboard/admin";
+import { Filter, Search } from "lucide-react";
+import { SearchInput } from "@/components/ui";
+import GroupLists from "@/components/dashboard/admin/group-lists";
 
-function InvitatitionsPage({ info }) {
+function GroupsPage({ info }) {
   const intl = useIntl();
   const { openModal } = useModal();
 
   return (
     <>
       <Seo
-        title={intl.formatMessage({ id: "invite_title" })}
-        description={intl.formatMessage({ id: "invite_desc" })}
-        keywords={intl.formatMessage({ id: "invite_key" })}
+        title={intl.formatMessage({ id: "groups_title" })}
+        description={intl.formatMessage({ id: "groups_desc" })}
+        keywords={intl.formatMessage({ id: "groups_key" })}
       />
       <AuthGuard roles={["CENTER_ADMIN"]}>
         <PageHeader
-          title="invite_title"
-          description="invite_desc"
+          title="groups_title"
+          description="groups_desc"
           badge="Faol"
+          buttonLabel="Guruh qo'shish"
           roles={["CENTER_ADMIN"]}
-          buttonLabel="Kod qo'shish"
-          onButtonClick={() => openModal("INVITE_FORM", {}, "middle")}
+          onButtonClick={() => openModal("GROUP_FORM", {}, "middle")}
+          extraActions={
+            <>
+              <SearchInput />
+            </>
+          }
         />
-        <InvitationLists />
+        <GroupLists />
       </AuthGuard>
     </>
   );
@@ -54,4 +62,4 @@ export async function getServerSideProps() {
   }
 }
 
-export default InvitatitionsPage;
+export default GroupsPage;

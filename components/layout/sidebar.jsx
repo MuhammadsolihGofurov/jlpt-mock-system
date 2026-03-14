@@ -131,7 +131,7 @@ const Sidebar = () => {
       `}
       >
         {/* Logo Section */}
-        <div className="p-8">
+        <div className="px-8 py-5">
           <div className="flex items-center gap-3">
             <div className="bg-orange-500 p-2.5 rounded-[14px] shadow-lg shadow-orange-200">
               <Image
@@ -150,9 +150,9 @@ const Sidebar = () => {
 
         {/* Navigation */}
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
-          <p className="px-4 mb-2 text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+          {/* <p className="px-4 mb-2 text-[11px] font-bold text-gray-400 uppercase tracking-widest">
             {intl.formatMessage({ id: "Asosiy Menyu" })}
-          </p>
+          </p> */}
           {filteredTabs.map((tab) => {
             const active = isActive(tab.href);
             const Icon = tab.icon;
