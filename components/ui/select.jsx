@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export const Select = ({ label, options, value, onChange, error }) => {
@@ -31,7 +32,7 @@ export const Select = ({ label, options, value, onChange, error }) => {
         <span
           className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
         >
-          ▼
+          <ChevronDown size={14}/>
         </span>
       </div>
 

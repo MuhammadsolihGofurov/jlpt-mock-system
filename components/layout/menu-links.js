@@ -6,6 +6,7 @@ import {
   Home,
   Settings,
   User2,
+  UserRoundKey,
   Users2,
 } from "lucide-react";
 
@@ -32,8 +33,14 @@ export const menus = [
   //   is_mobile: true,
   // },
   {
-    label: "O'qituvchilar",
-    href: "/dashboard/teachers",
+    label: "Taklif kodlari",
+    href: "/dashboard/invitations",
+    icon: UserRoundKey,
+    roles: ["CENTER_ADMIN"],
+  },
+  {
+    label: "user_title",
+    href: "/dashboard/users",
     icon: Users2,
     roles: ["CENTER_ADMIN"],
   },
