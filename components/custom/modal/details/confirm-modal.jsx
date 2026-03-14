@@ -5,6 +5,7 @@ import { useIntl } from "react-intl";
 import { mutate } from "swr";
 import { toast } from "react-toastify";
 import { handleApiError } from "@/utils/handle-error";
+import { useRouter } from "next/router";
 
 const ConfirmModal = ({
   title,
@@ -13,9 +14,11 @@ const ConfirmModal = ({
   confirmText,
   cancelText = "Bekor qilish",
   variant = "danger",
+  local = "unclear",
   mutateKey,
 }) => {
   const intl = useIntl();
+  const router = useRouter();
   const { closeModal } = useModal();
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +32,10 @@ const ConfirmModal = ({
       const response = await onConfirm();
 
       toast.update(toastId, {
-        render: response?.data?.message || response?.data?.status,
+        render:
+          response?.data?.message ||
+          response?.data?.status ||
+          response?.data?.detail,
         type: "success",
         isLoading: false,
         autoClose: 3000,
@@ -39,6 +45,13 @@ const ConfirmModal = ({
         mutate(mutateKey);
       } else {
         mutate();
+      }
+
+      if (local === "clear") {
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+
+        router.push("/login")
       }
 
       closeModal("CONFIRM_MODAL", { refresh: true });
@@ -69,7 +82,7 @@ const ConfirmModal = ({
           "Ushbu amalni ortga qaytarib bo'lmasligi mumkin."}
       </p>
 
-      <div className="flex flex-col sm:flex-row items-center gap-3">
+      <div className="flex flex-col-reverse sm:flex-row items-center gap-3">
         <button
           type="button"
           onClick={() => closeModal("CONFIRM_MODAL")}

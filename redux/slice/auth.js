@@ -19,6 +19,35 @@ export const loginUser = createAsyncThunk(
   },
 );
 
+export const logoutUser = createAsyncThunk(
+  "auth/logout",
+  async (__, { rejectWithValue }) => {
+    try {
+      const res = await authAxios.post("auth/logout/", {
+        refresh: localStorage.getItem("refresh"),
+      });
+
+      return res;
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const registerUser = createAsyncThunk(
+  "auth/register",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await defaultAxios.post("auth/register/", data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data || "Ro'yxatdan o'tishda xatolik",
+      );
+    }
+  },
+);
+
 // getMe thunk
 export const getMe = createAsyncThunk(
   "auth/getMe",
@@ -61,6 +90,29 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(logoutUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(logoutUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = false;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

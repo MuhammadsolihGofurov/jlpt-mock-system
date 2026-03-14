@@ -1,43 +1,59 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Home, BookOpen, BarChart3, User2, Building2 } from "lucide-react";
+import {
+  Home,
+  BookOpen,
+  BarChart3,
+  User2,
+  Building2,
+  CircleDollarSign,
+} from "lucide-react";
 import { useSelector } from "react-redux";
+import { menus } from "./menu-links";
+import { useIntl } from "react-intl";
 
-const tabs = [
-  {
-    label: "Asosiy",
-    href: "/dashboard",
-    icon: Home,
-    roles: ["OWNER", "CENTER_ADMIN", "TEACHER", "STUDENT"],
-  },
-  {
-    label: "Markazlar",
-    href: "/dashboard/centers",
-    icon: Building2,
-    roles: ["OWNER"],
-  },
-  {
-    label: "Testlar",
-    href: "/dashboard/tests",
-    icon: BookOpen,
-    roles: ["CENTER_ADMIN", "TEACHER", "STUDENT"],
-  },
-  {
-    label: "Natijalar",
-    href: "/dashboard/results",
-    icon: BarChart3,
-    roles: ["CENTER_ADMIN", "TEACHER", "STUDENT"],
-  },
-  {
-    label: "Profil",
-    href: "/dashboard/profile",
-    icon: User2,
-    roles: ["OWNER", "CENTER_ADMIN", "TEACHER", "STUDENT"],
-  },
-];
+// const tabs = [
+//   {
+//     label: "Asosiy",
+//     href: "/dashboard",
+//     icon: Home,
+//     roles: ["OWNER", "CENTER_ADMIN", "TEACHER", "STUDENT"],
+//   },
+//   {
+//     label: "Markazlar",
+//     href: "/dashboard/centers",
+//     icon: Building2,
+//     roles: ["OWNER"],
+//   },
+//   {
+//     label: "Obunalar",
+//     href: "/dashboard/subscriptions",
+//     icon: CircleDollarSign,
+//     roles: ["OWNER"],
+//   },
+//   {
+//     label: "Testlar",
+//     href: "/dashboard/tests",
+//     icon: BookOpen,
+//     roles: ["CENTER_ADMIN", "TEACHER", "STUDENT"],
+//   },
+//   {
+//     label: "Natijalar",
+//     href: "/dashboard/results",
+//     icon: BarChart3,
+//     roles: ["CENTER_ADMIN", "TEACHER", "STUDENT"],
+//   },
+//   {
+//     label: "Profil",
+//     href: "/dashboard/profile",
+//     icon: User2,
+//     roles: ["OWNER", "CENTER_ADMIN", "TEACHER", "STUDENT"],
+//   },
+// ];
 
 const BottomNav = () => {
   const router = useRouter();
+  const intl = useIntl();
   const { user } = useSelector((state) => state.auth);
   const role = user?.role;
 
@@ -47,10 +63,12 @@ const BottomNav = () => {
       : router.pathname.startsWith(href);
 
   // Rolga qarab linklarni filtrlash (Sidebar bilan bir xil mantiq)
-  const filteredTabs = tabs.filter((tab) => tab.roles.includes(role));
+  const filteredTabs = menus.filter(
+    (tab) => tab.roles.includes(role) && tab.is_mobile,
+  );
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-4 pb-4 pt-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-2 pb-2 pt-2">
       {/* Glassmorphism Container */}
       <div className="mx-auto max-w-[500px] bg-white/80 backdrop-blur-xl border border-gray-100 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] rounded-[2rem] px-2 py-2">
         <div className="flex items-center justify-around relative">
@@ -70,13 +88,13 @@ const BottomNav = () => {
                 )}
 
                 <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-300 ${
+                  className={`flex h-10 w-10 items-center justify-center rounded-2xl transition-all duration-300 ${
                     active
                       ? "bg-primary text-white shadow-lg shadow-orange-200 -translate-y-1"
                       : "text-muted hover:text-primary"
                   }`}
                 >
-                  <Icon size={22} strokeWidth={active ? 2.5 : 2} />
+                  <Icon size={20} strokeWidth={2} />
                 </div>
 
                 <span
@@ -84,7 +102,7 @@ const BottomNav = () => {
                     active ? "text-heading" : "text-muted"
                   }`}
                 >
-                  {tab.label}
+                  {intl.formatMessage({ id: tab.label })}
                 </span>
 
                 {/* Hover Background (for touch feedback) */}

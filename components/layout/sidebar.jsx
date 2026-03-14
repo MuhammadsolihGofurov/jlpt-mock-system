@@ -13,60 +13,72 @@ import {
   Building2,
   Settings,
   ShieldCheck,
+  SubscriptIcon,
+  CircleDollarSign,
 } from "lucide-react";
 import { logout } from "@/redux/slice/auth";
 import { closeSidebar } from "@/redux/slice/ui";
 import { useIntl } from "react-intl";
 import { SidebarSkeleton } from "../skeleton";
+import { menus } from "./menu-links";
+import { authAxios } from "@/utils/axios";
+import { useModal } from "@/context/modal-context";
 
 // Roles: OWNER, CENTER_ADMIN, TEACHER, STUDENT
-const tabs = [
-  {
-    label: "Bosh sahifa",
-    href: "/dashboard",
-    icon: Home,
-    roles: ["OWNER", "CENTER_ADMIN", "TEACHER", "STUDENT"],
-  },
-  {
-    label: "Markazlar",
-    href: "/dashboard/centers",
-    icon: Building2,
-    roles: ["OWNER"],
-  },
-  {
-    label: "O'qituvchilar",
-    href: "/dashboard/teachers",
-    icon: Users2,
-    roles: ["CENTER_ADMIN", "OWNER"],
-  },
-  {
-    label: "Testlar",
-    href: "/dashboard/tests",
-    icon: BookOpen,
-    roles: ["TEACHER", "STUDENT", "CENTER_ADMIN"],
-  },
-  {
-    label: "Natijalar",
-    href: "/dashboard/results",
-    icon: BarChart3,
-    roles: ["STUDENT", "TEACHER", "CENTER_ADMIN"],
-  },
-  {
-    label: "Profil",
-    href: "/dashboard/profile",
-    icon: User2,
-    roles: ["OWNER", "CENTER_ADMIN", "TEACHER", "STUDENT"],
-  },
-  {
-    label: "Sozlamalar",
-    href: "/dashboard/settings",
-    icon: Settings,
-    roles: ["OWNER", "CENTER_ADMIN"],
-  },
-];
+// const tabs = [
+//   {
+//     label: "Bosh sahifa",
+//     href: "/dashboard",
+//     icon: Home,
+//     roles: ["OWNER", "CENTER_ADMIN", "TEACHER", "STUDENT"],
+//   },
+//   {
+//     label: "Markazlar",
+//     href: "/dashboard/centers",
+//     icon: Building2,
+//     roles: ["OWNER"],
+//   },
+//   {
+//     label: "Obunalar",
+//     href: "/dashboard/subscriptions",
+//     icon: CircleDollarSign,
+//     roles: ["OWNER"],
+//   },
+//   {
+//     label: "O'qituvchilar",
+//     href: "/dashboard/teachers",
+//     icon: Users2,
+//     roles: ["CENTER_ADMIN", "OWNER"],
+//   },
+//   {
+//     label: "Testlar",
+//     href: "/dashboard/tests",
+//     icon: BookOpen,
+//     roles: ["TEACHER", "STUDENT", "CENTER_ADMIN"],
+//   },
+//   {
+//     label: "Natijalar",
+//     href: "/dashboard/results",
+//     icon: BarChart3,
+//     roles: ["STUDENT", "TEACHER", "CENTER_ADMIN"],
+//   },
+//   {
+//     label: "Profil",
+//     href: "/dashboard/profile",
+//     icon: User2,
+//     roles: ["OWNER", "CENTER_ADMIN", "TEACHER", "STUDENT"],
+//   },
+//   {
+//     label: "Sozlamalar",
+//     href: "/dashboard/settings",
+//     icon: Settings,
+//     roles: ["OWNER", "CENTER_ADMIN"],
+//   },
+// ];
 
 const Sidebar = () => {
   const router = useRouter();
+  const { openModal } = useModal();
   const intl = useIntl();
   const dispatch = useDispatch();
   const { isSidebarOpen } = useSelector((state) => state.ui);
@@ -77,9 +89,30 @@ const Sidebar = () => {
   const isActive = (href) => router.pathname === href;
 
   // Rolga qarab linklarni filtrlash
-  const filteredTabs = tabs.filter((tab) => tab.roles.includes(role));
+  const filteredTabs = menus.filter((tab) => tab.roles.includes(role));
 
   if (loading) return <SidebarSkeleton />;
+
+  const handleLoguot = () => {
+    openModal(
+      "CONFIRM_MODAL",
+      {
+        title: "Chiqish",
+        body: "Tizimdan chiqmoqchimisiz? Tizimga qayta kirishingiz uchun login sahifasiga o'tishingiz kerak.",
+        confirmText: "Ha",
+        variant: "danger",
+        local: "clear",
+        onConfirm: async () => {
+          const refresh = localStorage.getItem("refresh");
+
+          return await authAxios.post(`/auth/logout/`, {
+            refresh,
+          });
+        },
+      },
+      "small",
+    );
+  };
 
   return (
     <>
@@ -157,7 +190,7 @@ const Sidebar = () => {
         {/* User Role Badge & Logout */}
         <div className="p-4 mt-auto space-y-3">
           {user && (
-            <div className="mx-2 p-3 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-3">
+            <div className="mx-2 p-3 sm:flex hidden bg-gray-50 rounded-2xl border border-gray-100  items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-orange-500">
                 <ShieldCheck size={20} />
               </div>
@@ -173,10 +206,7 @@ const Sidebar = () => {
           )}
 
           <button
-            onClick={() => {
-              dispatch(logout());
-              router.push("/login");
-            }}
+            onClick={() => handleLoguot()}
             className="group flex w-full items-center gap-3 px-5 py-3.5 rounded-2xl text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all duration-200 font-bold"
           >
             <LogOut

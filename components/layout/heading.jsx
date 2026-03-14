@@ -12,10 +12,8 @@ const PageHeader = ({
 }) => {
   const intl = useIntl();
   return (
-    <div className="relative mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-      {/* Matn qismi */}
+    <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-5">
       <div className="relative">
-        {/* Chap tomondagi brend-line (faqat desktopda) */}
         <div className="absolute -left-5 top-1/2 -translate-y-1/2 w-1.5 h-10 bg-primary rounded-r-full hidden md:block shadow-[0_0_15px_rgba(245,166,35,0.4)]" />
 
         <div className="flex items-center gap-3 mb-1.5">
@@ -37,7 +35,6 @@ const PageHeader = ({
         )}
       </div>
 
-      {/* Harakatlar qismi (Buttons) */}
       <div className="flex items-center gap-3">
         {extraActions && (
           <div className="flex items-center gap-2">{extraActions}</div>

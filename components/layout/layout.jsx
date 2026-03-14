@@ -6,7 +6,7 @@ import { toggleSidebar } from "@/redux/slice/ui";
 import { useDispatch } from "react-redux";
 import MobileHeader from "./mobile-header";
 
-const AUTH_PATHS = ["/login", "/signup"];
+const AUTH_PATHS = ["/login", "/register"];
 
 const Layout = ({ children }) => {
   const router = useRouter();
@@ -58,9 +58,7 @@ const Layout = ({ children }) => {
       </Head>
 
       {isAuthPage ? (
-        <div className="flex min-h-screen items-center justify-center bg-cream">
-          <div className="mx-auto w-full max-w-[480px] px-4">{children}</div>
-        </div>
+        <>{children}</>
       ) : (
         <>
           <Sidebar />

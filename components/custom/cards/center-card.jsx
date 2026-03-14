@@ -7,6 +7,7 @@ import {
   Edit2,
   Trash2,
   Ban,
+  UserPlus,
 } from "lucide-react";
 import { ActionDropdown } from "@/components/ui";
 import { useModal } from "@/context/modal-context";
@@ -14,9 +15,11 @@ import { authAxios } from "@/utils/axios";
 import { mutate } from "swr";
 import { DropdownItem } from "@/components/ui/action-dropdown";
 import { useRouter } from "next/router";
+import { useIntl } from "react-intl";
 
 const CenterCard = ({ center, onEdit, onDelete }) => {
   const { openModal } = useModal();
+  const intl = useIntl();
   const router = useRouter();
   const statusColors = {
     ACTIVE: "bg-emerald-50 text-emerald-600 border-emerald-100",
@@ -57,6 +60,7 @@ const CenterCard = ({ center, onEdit, onDelete }) => {
       "small",
     );
   };
+
   const handleBlock = (id) => {
     openModal(
       "CONFIRM_MODAL",
@@ -101,6 +105,14 @@ const CenterCard = ({ center, onEdit, onDelete }) => {
 
         <ActionDropdown>
           <DropdownItem
+            icon={UserPlus}
+            label="Admin qo'shish"
+            variant="blue"
+            onClick={() =>
+              openModal("ADMIN_FORM", { centerId: center?.id }, "middle")
+            }
+          />
+          <DropdownItem
             icon={Edit2}
             label="Tahrirlash"
             variant="blue"
@@ -134,7 +146,7 @@ const CenterCard = ({ center, onEdit, onDelete }) => {
       <div className="grid grid-cols-2 gap-3 mb-6">
         <div className="bg-gray-50/50 p-3 rounded-2xl border border-gray-100/50">
           <p className="text-[10px] font-bold text-muted uppercase">
-            O'qituvchilar
+            {intl.formatMessage({ id: "O'qituvchilar" })}
           </p>
           <div className="flex items-center gap-1.5 mt-0.5 text-heading font-black">
             <Users size={14} className="text-primary" />
@@ -142,7 +154,9 @@ const CenterCard = ({ center, onEdit, onDelete }) => {
           </div>
         </div>
         <div className="bg-gray-50/50 p-3 rounded-2xl border border-gray-100/50">
-          <p className="text-[10px] font-bold text-muted uppercase">Tarif</p>
+          <p className="text-[10px] font-bold text-muted uppercase">
+            {intl.formatMessage({ id: "Tarif" })}
+          </p>
           <div className="flex items-center gap-1.5 mt-0.5 text-heading font-black text-sm">
             <ShieldCheck size={14} className="text-blue-500" />
             {center.plan_name}
@@ -153,14 +167,29 @@ const CenterCard = ({ center, onEdit, onDelete }) => {
       {/* Adminlar Ro'yxati */}
       <div className="space-y-2">
         <p className="text-[11px] font-bold text-muted uppercase px-1">
-          Adminlar
+          {intl.formatMessage({ id: "Adminlar" })}
         </p>
         <div className="flex -space-x-2 overflow-hidden mb-3">
           {center.centeradmin_emails.map((admin, i) => (
             <div
               key={i}
-              title={admin.email}
-              className="h-8 w-8 rounded-full ring-2 ring-white bg-orange-100 flex items-center justify-center text-[10px] font-bold text-primary border border-orange-200"
+              onClick={() =>
+                openModal(
+                  "ADMIN_FORM",
+                  { admin: admin, centerId: center?.id },
+                  "middle",
+                )
+              }
+              title={`${admin.first_name} ${admin.last_name} (${admin.email})`}
+              className={`
+                    h-8 w-8 rounded-full ring-2 ring-white bg-orange-100 
+                    flex items-center justify-center text-[10px] font-bold text-primary border border-orange-200
+                    cursor-pointer 
+                    transition-all duration-200 
+                    hover:bg-orange-200 hover:scale-110 hover:z-10
+                    active:scale-90 active:opacity-80
+                    select-none
+                  `}
             >
               {admin.first_name[0]}
               {admin.last_name[0]}

@@ -7,24 +7,24 @@ import { Filter, Search } from "lucide-react";
 import { CenterLists } from "@/components/dashboard/owner";
 import { useModal } from "@/context/modal-context";
 
-function CentersPage({ info }) {
+function SubscriptionPage({ info }) {
   const intl = useIntl();
   const { openModal } = useModal();
 
   return (
     <>
       <Seo
-        title={intl.formatMessage({ id: "centers_title" })}
-        description={intl.formatMessage({ id: "centers_desc" })}
-        keywords={intl.formatMessage({ id: "centers_key" })}
+        title={intl.formatMessage({ id: "subs_title" })}
+        description={intl.formatMessage({ id: "subs_desc" })}
+        keywords={intl.formatMessage({ id: "subs_key" })}
       />
       <AuthGuard roles={["OWNER"]}>
         <PageHeader
-          title="centers_title"
-          description="centers_desc"
+          title="subs_title"
+          description="subs_desc"
           badge="Faol"
-          buttonLabel="Markaz qo'shish"
-          onButtonClick={() => openModal("centerForm", {}, "middle")}
+          buttonLabel="Obuna qo'shish"
+          onButtonClick={() => openModal("SUBSCRIPTION_FORM", {}, "middle")}
           //   extraActions={
           //     <>
           //       <button className="p-3 bg-white border border-gray-100 rounded-2xl text-muted hover:text-primary hover:border-orange-100 transition-all shadow-sm">
@@ -37,7 +37,7 @@ function CentersPage({ info }) {
           //   }
         />
 
-        <CenterLists />
+        
       </AuthGuard>
     </>
   );
@@ -66,4 +66,4 @@ export async function getServerSideProps() {
   }
 }
 
-export default CentersPage;
+export default SubscriptionPage;
