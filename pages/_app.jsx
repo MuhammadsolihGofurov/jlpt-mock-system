@@ -17,7 +17,7 @@ import NProgress from "nprogress";
 import { initCollapse } from "../utils/collapse";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
-import { Flip, ToastContainer } from "react-toastify";
+import { Flip, Slide, ToastContainer } from "react-toastify";
 import { ModalProvider } from "@/context/modal-context";
 import { OffcanvasProvider } from "@/context/offcanvas-context";
 import { SWRConfig } from "swr";
@@ -76,12 +76,38 @@ export default function App({ Component, pageProps }) {
                 <Component {...pageProps} />
                 {/* </SWRConfig> */}
               </Layout>
-              <ToastContainer
+              {/* <ToastContainer
                 position="top-right"
                 autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
                 draggable
+                pauseOnHover
                 theme="light"
-                transition={Flip}
+                transition={Slide}
+                limit={3}
+              /> */}
+              <ToastContainer
+                position="top-center"
+                autoClose={3000}
+                transition={Slide}
+                theme="light"
+                hideProgressBar={false}
+                toastStyle={{
+                  backgroundColor: "rgba(255, 255, 255, 0.7)", // Yarim shaffof oq
+                  backdropFilter: "blur(10px)", // Orqa fonni xiralashtirish (Glass effect)
+                  WebkitBackdropFilter: "blur(10px)", // Safari uchun
+                  borderRadius: "20px",
+                  border: "1px solid rgba(255, 255, 255, 0.5)", // Shaffofroq chegara
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.03)",
+                  maxWidth: "320px",
+                  margin: "10px auto",
+                  minHeight: "32px"
+                }}
+                bodyClassName="!text-heading !font-semibold !font-sans !text-sm !p-2"
               />
             </ModalProvider>
           </OffcanvasProvider>

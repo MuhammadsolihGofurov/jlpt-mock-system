@@ -16,3 +16,34 @@ body {
     @apply bg-primary text-white rounded-xl py-3 font-semibold;
   }
 }
+
+
+/* React Toastify Custom Styling */
+:root {
+  /* Sizning ranglaringiz asosida */
+  --toastify-color-success: #10B981;
+  --toastify-color-error: #EF4444;
+  --toastify-color-warning: #F5A623;
+  --toastify-color-info: #64748B;
+  
+  /* Loading holati uchun sizning primary rangingiz */
+  --toastify-color-progress-light: linear-gradient(
+    to right,
+    #F5A623,
+    #FFD080
+  );
+  
+  /* Burchaklar va Shrift */
+  --toastify-border-radius: 1.25rem; /* rounded-2xl ga mos */
+  --toastify-font-family: 'Inter', sans-serif;
+  --toastify-toast-min-height: 70px;
+}
+/* Faqat matn rangi aniq bo'lishini ta'minlaymiz */
+.Toastify__toast-body {
+  color: #1A1C1E !important;
+}
+
+/* Progress barni ham biroz shaffof qilsak dizaynga mos tushadi */
+.Toastify__progress-bar {
+  opacity: 0.8;
+}

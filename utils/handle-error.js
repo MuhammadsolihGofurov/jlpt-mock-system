@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 export const handleApiError = (err, setError = null) => {
   console.error("API Error Detail:", err);
 
-  const response = err.response?.data;
+  const response = err.response?.error;
 
   if (setError && response && typeof response === "object") {
     Object.keys(response).forEach((key) => {
@@ -25,13 +25,11 @@ export const handleApiError = (err, setError = null) => {
     "Xatolik yuz berdi. Iltimos qaytadan urinib ko'ring.";
 
   toast.error(errorMessage, {
-    position: "top-right",
     autoClose: 5000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
-    theme: "colored",
   });
 
   return errorMessage;
