@@ -58,10 +58,10 @@ export const menus = [
     roles: ["CENTER_ADMIN"],
   },
   {
-    label: "Testlar",
-    href: "/dashboard/tests",
+    label: "Mocklar",
+    href: "/dashboard/mocks",
     icon: BookOpen,
-    roles: ["TEACHER", "STUDENT", "CENTER_ADMIN"],
+    roles: ["TEACHER", "CENTER_ADMIN"],
   },
   {
     label: "Natijalar",

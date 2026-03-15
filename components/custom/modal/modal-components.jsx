@@ -1,3 +1,6 @@
+import MockFilterModal from "./details/admin-teacher/mock-filter-modal";
+import MockFormModal from "./details/admin-teacher/mock-form-modal";
+import SectionFormModal from "./details/admin-teacher/section-form";
 import GroupFormModal from "./details/admin/group-form-modal";
 import GroupMembersModal from "./details/admin/group-members-modal";
 import InvitationFormModal from "./details/admin/invite-code-modal";
@@ -24,4 +27,7 @@ export const ModalComponents = {
   GROUP_MEMBERS: GroupMembersModal,
   MATERIAL_FORM: MaterialFormModal,
   MATERIAL_FILTER: MaterialFilterModal,
+  MOCK_FORM: MockFormModal,
+  MOCK_FILTER: MockFilterModal,
+  SECTION_FORM: SectionFormModal,
 };

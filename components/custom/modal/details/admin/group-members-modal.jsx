@@ -10,10 +10,12 @@ import fetcher from "@/utils/fetcher";
 import { authAxios } from "@/utils/axios";
 import { handleApiError } from "@/utils/handle-error";
 import { Select } from "@/components/ui";
+import { useModal } from "@/context/modal-context";
 
 const GroupMembersModal = ({ group }) => {
   const intl = useIntl();
   const router = useRouter();
+  const { openModal, closeModal } = useModal();
   const [isAdding, setIsAdding] = useState(false);
 
   // 1. Guruh a'zolarini olish
@@ -28,7 +30,7 @@ const GroupMembersModal = ({ group }) => {
     isAdding ? ["users/", router.locale, "STUDENT"] : null,
     (url, locale) =>
       fetcher(
-        `${url}?page=1&role=STUDENT`,
+        `${url}?page=all&role=STUDENT`,
         { headers: { "Accept-Language": locale } },
         {},
         true,
@@ -36,7 +38,7 @@ const GroupMembersModal = ({ group }) => {
   );
 
   const studentOptions =
-    allStudents?.results?.map((s) => ({
+    allStudents?.map((s) => ({
       value: s.id,
       label: `${s.first_name} ${s.last_name}`,
     })) || [];
@@ -52,22 +54,20 @@ const GroupMembersModal = ({ group }) => {
 
   // A'zoni o'chirish
   const handleDeleteMember = async (memberId) => {
-    if (
-      !confirm(
-        intl.formatMessage({
-          id: "Haqiqatan ham ushbu a'zoni guruhdan o'chirmoqchimisiz?",
-        }),
-      )
-    )
-      return;
-
-    try {
-      await authAxios.delete(`/group-memberships/${memberId}/`);
-      toast.success(intl.formatMessage({ id: "A'zo o'chirildi" }));
-      mutate([`groups/${group.id}/members/`, router.locale]);
-    } catch (err) {
-      handleApiError(err);
-    }
+    openModal(
+      "CONFIRM_MODAL",
+      {
+        title: "Foydalanuvchini chiqarish",
+        body: "Ushbu foydalanuvchini guruhdan chiqarib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
+        confirmText: "Ha",
+        variant: "danger",
+        mutateKey: [`groups/${group.id}/members/`, router.locale],
+        onConfirm: async () => {
+          return await authAxios.delete(`/group-memberships/${memberId}/`);
+        },
+      },
+      "small",
+    );
   };
 
   // Bulk Add (Ko'plab a'zo qo'shish)

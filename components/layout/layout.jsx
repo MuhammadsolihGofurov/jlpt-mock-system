@@ -6,12 +6,12 @@ import { toggleSidebar } from "@/redux/slice/ui";
 import { useDispatch } from "react-redux";
 import MobileHeader from "./mobile-header";
 
-const AUTH_PATHS = ["/login", "/register"];
+const AUTH_PATHS = ["/login", "/register", "/dashboard/mock-tests"];
 
 const Layout = ({ children }) => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const isAuthPage = AUTH_PATHS.includes(router.pathname);
+  const isAuthPage = AUTH_PATHS.some((path) => router.pathname.includes(path));
 
   return (
     <>

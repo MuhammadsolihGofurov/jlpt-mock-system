@@ -22,7 +22,7 @@ const GroupFormModal = ({ group = null }) => {
     ["users/", router.locale, "TEACHER"],
     (url, locale) =>
       fetcher(
-        `${url}?page=1&role=TEACHER`,
+        `${url}?page=all&role=TEACHER`,
         { headers: { "Accept-Language": locale } },
         {},
         true,
@@ -30,7 +30,7 @@ const GroupFormModal = ({ group = null }) => {
   );
 
   const teacherOptions =
-    teachersData?.results?.map((t) => ({
+    teachersData?.map((t) => ({
       value: t.id,
       label: `${t.first_name} ${t.last_name}`,
     })) || [];
