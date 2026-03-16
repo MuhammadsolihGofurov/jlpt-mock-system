@@ -1,20 +1,49 @@
-import { Edit2 } from "lucide-react";
+import { authAxios } from "@/utils/axios";
+import fetcher from "@/utils/fetcher";
+import { Edit2, Trash2 } from "lucide-react";
+import { useRouter } from "next/router";
+import { useIntl } from "react-intl";
+import useSWR from "swr";
 
 const { useModal } = require("@/context/modal-context");
 
-const QuestionList = ({ groupId }) => {
+const QuestionList = ({ groupId, section_type }) => {
   const { openModal } = useModal();
+  const router = useRouter();
+  const intl = useIntl();
 
   const { data: questions } = useSWR(
-    groupId ? [`/question-groups/${groupId}/questions/`, router.locale] : null,
+    groupId ? [`questions/`, router.locale, groupId] : null,
     (url, locale) =>
-      fetcher(url, { headers: { "Accept-Language": locale } }, {}, true),
+      fetcher(
+        `${url}?group=${groupId}&page=all`,
+        { headers: { "Accept-Language": locale } },
+        {},
+        true,
+      ),
   );
+
+  const handleDelete = (id) => {
+    openModal(
+      "CONFIRM_MODAL",
+      {
+        title: "Savolni o'chirish",
+        body: "Ushbu savolni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
+        confirmText: "Ha, o'chirilsin",
+        variant: "danger",
+        mutateKey: ["questions/", router.locale, groupId],
+        onConfirm: async () => {
+          return await authAxios.delete(`questions/${id}/`);
+        },
+      },
+      "small",
+    );
+  };
 
   return (
     <div className="space-y-2">
       {questions?.length > 0 ? (
-        questions.map((q, idx) => (
+        questions?.map((q, idx) => (
           <div
             key={q.id}
             className="group flex items-center justify-between p-4 hover:bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all"
@@ -27,18 +56,29 @@ const QuestionList = ({ groupId }) => {
             </div>
             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
-                onClick={() => openModal("QUESTION_FORM", { question: q })}
+                onClick={() =>
+                  openModal(
+                    "QUESTION_FORM",
+                    { groupId, question: q, section_type },
+                    "middle",
+                  )
+                }
                 className="p-2 text-emerald-500 bg-white border border-slate-100 rounded-xl shadow-sm"
               >
                 <Edit2 size={14} />
               </button>
-              {/* Delete function logic xuddi yuqoridagidek CONFIRM_MODAL bilan */}
+              <button
+                onClick={() => handleDelete(q?.id)}
+                className="p-2 text-danger bg-white border border-slate-100 rounded-xl shadow-sm"
+              >
+                <Trash2 size={14} />
+              </button>
             </div>
           </div>
         ))
       ) : (
         <p className="text-xs text-center text-muted py-4 italic">
-          Hozircha savollar yo'q
+          {intl.formatMessage({ id: "Hozircha savollar yo'q" })}
         </p>
       )}
     </div>

@@ -8,6 +8,7 @@ import { Layout } from "../components";
 import uz from "../lang/uz.json";
 import ru from "../lang/ru.json";
 import en from "../lang/en.json";
+import jp from "../lang/jp.json";
 import { IntlProvider } from "react-intl";
 import { LangProvider } from "../context/useLang";
 import { useState } from "react";
@@ -26,6 +27,7 @@ const messages = {
   ru,
   uz,
   en,
+  jp,
 };
 
 export default function App({ Component, pageProps }) {
@@ -105,7 +107,7 @@ export default function App({ Component, pageProps }) {
                   boxShadow: "0 10px 30px rgba(0,0,0,0.03)",
                   maxWidth: "320px",
                   margin: "10px auto",
-                  minHeight: "32px"
+                  minHeight: "32px",
                 }}
                 bodyClassName="!text-heading !font-semibold !font-sans !text-sm !p-2"
               />

@@ -11,10 +11,12 @@ import {
 import { useModal } from "@/context/modal-context";
 import { useRouter } from "next/router";
 import { authAxios } from "@/utils/axios";
+import { useIntl } from "react-intl";
 
 const SectionList = ({ mockId, activeSection, sections, onSelect }) => {
   const { openModal } = useModal();
   const router = useRouter();
+  const intl = useIntl();
 
   // Mock'ka tegishli barcha section'larni olish
   //   const { data: sections, mutate } = useSWR(
@@ -54,7 +56,9 @@ const SectionList = ({ mockId, activeSection, sections, onSelect }) => {
 
   if (!sections)
     return (
-      <div className="p-4 text-center text-xs text-muted">Yuklanmoqda...</div>
+      <div className="p-4 text-center text-xs text-muted">
+        {intl.formatMessage({ id: "Yuklanmoqda..." })}
+      </div>
     );
 
   return (
@@ -151,7 +155,7 @@ const SectionList = ({ mockId, activeSection, sections, onSelect }) => {
       ) : (
         <div className="py-10 text-center border-2 border-dashed border-slate-100 rounded-[2rem]">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            Bo'limlar mavjud emas
+            {intl.formatMessage({ id: "Bo'limlar mavjud emas" })}
           </p>
         </div>
       )}

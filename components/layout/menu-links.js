@@ -2,6 +2,7 @@ import {
   BarChart3,
   BookOpen,
   Building2,
+  File,
   Files,
   Home,
   Settings,
@@ -64,6 +65,12 @@ export const menus = [
     roles: ["TEACHER", "CENTER_ADMIN"],
   },
   {
+    label: "Assignments",
+    href: "/dashboard/assignments/exam",
+    icon: File,
+    roles: ["TEACHER", "CENTER_ADMIN"],
+  },
+  {
     label: "Natijalar",
     href: "/dashboard/results",
     icon: BarChart3,
@@ -74,12 +81,6 @@ export const menus = [
     href: "/dashboard/profile",
     icon: User2,
     roles: ["OWNER", "CENTER_ADMIN", "TEACHER", "STUDENT"],
-  },
-  {
-    label: "Sozlamalar",
-    href: "/dashboard/settings",
-    icon: Settings,
-    roles: ["OWNER", "CENTER_ADMIN"],
     is_mobile: true,
   },
 ];

@@ -1,5 +1,9 @@
+import ExamFilterModal from "./details/admin-teacher/exam-filter-modal";
+import ExamFormModal from "./details/admin-teacher/exam-form-modal";
 import MockFilterModal from "./details/admin-teacher/mock-filter-modal";
 import MockFormModal from "./details/admin-teacher/mock-form-modal";
+import QuestionFormModal from "./details/admin-teacher/question-form-modal";
+import QuestionGroupFormModal from "./details/admin-teacher/question-group-form-modal";
 import SectionFormModal from "./details/admin-teacher/section-form";
 import GroupFormModal from "./details/admin/group-form-modal";
 import GroupMembersModal from "./details/admin/group-members-modal";
@@ -30,4 +34,8 @@ export const ModalComponents = {
   MOCK_FORM: MockFormModal,
   MOCK_FILTER: MockFilterModal,
   SECTION_FORM: SectionFormModal,
+  QUESTION_GROUP: QuestionGroupFormModal,
+  QUESTION_FORM: QuestionFormModal,
+  EXAM_FORM: ExamFormModal,
+  EXAM_FILTER: ExamFilterModal,
 };

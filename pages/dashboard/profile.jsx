@@ -26,10 +26,12 @@ function ProfilePage({ info }) {
           description="profile_desc"
           badge="Faol"
         />
+
         <ProfileForm />
         {user?.role === "CENTER_ADMIN" && user?.center_info?.id && (
           <CenterProfileForm centerId={user.center_info.id} />
         )}
+        <AppearanceSettings />
       </AuthGuard>
     </>
   );

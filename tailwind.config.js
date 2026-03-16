@@ -45,6 +45,22 @@ module.exports = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      screens: {
+        small: "360px",
+        // => @media (min-width: 360px) { ... }
+
+        xs: "450px",
+        // => @media (min-width: 450px) { ... }
+
+        sm: "650px",
+        // => @media (min-width: 650px) { ... }
+
+        md: "770px",
+        // => @media (min-width: 770px) { ... }
+
+        lg: "992px",
+        // => @media (min-width: 992px) { ... }
+      },
     },
   },
   plugins: [],

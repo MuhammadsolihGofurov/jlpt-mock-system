@@ -32,7 +32,7 @@ const AppearanceSettings = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
           {[
             {
               code: "uz",
@@ -48,6 +48,11 @@ const AppearanceSettings = () => {
               code: "en",
               label: "English",
               flag: "https://flagcdn.com/w40/us.png",
+            },
+            {
+              code: "jp",
+              label: "日本語",
+              flag: "https://flagcdn.com/w40/jp.png",
             },
           ].map((lang) => (
             <button

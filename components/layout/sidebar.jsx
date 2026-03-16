@@ -86,28 +86,29 @@ const Sidebar = () => {
 
   const role = user?.role;
 
-  const isActive = (href) => router.pathname === href;
+  // Active mantiqi:
+  const checkActive = (href) => {
+    if (href === "/dashboard") {
+      return router.pathname === "/dashboard";
+    }
+    return router.pathname.startsWith(href);
+  };
 
-  // Rolga qarab linklarni filtrlash
   const filteredTabs = menus.filter((tab) => tab.roles.includes(role));
 
   if (loading) return <SidebarSkeleton />;
 
-  const handleLoguot = () => {
+  const handleLogout = () => {
     openModal(
       "CONFIRM_MODAL",
       {
         title: "Chiqish",
-        body: "Tizimdan chiqmoqchimisiz? Tizimga qayta kirishingiz uchun login sahifasiga o'tishingiz kerak.",
+        body: "Tizimdan chiqmoqchimisiz?",
         confirmText: "Ha",
         variant: "danger",
-        local: "clear",
         onConfirm: async () => {
           const refresh = localStorage.getItem("refresh");
-
-          return await authAxios.post(`/auth/logout/`, {
-            refresh,
-          });
+          return await authAxios.post(`/auth/logout/`, { refresh });
         },
       },
       "small",
@@ -116,6 +117,7 @@ const Sidebar = () => {
 
   return (
     <>
+      {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[60] md:hidden transition-opacity"
@@ -125,10 +127,10 @@ const Sidebar = () => {
 
       <aside
         className={`
-        fixed left-0 top-0 h-screen w-[260px] bg-white border-r border-gray-100 z-[70] 
-        transition-all duration-300 ease-in-out flex flex-col
-        ${isSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"} md:translate-x-0
-      `}
+          fixed left-0 top-0 h-screen w-[260px] bg-white border-r border-gray-100 z-[70] 
+          transition-all duration-300 ease-in-out flex flex-col
+          ${isSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"} md:translate-x-0
+        `}
       >
         {/* Logo Section */}
         <div className="px-8 py-5">
@@ -149,13 +151,11 @@ const Sidebar = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
-          {/* <p className="px-4 mb-2 text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-            {intl.formatMessage({ id: "Asosiy Menyu" })}
-          </p> */}
+        <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto custom-scrollbar">
           {filteredTabs.map((tab) => {
-            const active = isActive(tab.href);
+            const active = checkActive(tab.href);
             const Icon = tab.icon;
+
             return (
               <Link
                 key={tab.href}
@@ -171,11 +171,20 @@ const Sidebar = () => {
                 `}
               >
                 <div className="flex items-center gap-3.5">
-                  <Icon size={20} strokeWidth={active ? 2.5 : 2} />
+                  <Icon
+                    size={20}
+                    strokeWidth={active ? 2.5 : 2}
+                    className={
+                      active
+                        ? "text-white"
+                        : "text-gray-400 group-hover:text-orange-500"
+                    }
+                  />
                   <span className="text-[15px] font-bold">
-                    {intl.formatMessage({ id: tab.label })}
+                    {intl.formatMessage({ id: tab.label }) || tab.label}
                   </span>
                 </div>
+
                 {active && <ChevronRight size={16} className="opacity-70" />}
 
                 {/* Active indicator bar */}
@@ -190,15 +199,15 @@ const Sidebar = () => {
         {/* User Role Badge & Logout */}
         <div className="p-4 mt-auto space-y-3">
           {user && (
-            <div className="mx-2 p-3 sm:flex hidden bg-gray-50 rounded-2xl border border-gray-100  items-center gap-3">
+            <div className="mx-2 p-3 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-orange-500">
                 <ShieldCheck size={20} />
               </div>
               <div className="overflow-hidden">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-tight truncate">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
                   {intl.formatMessage({ id: "Roli" })}
                 </p>
-                <p className="text-[13px] font-black text-gray-800 leading-none mt-0.5">
+                <p className="text-[13px] font-black text-gray-800 leading-none mt-1 truncate">
                   {role}
                 </p>
               </div>
@@ -206,7 +215,7 @@ const Sidebar = () => {
           )}
 
           <button
-            onClick={() => handleLoguot()}
+            onClick={handleLogout}
             className="group flex w-full items-center gap-3 px-5 py-3.5 rounded-2xl text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all duration-200 font-bold"
           >
             <LogOut

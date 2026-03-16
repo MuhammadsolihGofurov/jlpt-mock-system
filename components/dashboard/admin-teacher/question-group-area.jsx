@@ -1,19 +1,44 @@
 import { useModal } from "@/context/modal-context";
-import { Plus, Settings } from "lucide-react";
+import { Plus, Settings, Trash2 } from "lucide-react";
 import QuestionList from "./question-list";
 import useSWR from "swr";
 import { useRouter } from "next/router";
 import fetcher from "@/utils/fetcher";
+import { useIntl } from "react-intl";
+import { authAxios } from "@/utils/axios";
 
 const GroupAndQuestionArea = ({ section }) => {
   const { openModal } = useModal();
   const router = useRouter();
+  const intl = useIntl();
 
   const { data: groups, mutate } = useSWR(
-    section ? [`/test-sections/${section.id}/groups/`, router.locale] : null,
+    section ? [`question-groups/`, router.locale, section?.id] : null,
     (url, locale) =>
-      fetcher(url, { headers: { "Accept-Language": locale } }, {}, true),
+      fetcher(
+        `${url}?section=${section?.id}&page=all`,
+        { headers: { "Accept-Language": locale } },
+        {},
+        true,
+      ),
   );
+
+  const handleDelete = (id) => {
+    openModal(
+      "CONFIRM_MODAL",
+      {
+        title: "Mondaini o'chirish",
+        body: "Ushbu mondaini o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
+        confirmText: "Ha, o'chirilsin",
+        variant: "danger",
+        mutateKey: ["question-groups/", router.locale, section?.id],
+        onConfirm: async () => {
+          return await authAxios.delete(`question-groups/${id}/`);
+        },
+      },
+      "small",
+    );
+  };
 
   return (
     <div className="p-8">
@@ -21,14 +46,15 @@ const GroupAndQuestionArea = ({ section }) => {
         <div>
           <h2 className="text-2xl font-black text-heading">{section.name}</h2>
           <p className="text-muted text-sm font-medium">
-            Vaqt: {section.duration} daqiqa
+            {intl.formatMessage({ id: "Vaqt" })}: {section.duration} daqiqa
           </p>
         </div>
         <button
-          onClick={() => openModal("GROUP_FORM", { sectionId: section.id })}
+          onClick={() => openModal("QUESTION_GROUP", { section }, "middle")}
           className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-slate-800 transition-all shadow-xl"
         >
-          <Plus size={18} /> Guruh qo'shish
+          <Plus size={18} />{" "}
+          {intl.formatMessage({ id: "Yangi Mondai qo'shish" })}
         </button>
       </div>
 
@@ -44,31 +70,52 @@ const GroupAndQuestionArea = ({ section }) => {
                 <span className="w-8 h-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center font-bold text-xs">
                   {group.order || "0"}
                 </span>
-                <h4 className="font-black text-heading uppercase tracking-wide">
-                  {group.name}
+                <h4 className="font-semibold text-heading uppercase tracking-wide">
+                  {group.title}
                 </h4>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() =>
-                    openModal("QUESTION_FORM", { groupId: group.id })
+                    openModal(
+                      "QUESTION_FORM",
+                      {
+                        section_type: section?.section_type,
+                        groupId: group.id,
+                      },
+                      "middle",
+                    )
                   }
                   className="text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-100"
                 >
-                  + Savol
+                  + {intl.formatMessage({ id: "Savol" })}
                 </button>
                 <button
-                  onClick={() => openModal("GROUP_FORM", { group })}
+                  onClick={() =>
+                    openModal("QUESTION_GROUP", { section, group }, "middle")
+                  }
                   className="p-2 text-slate-400 hover:text-primary transition-all"
                 >
                   <Settings size={18} />
+                </button>
+                <button
+                  onClick={() => handleDelete(group?.id)}
+                  className="p-2 text-slate-400 hover:text-danger transition-all"
+                >
+                  <Trash2 size={18} />
                 </button>
               </div>
             </div>
 
             {/* Questions List inside Group */}
-            <div className="p-4 bg-white">
-              <QuestionList groupId={group.id} />
+            <div className="p-4 bg-white h-60 overflow-y-scroll custom-scrollbar">
+              <p className="text-sm italic text-gray-500 pb-3">
+                "{group?.instruction}"
+              </p>
+              <QuestionList
+                groupId={group.id}
+                section_type={section?.section_type}
+              />
             </div>
           </div>
         ))}

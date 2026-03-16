@@ -47,3 +47,34 @@ body {
 .Toastify__progress-bar {
   opacity: 0.8;
 }
+
+/* Custom Scrollbar Styles */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px; /* Scrollbar kengligi */
+  height: 6px; /* Gorizontal scrollbar balandligi */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* Track (yo'lakcha) foni */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0; /* Slate-200 rangi */
+  border-radius: 10px; /* Yumaloq burchaklar */
+  transition: all 0.3s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1; /* Slate-300 rangi (sichqoncha ustiga kelganda) */
+}
+
+/* Firefox uchun moslashuvchanlik */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 transparent;
+}
+
+/* Textarea ichidagi scrollni chiroyli qilish uchun */
+textarea.custom-scrollbar {
+  scrollbar-gutter: stable; /* Matn scroll paytida qimirlab ketmasligi uchun */
+}
