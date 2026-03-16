@@ -46,7 +46,7 @@ const SearchInput = ({ placeholderKey = "Qidirish..." }) => {
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
         placeholder={intl.formatMessage({ id: placeholderKey })}
-        className="w-full bg-white border border-gray-100 py-3 pl-12 pr-10 rounded-[1.25rem] text-sm font-medium focus:ring-4 focus:ring-orange-50 focus:border-primary transition-all outline-none"
+        className="w-full bg-white border border-gray-100 py-3 pl-12 pr-10 rounded-[1.25rem] text-sm font-medium focus:ring-4 focus:ring-orange-50 focus:border-primary transition-all outline-none shadow-sm"
       />
       {searchValue && (
         <button

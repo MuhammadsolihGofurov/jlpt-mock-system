@@ -2,9 +2,13 @@ import { useIntl } from "react-intl";
 import Seo from "@/components/seo/seo";
 import { AuthGuard } from "@/components/guard";
 import { PageHeader } from "@/components/layout";
-import { Filter, Search } from "lucide-react";
+import { FileText, Filter, GraduationCap, Search } from "lucide-react";
 import { useModal } from "@/context/modal-context";
-import { AssignmentTabs } from "@/components/dashboard/admin-teacher";
+import {
+  AssignmentTabs,
+  HomeworkLists,
+} from "@/components/dashboard/admin-teacher";
+import { SearchInput } from "@/components/ui";
 
 function HomeworkAssignmentsPage({ info }) {
   const intl = useIntl();
@@ -22,21 +26,32 @@ function HomeworkAssignmentsPage({ info }) {
           title="homework_title"
           description="homework_desc"
           badge="Faol"
-          buttonLabel="Markaz qo'shish"
-          roles={["OWNER"]}
-          onButtonClick={() => openModal("centerForm", {}, "middle")}
-          //   extraActions={
-          //     <>
-          //       <button className="p-3 bg-white border border-gray-100 rounded-2xl text-muted hover:text-primary hover:border-orange-100 transition-all shadow-sm">
-          //         <Search size={20} />
-          //       </button>
-          //       <button className="p-3 bg-white border border-gray-100 rounded-2xl text-muted hover:text-primary hover:border-orange-100 transition-all shadow-sm">
-          //         <Filter size={20} />
-          //       </button>
-          //     </>
-          //   }
+          buttonLabel="Uyga vazifa qo'shish"
+          roles={["CENTER_ADMIN", "TEACHER"]}
+          onButtonClick={() => openModal("HOMEWORK_FORM", {}, "middle")}
+          extraActions={
+            <>
+              <SearchInput />
+            </>
+          }
         />
-        <AssignmentTabs />
+        <AssignmentTabs
+          tabs={[
+            {
+              id: "exam",
+              label: "Imtihonlar",
+              path: "/dashboard/assignments/exam",
+              icon: <GraduationCap size={20} />,
+            },
+            {
+              id: "homework",
+              label: "Vazifalar",
+              path: "/dashboard/assignments/homework",
+              icon: <FileText size={20} />,
+            },
+          ]}
+        />
+        <HomeworkLists />
       </AuthGuard>
     </>
   );

@@ -2,38 +2,41 @@ import { useIntl } from "react-intl";
 import Seo from "@/components/seo/seo";
 import { AuthGuard } from "@/components/guard";
 import { PageHeader } from "@/components/layout";
-import { FileText, Filter, GraduationCap, Search } from "lucide-react";
 import { useModal } from "@/context/modal-context";
+import { MaterialLists, UserLists } from "@/components/dashboard/admin";
+import { BookOpen, FileQuestion, Filter, Search } from "lucide-react";
+import { SearchInput } from "@/components/ui";
+import GroupLists from "@/components/dashboard/admin/group-lists";
 import {
   AssignmentTabs,
-  ExamLists,
+  MockLists,
+  QuizLists,
 } from "@/components/dashboard/admin-teacher";
-import { SearchInput } from "@/components/ui";
 
-function ExamAssignmentsPage({ info }) {
+function QuizPage({ info }) {
   const intl = useIntl();
   const { openModal } = useModal();
 
   return (
     <>
       <Seo
-        title={intl.formatMessage({ id: "exams_title" })}
-        description={intl.formatMessage({ id: "exams_desc" })}
-        keywords={intl.formatMessage({ id: "exams_key" })}
+        title={intl.formatMessage({ id: "Quizlar" })}
+        description={intl.formatMessage({ id: "quiz_desc" })}
+        keywords={intl.formatMessage({ id: "mock_key" })}
       />
-      <AuthGuard roles={["CENTER_ADMIN", "TEACHER", "STUDENT"]}>
+      <AuthGuard roles={["CENTER_ADMIN", "TEACHER"]}>
         <PageHeader
-          title="exams_title"
-          description="exams_desc"
+          title="Quizlar"
+          description="mock_desc"
           badge="Faol"
-          buttonLabel="Imtihon qo'shish"
+          buttonLabel="Quiz qo'shish"
           roles={["CENTER_ADMIN", "TEACHER"]}
-          onButtonClick={() => openModal("EXAM_FORM", {}, "middle")}
+          onButtonClick={() => openModal("QUIZ_FORM", {}, "middle")}
           extraActions={
             <>
               <SearchInput />
               <button
-                onClick={() => openModal("EXAM_FILTER", {}, "middle")}
+                onClick={() => openModal("QUIZ_FILTER", {}, "middle")}
                 className="p-3 bg-white border border-gray-100 rounded-2xl text-muted hover:text-primary hover:border-orange-100 transition-all shadow-sm flex-1"
               >
                 <Filter size={20} />
@@ -45,19 +48,19 @@ function ExamAssignmentsPage({ info }) {
           tabs={[
             {
               id: "exam",
-              label: "Imtihonlar",
-              path: "/dashboard/assignments/exam",
-              icon: <GraduationCap size={20} />,
+              label: "mock_title",
+              path: "/dashboard/mocks",
+              icon: <BookOpen size={20} />,
             },
             {
               id: "homework",
-              label: "Vazifalar",
-              path: "/dashboard/assignments/homework",
-              icon: <FileText size={20} />,
+              label: "Quizlar",
+              path: "/dashboard/quiz",
+              icon: <FileQuestion size={20} />,
             },
           ]}
         />
-        <ExamLists />
+        <QuizLists />
       </AuthGuard>
     </>
   );
@@ -66,9 +69,9 @@ function ExamAssignmentsPage({ info }) {
 export async function getServerSideProps() {
   try {
     const pageData = {
-      seo_title: "Centers",
-      meta_description: "Centers description",
-      meta_keywords: "mikan login",
+      seo_title: "Xush kelibsiz!",
+      meta_description: "description",
+      meta_keywords: "mikan",
     };
 
     if (!pageData) {
@@ -86,4 +89,4 @@ export async function getServerSideProps() {
   }
 }
 
-export default ExamAssignmentsPage;
+export default QuizPage;

@@ -74,7 +74,7 @@ const ExamFormModal = ({ exam = null }) => {
       estimated_start_time: "",
       assigned_group_ids: [],
       status: "CLOSED",
-      is_published: false, 
+      is_published: false,
     },
   });
 
@@ -102,6 +102,9 @@ const ExamFormModal = ({ exam = null }) => {
       // API kutilganidek doim CLOSED va false yuborish (siz so'ragandek)
       const finalData = {
         ...formData,
+        estimated_start_time: formData.estimated_start_time
+          ? new Date(formData.estimated_start_time).toISOString()
+          : null,
         status: isEdit ? formData.status : "CLOSED",
         is_published: isEdit ? formData.is_published : false,
       };
@@ -137,7 +140,9 @@ const ExamFormModal = ({ exam = null }) => {
             {isEdit ? "Imtihonni tahrirlash" : "Yangi imtihon yaratish"}
           </h2>
           <p className="text-muted text-sm font-medium">
-            Imtihon vaqti va guruhlarni belgilang
+            {intl.formatMessage({
+              id: "Imtihon vaqti va guruhlarni belgilang",
+            })}
           </p>
         </div>
       </div>
@@ -197,13 +202,13 @@ const ExamFormModal = ({ exam = null }) => {
           <div className="flex items-center gap-3 text-slate-500 mb-2">
             <ClipboardCheck size={18} />
             <span className="text-sm font-bold uppercase tracking-wider">
-              Avtomatik sozlamalar
+              {intl.formatMessage({ id: "Avtomatik sozlamalar" })}
             </span>
           </div>
           <p className="text-xs text-muted leading-relaxed">
-            Yangi yaratilgan imtihonlar sukut bo'yicha <b>CLOSED</b> (yopiq)
-            holatda bo'ladi va natijalari e'lon qilinmaydi. Imtihonni boshlash
-            uchun uni ro'yxatdan "Ochish" tugmasi orqali faollashtiring.
+            {intl.formatMessage({
+              id: "Yangi yaratilgan imtihonlar sukut bo'yicha CLOSED (yopiq) holatda bo'ladi va natijalari e'lon qilinmaydi. Imtihonni boshlash uchun uni ro'yxatdan 'Ochish' tugmasi orqali faollashtiring.",
+            })}
           </p>
         </div>
 
@@ -222,7 +227,7 @@ const ExamFormModal = ({ exam = null }) => {
             onClick={() => closeModal("EXAM_FORM")}
             className="px-6 py-3.5 rounded-2xl font-bold text-muted hover:bg-gray-100 transition-all"
           >
-            Bekor qilish
+            {intl.formatMessage({ id: "Bekor qilish" })}
           </button>
           <button
             type="submit"
@@ -230,7 +235,7 @@ const ExamFormModal = ({ exam = null }) => {
             className="bg-primary text-white font-black px-8 py-3.5 rounded-2xl shadow-xl shadow-orange-200 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
           >
             <Save size={20} />
-            {isSubmitting ? "Saqlanmoqda..." : "Imtihonni saqlash"}
+            {isSubmitting ? "Saqlanmoqda..." : "Saqlash"}
           </button>
         </div>
       </form>

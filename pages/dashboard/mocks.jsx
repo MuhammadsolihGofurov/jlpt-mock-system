@@ -4,10 +4,13 @@ import { AuthGuard } from "@/components/guard";
 import { PageHeader } from "@/components/layout";
 import { useModal } from "@/context/modal-context";
 import { MaterialLists, UserLists } from "@/components/dashboard/admin";
-import { Filter, Search } from "lucide-react";
+import { BookOpen, FileQuestion, Filter, Search } from "lucide-react";
 import { SearchInput } from "@/components/ui";
 import GroupLists from "@/components/dashboard/admin/group-lists";
-import { MockLists } from "@/components/dashboard/admin-teacher";
+import {
+  AssignmentTabs,
+  MockLists,
+} from "@/components/dashboard/admin-teacher";
 
 function MocksPage({ info }) {
   const intl = useIntl();
@@ -39,6 +42,22 @@ function MocksPage({ info }) {
               </button>
             </>
           }
+        />
+        <AssignmentTabs
+          tabs={[
+            {
+              id: "exam",
+              label: "mock_title",
+              path: "/dashboard/mocks",
+              icon: <BookOpen size={20} />,
+            },
+            {
+              id: "homework",
+              label: "Quizlar",
+              path: "/dashboard/quiz",
+              icon: <FileQuestion size={20} />,
+            },
+          ]}
         />
         <MockLists />
       </AuthGuard>

@@ -3,6 +3,7 @@ import {
   BookOpen,
   Building2,
   File,
+  FileQuestion,
   Files,
   Home,
   Settings,
@@ -69,12 +70,6 @@ export const menus = [
     href: "/dashboard/assignments/exam",
     icon: File,
     roles: ["TEACHER", "CENTER_ADMIN"],
-  },
-  {
-    label: "Natijalar",
-    href: "/dashboard/results",
-    icon: BarChart3,
-    roles: ["STUDENT"],
   },
   {
     label: "Profil",

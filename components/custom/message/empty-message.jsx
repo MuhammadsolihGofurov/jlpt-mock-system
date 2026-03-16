@@ -1,5 +1,5 @@
 import { useIntl } from "react-intl";
-import { UserPlus, Search, Inbox, Users, Ticket } from "lucide-react";
+import { UserPlus, Search, Inbox, Users, Ticket, FileQuestion } from "lucide-react";
 
 const icons = {
   users: Users,
@@ -7,6 +7,7 @@ const icons = {
   search: Search,
   default: Inbox,
   userPlus: UserPlus,
+  quizzes: FileQuestion
 };
 
 const EmptyMessage = ({
