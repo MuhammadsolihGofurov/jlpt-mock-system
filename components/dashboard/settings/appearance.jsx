@@ -17,7 +17,7 @@ const AppearanceSettings = () => {
   return (
     <div className="space-y-3 sm:space-y-6">
       {/* Tilni o'zgartirish bloki */}
-      <div className="bg-white/80 backdrop-blur-md border border-gray-100 p-6 rounded-[2.5rem] shadow-sm">
+      <div className="bg-white/80 backdrop-blur-md border border-gray-100 p-6 rounded-xl sm:rounded-[2.5rem] shadow-sm">
         <div className="flex items-center gap-4 mb-6">
           <div className="bg-blue-50 p-3 rounded-2xl text-blue-600">
             <Languages size={24} />
