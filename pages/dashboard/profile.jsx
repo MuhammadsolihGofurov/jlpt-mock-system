@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/layout";
 import {
   AppearanceSettings,
   CenterProfileForm,
+  PasswordUpdateForm,
   ProfileForm,
 } from "@/components/dashboard/settings";
 import { useSelector } from "react-redux";
@@ -31,6 +32,7 @@ function ProfilePage({ info }) {
         {user?.role === "CENTER_ADMIN" && user?.center_info?.id && (
           <CenterProfileForm centerId={user.center_info.id} />
         )}
+        <PasswordUpdateForm />
         <AppearanceSettings />
       </AuthGuard>
     </>

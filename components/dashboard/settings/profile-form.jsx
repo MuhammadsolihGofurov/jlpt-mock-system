@@ -88,7 +88,7 @@ const ProfileForm = () => {
       </h2>
       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Avatar Section */}
-        <div className="bg-white/80 backdrop-blur-xl border border-gray-100 p-8 rounded-[3rem] shadow-sm flex flex-col items-center">
+        <div className="bg-white/80 backdrop-blur-xl border border-gray-100 p-4 sm:p-8 rounded-xl sm:rounded-[3rem] shadow-sm flex flex-col items-center">
           <div className="relative group">
             <div className="w-32 h-32 rounded-[2.5rem] overflow-hidden ring-4 ring-orange-50 bg-gray-100 flex items-center justify-center border-2 border-white shadow-xl">
               {user?.avatar ? (
@@ -130,7 +130,7 @@ const ProfileForm = () => {
         </div>
 
         {/* Form Section */}
-        <div className="bg-white/80 backdrop-blur-xl border border-gray-100 p-8 rounded-[3rem] shadow-sm">
+        <div className="bg-white/80 backdrop-blur-xl border border-gray-100 p-4 sm:p-8 rounded-xl sm:rounded-[3rem] shadow-sm">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input

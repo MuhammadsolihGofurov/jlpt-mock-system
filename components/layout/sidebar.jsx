@@ -106,6 +106,7 @@ const Sidebar = () => {
         body: "Tizimdan chiqmoqchimisiz?",
         confirmText: "Ha",
         variant: "danger",
+        local: "clear",
         onConfirm: async () => {
           const refresh = localStorage.getItem("refresh");
           return await authAxios.post(`/auth/logout/`, { refresh });

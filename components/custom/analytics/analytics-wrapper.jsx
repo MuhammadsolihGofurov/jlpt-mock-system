@@ -17,6 +17,15 @@ import StatCard from "./stat-card";
 import fetcher from "@/utils/fetcher";
 import { useRouter } from "next/router";
 import RecentRequests from "./recently-requests";
+import {
+  PolarAngleAxis,
+  PolarGrid,
+  Radar,
+  RadarChart,
+  ResponsiveContainer,
+} from "recharts";
+import { useIntl } from "react-intl";
+import { EmptyMessage } from "../message";
 
 const AnalyticsContainer = () => {
   const { user, loading: loading } = useSelector((state) => state.auth);
@@ -81,46 +90,129 @@ const AnalyticsSkeleton = () => (
 
 export default AnalyticsContainer;
 
-const UserAnalytics = ({ data, role }) => (
-  <div className="space-y-6">
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <StatCard
-        title={role === "TEACHER" ? "Mening guruhlarim" : "O'rtacha ball"}
-        value={role === "TEACHER" ? data?.my_groups_count : data?.average_score}
-        icon={role === "TEACHER" ? LayoutGrid : Star}
-      />
-      <StatCard
-        title={role === "TEACHER" ? "O'quvchilarim" : "Tugallangan testlar"}
-        value={
-          role === "TEACHER"
-            ? data?.total_students
-            : data?.completed_exams_count
-        }
-        icon={GraduationCap}
-      />
-      <StatCard
-        title={
-          role === "TEACHER"
-            ? "Tekshirilishi kerak"
-            : "Yaqinlashayotgan muddatlar"
-        }
-        value={
-          role === "TEACHER"
-            ? data?.pending_grading_count
-            : data?.upcoming_deadlines?.length
-        }
-        icon={role === "TEACHER" ? ClipboardCheck : Calendar}
-      />
-    </div>
+const UserAnalytics = ({ data, role }) => {
+  const intl = useIntl();
 
-    {/* Student skill performance visualization */}
-    {role === "STUDENT" && data?.skill_performance && (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Chart component here */}
+  // Barcha ko'nikmalar 0 ekanligini tekshiramiz
+  const isAllZero = data?.skill_performance?.every(
+    (skill) => skill.average_score === 0,
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title={role === "TEACHER" ? "Mening guruhlarim" : "O'rtacha ball"}
+          value={
+            role === "TEACHER" ? data?.my_groups_count : data?.average_score
+          }
+          icon={role === "TEACHER" ? LayoutGrid : Star}
+        />
+        <StatCard
+          title={role === "TEACHER" ? "O'quvchilarim" : "Tugallangan testlar"}
+          value={
+            role === "TEACHER"
+              ? data?.total_students
+              : data?.completed_exams_count
+          }
+          icon={GraduationCap}
+        />
+        <StatCard
+          title={
+            role === "TEACHER"
+              ? "Tekshirilishi kerak"
+              : "Yaqinlashayotgan muddatlar"
+          }
+          value={
+            role === "TEACHER"
+              ? data?.pending_grading_count
+              : data?.upcoming_deadlines?.length
+          }
+          icon={role === "TEACHER" ? ClipboardCheck : Calendar}
+        />
       </div>
-    )}
-  </div>
-);
+
+      {/* Student Skill Performance */}
+      {role === "STUDENT" && data?.skill_performance && (
+        <>
+          {isAllZero ? (
+            <>
+              <EmptyMessage
+                titleKey="Hali natijalar mavjud emas"
+                descriptionKey="Ko'nikmalaringiz tahlilini ko'rish uchun kamida bitta test yeching."
+                iconKey="exams"
+              />
+            </>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+              {/* Radar Chart - Ko'nikmalar balansi */}
+              <div className="lg:col-span-2 bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm">
+                <h3 className="text-xl font-black text-heading mb-6 flex items-center gap-2">
+                  <TrendingUp className="text-primary" size={24} />
+                  {intl.formatMessage({ id: "Ko'nikmalar tahlili" })}
+                </h3>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart
+                      cx="50%"
+                      cy="50%"
+                      outerRadius="80%"
+                      data={data.skill_performance}
+                    >
+                      <PolarGrid stroke="#e2e8f0" />
+                      <PolarAngleAxis
+                        dataKey="skill_name"
+                        tick={{
+                          fill: "#64748b",
+                          fontSize: 12,
+                          fontWeight: 600,
+                        }}
+                      />
+                      <Radar
+                        name="Student"
+                        dataKey="average_score"
+                        stroke="#FF6B00"
+                        fill="#FF6B00"
+                        fillOpacity={0.5}
+                      />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Progress List - Batafsil ro'yxat */}
+              <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm">
+                <h3 className="text-xl font-black text-heading mb-6">
+                  {intl.formatMessage({ id: "Batafsil" })}
+                </h3>
+                <div className="space-y-5">
+                  {data.skill_performance.map((skill, index) => (
+                    <div key={index} className="space-y-2">
+                      <div className="flex justify-between items-center text-sm font-bold">
+                        <span className="text-slate-600">
+                          {skill.skill_name}
+                        </span>
+                        <span className="text-primary">
+                          {skill.average_score}%
+                        </span>
+                      </div>
+                      <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary transition-all duration-1000 ease-out"
+                          style={{ width: `${skill.average_score}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
 
 const AdminAnalytics = ({ data, role }) => (
   <div className="space-y-6">

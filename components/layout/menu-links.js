@@ -69,7 +69,8 @@ export const menus = [
     label: "Assignments",
     href: "/dashboard/assignments/exam",
     icon: File,
-    roles: ["TEACHER", "CENTER_ADMIN"],
+    roles: ["TEACHER", "CENTER_ADMIN", "STUDENT"],
+    is_mobile: true,
   },
   {
     label: "Profil",

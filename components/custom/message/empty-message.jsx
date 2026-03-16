@@ -19,7 +19,7 @@ const EmptyMessage = ({
   const Icon = icons[iconKey] || icons.default;
 
   return (
-    <div className="flex flex-col items-center justify-center py-24 bg-white/40 backdrop-blur-sm rounded-[3rem] border-2 border-dashed border-orange-100/60 transition-all">
+    <div className="flex flex-col items-center justify-center py-24 bg-white backdrop-blur-sm rounded-[3rem] border-2 border-dashed border-orange-100/60 transition-all">
       <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center text-primary/40 mb-5 shadow-inner">
         <Icon size={40} strokeWidth={1.5} />
       </div>
