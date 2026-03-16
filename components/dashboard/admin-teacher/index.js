@@ -4,3 +4,4 @@ export { default as AssignmentTabs } from "./assignment-tabs";
 export { default as ExamLists } from "./exam-lists";
 export { default as HomeworkLists } from "./homework-lists";
 export { default as QuizLists } from "./quiz-lists";
+export { default as SubmissionLists } from "./submission-lists";

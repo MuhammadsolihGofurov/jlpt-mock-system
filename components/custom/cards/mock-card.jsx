@@ -12,9 +12,11 @@ import { authAxios } from "@/utils/axios";
 import { useModal } from "@/context/modal-context";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { useIntl } from "react-intl";
 
 const MockCard = ({ item }) => {
   const { openModal } = useModal();
+  const intl = useIntl();
   const router = useRouter();
   const isPublished = item.status === "PUBLISHED";
 
@@ -138,13 +140,17 @@ const MockCard = ({ item }) => {
       </div>
 
       {/* Footer Actions */}
-      <div className="mt-6 pt-5 border-t border-slate-50 flex items-center justify-between">
-        <Link href={`/dashboard/mock-tests/${item.id}`}>
-          <button className="flex items-center gap-2 text-[11px] font-black text-primary hover:gap-3 transition-all uppercase tracking-widest">
-            Savollar <ExternalLink size={14} />
-          </button>
-        </Link>
-
+      <div
+        className={`mt-6 pt-5 border-t border-slate-50 flex items-center ${!isPublished ? "justify-between" : "justify-end"}`}
+      >
+        {!isPublished && (
+          <Link href={`/dashboard/mock-tests/${item.id}`}>
+            <button className="flex items-center gap-2 text-[11px] font-black text-primary hover:gap-3 transition-all uppercase tracking-widest">
+              {intl.formatMessage({ id: "Savollar" })}{" "}
+              <ExternalLink size={14} />
+            </button>
+          </Link>
+        )}
         <div className="flex items-center gap-3">
           <div
             className={`px-3 py-1 rounded-lg text-[9px] font-black tracking-widest uppercase ${

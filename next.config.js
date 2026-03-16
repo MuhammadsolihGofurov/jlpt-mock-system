@@ -12,7 +12,7 @@ const nextConfig = {
   },
   images: {
     // like ['domen.uz']
-    domains: [],
+    domains: ["api.mikan.uz"],
   },
   env: {
     // like base url

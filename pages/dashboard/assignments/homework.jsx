@@ -21,7 +21,7 @@ function HomeworkAssignmentsPage({ info }) {
         description={intl.formatMessage({ id: "homework_desc" })}
         keywords={intl.formatMessage({ id: "homework_key" })}
       />
-      <AuthGuard roles={["CENTER_ADMIN", "TEACHER"]}>
+      <AuthGuard roles={["CENTER_ADMIN", "TEACHER", "STUDENT"]}>
         <PageHeader
           title="homework_title"
           description="homework_desc"

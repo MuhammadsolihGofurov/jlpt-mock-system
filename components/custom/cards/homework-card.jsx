@@ -6,16 +6,21 @@ import {
   BarChart3,
   BookOpen,
   Clock,
+  PlayCircle,
 } from "lucide-react";
 import { authAxios } from "@/utils/axios";
 import { useModal } from "@/context/modal-context";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import Link from "next/link";
+import { useIntl } from "react-intl";
 
 const HomeworkCard = ({ item, mutate }) => {
   const { openModal } = useModal();
   const router = useRouter();
+  const intl = useIntl();
+  const { page = 1, search } = router.query;
+
   const { user } = useSelector((state) => state.auth);
 
   const isAdmin = user?.role === "CENTER_ADMIN";
@@ -42,8 +47,8 @@ const HomeworkCard = ({ item, mutate }) => {
         confirmText: "Ha, o'chirilsin",
         variant: "danger",
         onConfirm: async () =>
-          await authAxios.delete(`/homework-assignments/${item.id}/`),
-        mutateKey: [`homework-assignments/`, router.locale],
+          await authAxios.delete(`homework-assignments/${item.id}/`),
+        mutateKey: [`homework-assignments/`, router.locale, page, search],
       },
       "small",
     );
@@ -90,19 +95,19 @@ const HomeworkCard = ({ item, mutate }) => {
       )}
 
       {/* Icon & Badge */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex flex-col items-start gap-3 mb-4">
         <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
           <BookOpen size={24} />
         </div>
         <div className="px-3 py-1 bg-amber-50 text-amber-600 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
           <Clock size={12} />
-          Deadline:{" "}
+          <span>{intl.formatMessage({ id: "Deadline" })}:</span>
           {item.deadline ? (
             <div className="flex items-center gap-2.5 text-slate-800">
-              <span className="text-[12px] font-black tracking-tight">
+              <span className="text-[12px] font-semibold tracking-tight">
                 {dateInfo.full}
               </span>
-              <div className="flex items-center gap-1 px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200 text-[10px] font-black text-slate-500">
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200 text-[10px] font-semibold text-slate-500">
                 <Clock size={10} /> {dateInfo.time}
               </div>
             </div>
@@ -139,12 +144,26 @@ const HomeworkCard = ({ item, mutate }) => {
         </div>
       </div>
 
-      <Link href={getResultsLink()}>
-        <button className="w-full bg-slate-50 hover:bg-blue-600 hover:text-white text-heading font-black py-4 rounded-2xl transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-widest shadow-sm">
-          <BarChart3 size={16} />
-          Natijalarni ko'rish
-        </button>
-      </Link>
+      <div className="flex flex-col gap-2">
+        {isStudent && (
+          <Link
+            href={`/`}
+            className="w-full bg-primary text-white font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm group-active:scale-95"
+          >
+            <PlayCircle size={18} />
+            {intl.formatMessage({ id: "Vazifani boshlash" })}
+          </Link>
+        )}
+
+        {(canManage || item?.show_results_immediately) && (
+          <Link href={getResultsLink()}>
+            <button className="w-full bg-slate-50 hover:bg-slate-100 text-heading font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm group-active:scale-95">
+              <BarChart3 size={16} />
+              {intl.formatMessage({ id: "Natijalarni ko'rish" })}
+            </button>
+          </Link>
+        )}
+      </div>
     </div>
   );
 };

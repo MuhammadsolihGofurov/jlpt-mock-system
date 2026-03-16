@@ -22,6 +22,7 @@ const ExamFormModal = ({ exam = null }) => {
   const isEdit = !!exam;
   const router = useRouter();
   const intl = useIntl();
+  const { page = 1, search, status } = router.query;
 
   // 1. Mock testlar ro'yxatini olish (Imtihon shabloni uchun)
   const { data: mocksData } = useSWR(
@@ -121,7 +122,7 @@ const ExamFormModal = ({ exam = null }) => {
       });
 
       closeModal("EXAM_FORM", { refresh: true });
-      mutate((key) => Array.isArray(key) && key[0] === "exams/");
+      mutate([`exam-assignments/`, router.locale, page, search, status]);
     } catch (err) {
       toast.dismiss(toastId);
       handleApiError(err, setError);

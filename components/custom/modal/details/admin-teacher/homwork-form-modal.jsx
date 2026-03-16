@@ -23,6 +23,7 @@ const HomeworkFormModal = ({ homework = null }) => {
   const isEdit = !!homework;
   const intl = useIntl();
   const router = useRouter();
+  const { page = 1, search } = router.query;
 
   // 1. Ma'lumotlarni yuklab olish (Mocklar, Quizlar, Guruhlar)
   const { data: mocksData } = useSWR(
@@ -78,7 +79,7 @@ const HomeworkFormModal = ({ homework = null }) => {
       mock_test_ids: [],
       quiz_ids: [],
       assigned_group_ids: [],
-      assigned_user_ids: [], // Bu qismni backend formatiga qarab array sifatida yuboramiz
+      assigned_user_ids: [],
       show_results_immediately: true,
     },
   });
@@ -88,9 +89,7 @@ const HomeworkFormModal = ({ homework = null }) => {
       reset({
         title: homework.title,
         description: homework.description,
-        deadline: formData.deadline
-          ? new Date(formData.deadline).toISOString()
-          : null,
+        deadline: homework.deadline?.slice(0, 16),
         mock_test_ids: homework.mock_tests?.map((m) => m.id) || [],
         quiz_ids: homework.quizzes?.map((q) => q.id) || [],
         assigned_group_ids: homework.assigned_groups?.map((g) => g.id) || [],
@@ -116,7 +115,7 @@ const HomeworkFormModal = ({ homework = null }) => {
         autoClose: 3000,
       });
       closeModal("HOMEWORK_FORM", { refresh: true });
-      mutate([`homework-assignments/`, router.locale]);
+      mutate([`homework-assignments/`, router.locale, page, search]);
     } catch (err) {
       toast.dismiss(toastId);
       // handleApiError(err, setError);

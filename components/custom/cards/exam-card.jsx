@@ -11,17 +11,23 @@ import {
   ExternalLink,
   MoreVertical,
   Clock,
+  Play,
+  PlayCircle,
+  LockKeyhole,
 } from "lucide-react";
 import { authAxios } from "@/utils/axios";
 import { useModal } from "@/context/modal-context";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import Link from "next/link";
+import { useIntl } from "react-intl";
 
 const ExamCard = ({ item, mutate }) => {
   const { openModal } = useModal();
   const router = useRouter();
+  const intl = useIntl();
   const { user } = useSelector((state) => state.auth);
+  const { page = 1, search, status } = router.query;
 
   const isOwner = user?.role === "OWNER";
   const isAdmin = user?.role === "CENTER_ADMIN";
@@ -48,11 +54,12 @@ const ExamCard = ({ item, mutate }) => {
         confirmText: isOpen ? "Ha, yopilsin" : "Ha, ochilsin",
         variant: isOpen ? "danger" : "primary",
         onConfirm: async () => {
-          return await authAxios.patch(`/exams/${item.id}/`, {
+          return await authAxios.patch(`exam-assignments/${item.id}/`, {
             status: newStatus,
+            assigned_group_ids: item?.assigned_groups?.map((item) => item.id),
           });
         },
-        mutateKey: [`exams/`, router.locale],
+        mutateKey: ["exam-assignments/", router.locale, page, search, status],
       },
       "small",
     );
@@ -70,13 +77,14 @@ const ExamCard = ({ item, mutate }) => {
           ? "Natijalarni yashirsangiz, o'quvchilar o'z ballarini ko'ra olmaydilar."
           : "Natijalarni e'lon qilsangiz, barcha topshirgan o'quvchilarga natijalar ko'rinadi.",
         confirmText: isPublished ? "Ha, yashirilsin" : "Ha, e'lon qilinsin",
-        variant: isPublished ? "warning" : "primary",
+        variant: isPublished ? "warning" : "danger",
         onConfirm: async () => {
-          return await authAxios.patch(`/exams/${item.id}/`, {
+          return await authAxios.patch(`exam-assignments/${item.id}/`, {
             is_published: !isPublished,
+            assigned_group_ids: item?.assigned_groups?.map((item) => item.id),
           });
         },
-        mutateKey: [`exams/`, router.locale],
+        mutateKey: [`exam-assignments/`, router.locale, page, search, status],
       },
       "small",
     );
@@ -92,9 +100,9 @@ const ExamCard = ({ item, mutate }) => {
         confirmText: "Ha, o'chirilsin",
         variant: "danger",
         onConfirm: async () => {
-          return await authAxios.delete(`/exams/${item.id}/`);
+          return await authAxios.delete(`exam-assignments/${item.id}/`);
         },
-        mutateKey: [`exams/`, router.locale],
+        mutateKey: [`exam-assignments/`, router.locale, page, search, status],
       },
       "small",
     );
@@ -103,7 +111,7 @@ const ExamCard = ({ item, mutate }) => {
   // Natijalar linkini rolga qarab aniqlash
   const getResultsLink = () => {
     if (isStudent) {
-      return `/dashboard/results/my-results?exam_id=${item.id}`; // Student uchun
+      return `/dashboard/results/my-exam-results/${item.id}`; // Student uchun
     }
     return `/dashboard/results/exam-results/${item.id}`; // Admin/Teacher uchun
   };
@@ -179,7 +187,7 @@ const ExamCard = ({ item, mutate }) => {
                   </div>
                 </div>
               ) : (
-                "Vaqt belgilanmagan"
+                intl.formatMessage({ id: "Vaqt belgilanmagan" })
               )}
             </span>
           </div>
@@ -212,7 +220,7 @@ const ExamCard = ({ item, mutate }) => {
             }`}
           >
             {isOpen ? <Lock size={14} /> : <Unlock size={14} />}
-            {isOpen ? "Yopish" : "Ochish"}
+            {intl.formatMessage({ id: isOpen ? "Yopish" : "Ochish" })}
           </button>
 
           <button
@@ -224,18 +232,39 @@ const ExamCard = ({ item, mutate }) => {
             }`}
           >
             {isPublished ? <EyeOff size={14} /> : <Eye size={14} />}
-            {isPublished ? "Yashirish" : "E'lon qilish"}
+            {intl.formatMessage({
+              id: isPublished ? "Yashirish" : "E'lon qilish",
+            })}
           </button>
         </div>
       )}
 
       {/* Main Action Button */}
-      <Link href={getResultsLink()}>
-        <button className="w-full bg-slate-50 hover:bg-primary hover:text-white text-heading font-black py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm group-active:scale-95">
-          <BarChart3 size={18} />
-          Natijalarni ko'rish
-        </button>
-      </Link>
+      <div className="flex items-center justify-between w-full">
+        {isStudent && !isPublished && (
+          <button
+            disabled={!isOpen}
+            onClick={() =>
+              router.push(`/dashboard/playground/exam/${item?.id}`)
+            }
+            className={`w-full ${isOpen ? "bg-primary" : "bg-slate-400"} text-white font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm group-active:scale-95`}
+          >
+            {isOpen ? <PlayCircle size={18} /> : <LockKeyhole size={18} />}
+            {intl.formatMessage({
+              id: isOpen ? "Imtihonni boshlash" : "Imtihon ochiq emas",
+            })}
+          </button>
+        )}
+        {(isPublished || canManage) && (
+          <Link
+            href={getResultsLink()}
+            className="w-full bg-slate-50 hover:bg-slate-100 text-heading font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm group-active:scale-95"
+          >
+            <BarChart3 size={18} />
+            {intl.formatMessage({ id: "Natijalarni ko'rish" })}
+          </Link>
+        )}
+      </div>
     </div>
   );
 };
