@@ -1,4 +1,5 @@
 import { AlertCircle } from "lucide-react";
+import { useIntl } from "react-intl";
 
 const ExamFooter = ({
   onNext,
@@ -9,6 +10,7 @@ const ExamFooter = ({
   canPrev,
   isDisabled,
 }) => {
+  const intl = useIntl();
   return (
     <footer className="max-h-24 bg-white border-t border-slate-200 px-3 py-2 sm:px-8 flex items-center flex-col sm:flex-row justify-end z-50">
       {/* {canPrev && (
@@ -28,7 +30,7 @@ const ExamFooter = ({
           <div className="flex items-center gap-2 text-orange-600 sm:bg-orange-50 smpx-4 sm:py-2 rounded-xl sm:border sm:border-orange-100 ">
             <AlertCircle size={18} />
             <span className="text-xs font-semibold sm:font-black uppercase">
-              Barcha savollarni belgilang!
+              {intl.formatMessage({ id: "Barcha savollarni belgilang!" })}
             </span>
           </div>
         )}
@@ -38,26 +40,24 @@ const ExamFooter = ({
             onClick={onSubmit}
             disabled={loading || isDisabled}
             className={`px-12 py-3 sm:py-4 rounded-[1.5rem] font-semibold sm:font-black shadow-xl transition-all active:scale-95 flex items-center gap-3
-              ${
-                isDisabled || loading
-                  ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
-                  : "bg-green-600 hover:bg-green-700 text-white shadow-green-100"
+              ${isDisabled || loading
+                ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
+                : "bg-green-600 hover:bg-green-700 text-white shadow-green-100"
               }`}
           >
-            {loading ? "Yuborilmoqda..." : "Imtihonni yakunlash"}
+            {intl.formatMessage({ id: loading ? "Yuborilmoqda..." : "Imtihonni yakunlash" })}
           </button>
         ) : (
           <button
             onClick={onNext}
             disabled={isDisabled}
             className={`px-12 py-3 sm:py-4 rounded-[1.5rem] font-semibold sm:font-black shadow-xl transition-all active:scale-95 flex items-center gap-3
-              ${
-                isDisabled
-                  ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
-                  : "bg-primary hover:bg-primary-dark text-white shadow-orange-100"
+              ${isDisabled
+                ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
+                : "bg-primary hover:bg-primary-dark text-white shadow-orange-100"
               }`}
           >
-            Keyingi bo'lim
+            {intl.formatMessage({ id: "Keyingi bo'lim" })}
           </button>
         )}
       </div>

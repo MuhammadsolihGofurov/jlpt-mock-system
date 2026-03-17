@@ -1,5 +1,5 @@
 import { useModal } from "@/context/modal-context";
-import { Plus, Settings, Trash2 } from "lucide-react";
+import { Edit2, Plus, Settings, Trash2 } from "lucide-react";
 import QuestionList from "./question-list";
 import useSWR from "swr";
 import { useRouter } from "next/router";
@@ -50,7 +50,7 @@ const GroupAndQuestionArea = ({ section }) => {
           </p>
         </div>
         <button
-          onClick={() => openModal("QUESTION_GROUP", { section }, "middle")}
+          onClick={() => openModal("QUESTION_GROUP", { section, group_count: groups?.length }, "middle")}
           className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-slate-800 transition-all shadow-xl"
         >
           <Plus size={18} />{" "}
@@ -82,6 +82,8 @@ const GroupAndQuestionArea = ({ section }) => {
                       {
                         section_type: section?.section_type,
                         groupId: group.id,
+                        sectionId: section?.id,
+                        question_count: group?.questions?.length
                       },
                       "middle",
                     )
@@ -96,7 +98,7 @@ const GroupAndQuestionArea = ({ section }) => {
                   }
                   className="p-2 text-slate-400 hover:text-primary transition-all"
                 >
-                  <Settings size={18} />
+                  <Edit2 size={18} />
                 </button>
                 <button
                   onClick={() => handleDelete(group?.id)}
@@ -109,12 +111,11 @@ const GroupAndQuestionArea = ({ section }) => {
 
             {/* Questions List inside Group */}
             <div className="p-4 bg-white h-60 overflow-y-scroll custom-scrollbar">
-              <p className="text-sm italic text-gray-500 pb-3">
-                "{group?.instruction}"
-              </p>
+              <div className="text-sm italic text-gray-500 pb-3" dangerouslySetInnerHTML={{ __html: group?.instruction }} />
               <QuestionList
                 groupId={group.id}
                 section_type={section?.section_type}
+                sectionId={section?.id}
               />
             </div>
           </div>

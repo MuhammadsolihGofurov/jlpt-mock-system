@@ -9,7 +9,7 @@ import {
   ImageIcon,
   FileText,
 } from "lucide-react";
-import { Input, Textarea } from "@/components/ui";
+import { Input, RichTextarea, Textarea } from "@/components/ui";
 import { useModal } from "@/context/modal-context";
 import { useIntl } from "react-intl";
 import { toast } from "react-toastify";
@@ -19,7 +19,7 @@ import { mutate } from "swr";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 
-const QuestionGroupFormModal = ({ section, group = null }) => {
+const QuestionGroupFormModal = ({ section, group = null, group_count = 0 }) => {
   const { closeModal } = useModal();
   const isEdit = !!group;
   const router = useRouter();
@@ -37,11 +37,11 @@ const QuestionGroupFormModal = ({ section, group = null }) => {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      mondai_number: 1,
+      mondai_number: group_count + 1,
       title: "",
       instruction: "",
       reading_text: "",
-      order: 1,
+      order: group_count + 1,
       audio_file: null,
       image: null,
     },
@@ -95,7 +95,7 @@ const QuestionGroupFormModal = ({ section, group = null }) => {
 
       toast.update(toastId, {
         render: intl.formatMessage({
-          id: isEdit ? "Guruh yangilandi!" : "Guruh muvaffaqiyatli qo'shildi!",
+          id: isEdit ? "Mondai yangilandi!" : "Mondai muvaffaqiyatli qo'shildi!",
         }),
         type: "success",
         isLoading: false,
@@ -149,7 +149,7 @@ const QuestionGroupFormModal = ({ section, group = null }) => {
           </div>
         </div>
 
-        <Textarea
+        {/* <Textarea
           label="Yo'riqnoma (Instruction)"
           name="instruction"
           register={register}
@@ -157,17 +157,48 @@ const QuestionGroupFormModal = ({ section, group = null }) => {
           rows={2}
           placeholder="Savollar uchun ko'rsatma yozing..."
           rules={{ required: "Yo'riqnoma majburiy" }}
+        /> */}
+
+        <Controller
+          name="instruction"
+          control={control}
+          rules={{ required: "Yo'riqnoma majburiy" }}
+          render={({ field: { value, onChange }, fieldState: { error } }) => (
+            <RichTextarea
+              label="Yo'riqnoma (Instruction)"
+              value={value}
+              onChange={onChange}
+              error={error}
+              placeholder="Savollar uchun ko'rsatma yozing..."
+            />
+          )}
         />
 
-        <Textarea
-          label="Reading Text / Context"
-          name="reading_text"
-          register={register}
-          error={errors.reading_text}
-          rows={6}
-          placeholder="Asosiy matnni kiriting..."
-        />
-
+        {
+          section?.section_type === "GRAMMAR_READING" &&
+          // <Textarea
+          //   label="Reading Text / Context"
+          //   name="reading_text"
+          //   register={register}
+          //   error={errors.reading_text}
+          //   rows={6}
+          //   placeholder="Asosiy matnni kiriting..."
+          // />
+          <Controller
+            name="reading_text"
+            control={control}
+            rules={{ required: "Yo'riqnoma majburiy" }}
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
+              <RichTextarea
+                label="Reading Text / Context"
+                value={value}
+                onChange={onChange}
+                error={error}
+                placeholder="Asosiy matnni kiriting..."
+              />
+            )}
+          />
+        }
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="space-y-2">
             <label className="text-sm font-black text-heading ml-1 flex items-center gap-2">

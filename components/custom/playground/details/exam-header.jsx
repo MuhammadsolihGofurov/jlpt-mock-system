@@ -21,7 +21,13 @@ const ExamHeader = ({ title, sectionName, duration, onTimeUp }) => {
     }
 
     const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
 
     return () => clearInterval(timer);
@@ -59,11 +65,10 @@ const ExamHeader = ({ title, sectionName, duration, onTimeUp }) => {
 
       {/* Markaz: Taymer */}
       <div
-        className={`flex items-center gap-3 px-6 py-2.5 rounded-2xl transition-all duration-500 border ${
-          isLowTime
-            ? "bg-red-50 text-red-600 border-red-100 animate-pulse shadow-lg shadow-red-100"
-            : "bg-slate-50 text-slate-700 border-slate-100"
-        }`}
+        className={`flex items-center gap-3 px-6 py-2.5 rounded-2xl transition-all duration-500 border ${isLowTime
+          ? "bg-red-50 text-red-600 border-red-100 animate-pulse shadow-lg shadow-red-100"
+          : "bg-slate-50 text-slate-700 border-slate-100"
+          }`}
       >
         <Timer
           size={24}

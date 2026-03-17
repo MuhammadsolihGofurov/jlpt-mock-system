@@ -64,28 +64,28 @@ const SubmissionLists = () => {
                   №
                 </th>
                 <th className="px-6 py-6 text-[10px] font-black uppercase tracking-widest">
-                  Talaba
+                  {intl.formatMessage({ id: "Talaba" })}
                 </th>
 
                 {/* Section Headers with Labels */}
                 <th className="px-4 py-6 text-[10px] font-black uppercase tracking-widest text-center">
-                  Vocab / Grammar
+                  {intl.formatMessage({ id: "Vocabular" })}
                 </th>
                 <th className="px-4 py-6 text-[10px] font-black uppercase tracking-widest text-center">
-                  Reading
+                  {intl.formatMessage({ id: "Reading" })}
                 </th>
                 <th className="px-4 py-6 text-[10px] font-black uppercase tracking-widest text-center">
-                  Listening
+                  {intl.formatMessage({ id: "Listening" })}
                 </th>
 
                 <th className="px-4 py-6 text-[10px] font-black uppercase tracking-widest text-center">
-                  Jami
+                  {intl.formatMessage({ id: "Jami" })}
                 </th>
                 <th className="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-center">
-                  Holat
+                  {intl.formatMessage({ id: "Holat" })}
                 </th>
                 <th className="px-6 py-6 text-[10px] font-black uppercase tracking-widest">
-                  Vaqt
+                  {intl.formatMessage({ id: "Vaqt" })}
                 </th>
                 {/* <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-right">Amal</th> */}
               </tr>
@@ -105,7 +105,7 @@ const SubmissionLists = () => {
                   (s) => s.section_type === "VOCAB",
                 );
                 const readingData = Object.values(sectionDetails).find(
-                  (s) => s.section_type === "READING",
+                  (s) => s.section_type === "GRAMMAR_READING",
                 );
                 const listeningData = Object.values(sectionDetails).find(
                   (s) => s.section_type === "LISTENING",
@@ -159,11 +159,10 @@ const SubmissionLists = () => {
 
                     <td className="px-6 py-5 text-center">
                       <div
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
-                          isPassed
-                            ? "bg-green-50 text-green-600"
-                            : "bg-red-50 text-red-600"
-                        }`}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${isPassed
+                          ? "bg-green-50 text-green-600"
+                          : "bg-red-50 text-red-600"
+                          }`}
                       >
                         {isPassed ? (
                           <CheckCircle2 size={12} />

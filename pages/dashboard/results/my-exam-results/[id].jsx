@@ -33,13 +33,13 @@ const MyExamResults = () => {
   if (isLoading)
     return (
       <div className="min-h-screen flex items-center justify-center font-black text-slate-200 animate-pulse text-2xl italic">
-        Mikan Loading...
+        {intl.formatMessage({ id: "Mikan Loading..." })}
       </div>
     );
   if (!data?.submission)
     return (
       <div className="p-20 text-center text-slate-400 font-bold">
-        Natija topilmadi.
+        {intl.formatMessage({ id: "Natija topilmadi." })}
       </div>
     );
 
@@ -118,7 +118,7 @@ const MyExamResults = () => {
         {/* Sections Analysis */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <AnalysisCard
-            title="Vocabulary and Grammar"
+            title="Vocabulary"
             subtitle="Language Knowledge"
             icon={<Type size={22} />}
             color="indigo"
@@ -146,7 +146,7 @@ const MyExamResults = () => {
                 "RESULT_VIEW",
                 {
                   data: Object.values(sections).find(
-                    (s) => s.section_type === "READING",
+                    (s) => s.section_type === "GRAMMAR_READING",
                   ),
                 },
                 "middle",

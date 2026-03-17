@@ -147,8 +147,8 @@ const HomeworkCard = ({ item, mutate }) => {
       <div className="flex flex-col gap-2">
         {isStudent && (
           <Link
-            href={`/`}
-            className="w-full bg-primary text-white font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm group-active:scale-95"
+            href={`/dashboard/playground/homework/${item?.id}`}
+            className="w-full bg-primary text-white font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm active:scale-95"
           >
             <PlayCircle size={18} />
             {intl.formatMessage({ id: "Vazifani boshlash" })}
@@ -157,7 +157,7 @@ const HomeworkCard = ({ item, mutate }) => {
 
         {(canManage || item?.show_results_immediately) && (
           <Link href={getResultsLink()}>
-            <button className="w-full bg-slate-50 hover:bg-slate-100 text-heading font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm group-active:scale-95">
+            <button className="w-full bg-slate-50 hover:bg-slate-100 text-heading font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm active:scale-95">
               <BarChart3 size={16} />
               {intl.formatMessage({ id: "Natijalarni ko'rish" })}
             </button>

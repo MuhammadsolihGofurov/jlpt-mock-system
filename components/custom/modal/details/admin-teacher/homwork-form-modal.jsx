@@ -175,7 +175,7 @@ const HomeworkFormModal = ({ homework = null }) => {
         </div>
 
         {/* Resources Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-slate-50 rounded-[2rem] border border-slate-100">
+        <div className="grid grid-cols-1 gap-6 p-6 bg-slate-50 rounded-[2rem] border border-slate-100">
           <Controller
             name="mock_test_ids"
             control={control}

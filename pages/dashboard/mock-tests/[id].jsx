@@ -64,7 +64,7 @@ const MockManagePage = () => {
                 </span>
                 <button
                   onClick={() =>
-                    openModal("SECTION_FORM", { mockId }, "middle")
+                    openModal("SECTION_FORM", { mockId, section_count: mock?.sections?.length }, "middle")
                   }
                   className="p-2 bg-primary text-white rounded-xl shadow-lg shadow-orange-100 hover:scale-105 transition-all"
                 >
@@ -94,7 +94,8 @@ const MockManagePage = () => {
                     {intl.formatMessage({ id: "Bo'lim tanlang" })}
                   </h3>
                   <p className="text-muted max-w-xs">
-                    {intl.formatMessage({id: `Savollar va guruhlarni ko'rish uchun chap tomondan kerakli
+                    {intl.formatMessage({
+                      id: `Savollar va guruhlarni ko'rish uchun chap tomondan kerakli
                     bo'limni tanlang`})}
                   </p>
                 </div>

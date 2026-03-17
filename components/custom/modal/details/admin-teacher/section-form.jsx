@@ -10,7 +10,7 @@ import { mutate } from "swr";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 
-const SectionFormModal = ({ mockId, section = null }) => {
+const SectionFormModal = ({ mockId, section = null, section_count = 0, }) => {
   const { closeModal } = useModal();
   const isEdit = !!section;
   const router = useRouter();
@@ -28,7 +28,7 @@ const SectionFormModal = ({ mockId, section = null }) => {
       name: "",
       section_type: "VOCAB",
       duration: 20,
-      order: 1,
+      order: section_count + 1,
       total_score: 60,
     },
   });
@@ -116,7 +116,7 @@ const SectionFormModal = ({ mockId, section = null }) => {
               <Select
                 label="Bo'lim turi"
                 options={[
-                  { value: "VOCAB", label: "Vocabulary and Grammar" },
+                  { value: "VOCAB", label: "Vocabulary" },
                   //   { value: "GRAMMAR", label: "Grammar" },
                   { value: "GRAMMAR_READING", label: "Reading" },
                   { value: "LISTENING", label: "Listening" },

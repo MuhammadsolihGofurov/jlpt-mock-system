@@ -7,7 +7,7 @@ import useSWR from "swr";
 
 const { useModal } = require("@/context/modal-context");
 
-const QuestionList = ({ groupId, section_type }) => {
+const QuestionList = ({ groupId, section_type, sectionId }) => {
   const { openModal } = useModal();
   const router = useRouter();
   const intl = useIntl();
@@ -50,16 +50,14 @@ const QuestionList = ({ groupId, section_type }) => {
           >
             <div className="flex items-center gap-4">
               <span className="text-slate-300 font-bold">#{idx + 1}</span>
-              <p className="text-sm font-bold text-slate-700 line-clamp-1">
-                {q.text}
-              </p>
+              <div className="text-sm font-bold text-slate-700 line-clamp-1" dangerouslySetInnerHTML={{ __html: q?.text }} />
             </div>
             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={() =>
                   openModal(
                     "QUESTION_FORM",
-                    { groupId, question: q, section_type },
+                    { groupId, question: q, section_type, sectionId },
                     "middle",
                   )
                 }

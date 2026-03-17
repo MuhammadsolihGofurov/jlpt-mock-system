@@ -6,17 +6,19 @@ import { Seo } from "@/components/seo";
 import { AuthGuard } from "@/components/guard";
 import { useIntl } from "react-intl";
 import {
-  Play,
-  Clock,
   BookOpen,
   Award,
   AlertCircle,
-  CheckCircle2,
-  PlayCircle,
+  ChevronLeft,
+  Timer,
+  ShieldCheck,
+  ArrowRight,
+  Loader2
 } from "lucide-react";
 import { ExamPlayground } from "@/components/custom/playground";
 import { authAxios } from "@/utils/axios";
 import { handleApiError } from "@/utils/handle-error";
+import { toast } from "react-toastify";
 
 const ExamPlaygroundPage = () => {
   const router = useRouter();
@@ -27,14 +29,12 @@ const ExamPlaygroundPage = () => {
 
   const { data: examInfo, isLoading } = useSWR(
     examId ? [`/exam-assignments/${examId}/`, router.locale] : null,
-    (url, locale) =>
-      fetcher(url, { headers: { "Accept-Language": locale } }, {}, true),
+    (url, locale) => fetcher(url, { headers: { "Accept-Language": locale } }, {}, true)
   );
 
   const { data: mockInfo } = useSWR(
     examInfo ? [`/mock-tests/${examInfo?.mock_test}/`, router.locale] : null,
-    (url, locale) =>
-      fetcher(url, { headers: { "Accept-Language": locale } }, {}, true),
+    (url, locale) => fetcher(url, { headers: { "Accept-Language": locale } }, {}, true)
   );
 
   const handleStartExam = async () => {
@@ -45,10 +45,12 @@ const ExamPlaygroundPage = () => {
       });
       setExamData(res.data);
     } catch (error) {
-      console.error("Start exam error:", error);
       const msg = handleApiError(error);
-
-      toast.error(msg);
+      if (msg == "You have already completed this exam. Each exam can only be attempted once.") {
+        toast.error(intl.formatMessage({ id: "Siz ushbu imtihonni allaqachon topshirgansiz!" }));
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setIsStarting(false);
     }
@@ -62,130 +64,133 @@ const ExamPlaygroundPage = () => {
     <>
       <Seo title={examInfo?.title || "Exam"} />
       <AuthGuard roles={["STUDENT"]}>
-        <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4 md:p-8">
-          <div className="max-w-4xl w-full bg-white rounded-[3.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-5 h-full">
-              <div className="lg:col-span-2 bg-slate-900 p-10 text-white flex flex-col justify-between">
-                <div>
-                  <div className="inline-block px-4 py-1.5 rounded-full bg-primary/20 text-primary border border-primary/30 text-xs font-black uppercase tracking-widest mb-6">
-                    {examInfo?.mock_test?.level || "JLPT"}
-                  </div>
-                  <h1 className="text-4xl font-black leading-tight mb-4 text-white">
-                    {examInfo?.title}
-                  </h1>
-                  <p className="text-slate-400 font-medium leading-relaxed">
-                    {examInfo?.description}
-                  </p>
-                </div>
+        <div className="min-h-screen bg-[#FDFDFF] text-slate-900 selection:bg-primary/10 pb-10">
 
-                <div className="mt-12 space-y-4">
-                  {/* <div className="flex items-center gap-4 group">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center group-hover:bg-primary transition-colors">
-                      <Clock
-                        size={20}
-                        className="text-primary group-hover:text-white"
-                      />
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-tighter">
-                        {intl.formatMessage({ id: "Umumiy vaqt" })}
-                      </p>
-                      <p className="font-black text-lg">
-                        {mockInfo?.total_duration || 0}{" "}
-                        {intl.formatMessage({ id: "minut" })}
-                      </p>
-                    </div>
-                  </div> */}
-                  <div className="flex items-center gap-4 group">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center group-hover:bg-primary transition-colors">
-                      <Award
-                        size={20}
-                        className="text-primary group-hover:text-white"
-                      />
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-tighter">
-                        {intl.formatMessage({ id: "O'tish balli" })}
-                      </p>
-                      <p className="font-black text-lg">
-                        {mockInfo?.pass_score || 0} ball
-                      </p>
-                    </div>
-                  </div>
+          {/* Header Nav */}
+          <nav className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8 flex justify-between items-center">
+            <button
+              onClick={() => router.push("/dashboard/assignments/exam")}
+              className="group flex items-center gap-2 text-slate-400 hover:text-slate-900 transition-all font-bold text-xs md:text-sm"
+            >
+              <div className="w-8 h-8 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-slate-50 transition-all">
+                <ChevronLeft size={16} />
+              </div>
+              <span className="hidden xs:inline">{intl.formatMessage({ id: "Ortga qaytish" })}</span>
+            </button>
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="text-emerald-500" size={16} />
+              <span className="text-[9px] md:text-[10px] font-black uppercase tracking-wider md:tracking-[0.2em] text-slate-400">Secure Environment</span>
+            </div>
+          </nav>
+
+          <main className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
+
+            {/* Chap taraf: Ma'lumotlar */}
+            <div className="lg:col-span-7 flex flex-col justify-center space-y-6 md:space-y-8">
+              <div>
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-4 md:mb-6">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                  </span>
+                  {examInfo?.mock_test?.level || "JLPT"} Level Exam
+                </span>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tight leading-tight mb-4 md:mb-6">
+                  {examInfo?.title}
+                </h1>
+                <p className="text-base md:text-lg text-slate-500 font-medium leading-relaxed max-w-2xl">
+                  {examInfo?.description || "Ushbu imtihon sizning bilimlaringizni real vaqt rejimida tekshirish uchun mo'ljallangan."}
+                </p>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                {/* <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] border border-slate-100 shadow-sm">
+                  <Timer className="text-primary mb-2 md:mb-3" size={20} />
+                  <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Davomiyligi</p>
+                  <p className="text-lg md:text-xl font-black">{mockInfo?.total_duration || 0} min</p>
+                </div> */}
+                <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] border border-slate-100 shadow-sm">
+                  <Award className="text-emerald-500 mb-2 md:mb-3" size={20} />
+                  <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">O'tish balli</p>
+                  <p className="text-lg md:text-xl font-black">{mockInfo?.pass_score || 0} ball</p>
+                </div>
+                <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] border border-slate-100 shadow-sm col-span-2 md:col-span-1">
+                  <BookOpen className="text-blue-500 mb-2 md:mb-3" size={20} />
+                  <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Bo'limlar</p>
+                  <p className="text-lg md:text-xl font-black">{mockInfo?.sections?.length || 0} ta bo'lim</p>
                 </div>
               </div>
 
-              {/* O'ng taraf: Bo'limlar va Start tugmasi */}
-              <div className="lg:col-span-3 p-10 flex flex-col justify-center">
-                <h3 className="text-xl font-black text-slate-800 mb-8 flex items-center gap-3">
-                  <BookOpen className="text-primary" />
+              {/* Warning Box */}
+              <div className="p-5 md:p-8 bg-orange-50/50 rounded-2xl md:rounded-[3rem] border border-orange-100/50 flex gap-4 md:gap-6 items-start">
+                <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-xl md:rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600">
+                  <AlertCircle size={20} />
+                </div>
+                <div>
+                  <h4 className="font-black text-orange-900 text-sm md:text-base mb-1">Muhim eslatma</h4>
+                  <p className="text-xs md:text-sm text-orange-800/70 font-medium leading-relaxed">
+                    Imtihonni boshlaganingizdan so'ng taymerni to'xtatib bo'lmaydi. Sahifani yangilamang!
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* O'ng taraf: Struktura va Start */}
+            <div className="lg:col-span-5 relative">
+              <div className="bg-white rounded-2xl md:rounded-[3rem] lg:rounded-[4rem] p-6 md:p-10 border border-slate-100 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] lg:sticky lg:top-10">
+                <h3 className="text-xl md:text-2xl font-black mb-6 md:mb-8 flex items-center justify-between">
                   {intl.formatMessage({ id: "Imtihon tarkibi" })}
+                  <BookOpen size={20} className="text-slate-300" />
                 </h3>
 
-                <div className="space-y-4 mb-10">
+                <div className="space-y-2 md:space-y-3 mb-8 md:mb-12 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                   {mockInfo?.sections?.map((section, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between p-5 rounded-3xl bg-slate-50 border border-slate-100 hover:border-primary/30 transition-all group"
+                      className="group flex items-center justify-between p-3 md:p-4 rounded-xl md:rounded-3xl bg-slate-50/50 border border-transparent hover:border-primary/20 hover:bg-white transition-all"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm font-black text-primary">
-                          {idx + 1}
+                      <div className="flex items-center gap-3 md:gap-4">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-2xl bg-white flex items-center justify-center shadow-sm font-black text-slate-400 text-sm">
+                          {String(idx + 1).padStart(2, '0')}
                         </div>
                         <div>
-                          <p className="font-black text-slate-700 leading-none">
+                          <p className="font-bold text-slate-800 text-sm md:text-base leading-tight">
                             {section.name}
                           </p>
-                          <p className="text-xs text-slate-400 mt-1 font-bold">
+                          <p className="text-[9px] md:text-[10px] text-slate-400 font-black uppercase tracking-tighter">
                             {section.section_type}
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm font-black text-slate-600">
-                          {section.duration} m
-                        </p>
+                      <div className="bg-slate-200/50 px-2 md:px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black text-slate-500 whitespace-nowrap">
+                        {section.duration} MIN
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="bg-orange-50/50 p-6 rounded-3xl border border-orange-100 mb-8">
-                  <div className="flex gap-4">
-                    <AlertCircle className="text-primary shrink-0" />
-                    <p className="text-sm text-orange-800 font-medium leading-relaxed">
-                      {intl.formatMessage({
-                        id: "Imtihonni boshlaganingizdan so'ng taymerni to'xtatib bo'lmaydi. Sahifani yangilamang!",
-                      })}
-                    </p>
-                  </div>
-                </div>
-
                 <button
                   onClick={handleStartExam}
-                  disabled={isStarting}
-                  className="w-full py-4 bg-primary hover:bg-primary-dark disabled:bg-slate-300 text-white rounded-[2rem] font-semibold text-xl shadow-2xl shadow-orange-200 transition-all flex items-center justify-center gap-4 active:scale-[0.98]"
+                  disabled={isStarting || isLoading}
+                  className="w-full relative group overflow-hidden py-4 md:py-6 bg-slate-900 text-white rounded-xl md:rounded-[2.5rem] font-black text-lg md:text-xl transition-all hover:bg-primary active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-400 shadow-xl shadow-slate-200"
                 >
-                  {isStarting ? (
-                    <span className="animate-pulse">
-                      {intl.formatMessage({ id: "Yuklanmoqda..." })}
-                    </span>
-                  ) : (
-                    <>
-                      {intl.formatMessage({ id: "Imtihonni boshlash" })}
-                      <PlayCircle size={18} />
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={() => router.push("/dashboard/assignments/exam")}
-                  className="w-full mt-3 hover:text-primary"
-                >
-                  {intl.formatMessage({ id: "Ortga qaytish" })}
+                  <div className="relative z-10 flex items-center justify-center gap-3 md:gap-4">
+                    {isStarting ? (
+                      <Loader2 className="animate-spin" size={20} />
+                    ) : (
+                      <>
+                        {intl.formatMessage({ id: "Imtihonni boshlash" })}
+                        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
               </div>
             </div>
-          </div>
+
+          </main>
         </div>
       </AuthGuard>
     </>

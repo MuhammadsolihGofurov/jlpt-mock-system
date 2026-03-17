@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useExamSecurity } from "@/hooks/useExamSecurity";
 import { QuestionRenderer } from "./details/question-renderer";
 import { SidebarNavigation } from "./details/sidebar-nav";
@@ -7,12 +7,37 @@ import ExamFooter from "./details/exam-footer";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { authAxios } from "@/utils/axios";
+import { ListeningOverlay } from "./details/exam-listening-overlay";
+import { useIntl } from "react-intl";
 
 const ExamPlayground = ({ examData }) => {
   const router = useRouter();
+  const intl = useIntl();
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [activeGroupIndex, setActiveGroupIndex] = useState(0);
+  const [isAudioStarted, setIsAudioStarted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setActiveGroupIndex(0);
+    setIsAudioStarted(false);
+  }, [currentSectionIndex]);
+
+  const handleAudioEnd = () => {
+    if (currentSection.section_type === "LISTENING") {
+      if (activeGroupIndex < currentSection.question_groups.length - 1) {
+        setActiveGroupIndex(prev => prev + 1);
+
+        const nextGroup = currentSection.question_groups[activeGroupIndex + 1];
+        document.getElementById(`group-${nextGroup.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        toast.info(intl.formatMessage({
+          id: "Tinglab tushunish bo'limi yakunlandi."
+        }));
+      }
+    }
+  };
 
   const sections = examData.exam_paper.sections;
   const currentSection = sections[currentSectionIndex];
@@ -48,8 +73,23 @@ const ExamPlayground = ({ examData }) => {
     }
   };
 
+  const handleTimeUp = () => {
+    if (isLastSection) {
+      toast.warning(intl.formatMessage({ id: "Vaqt tugadi! Imtihon avtomatik topshirilmoqda..." }));
+      handleSubmit(true);
+    } else {
+      toast.info(intl.formatMessage({ id: "Bo'lim vaqti tugadi. Keyingi bo'limga o'tilmoqda..." }));
+      handleNext();
+    }
+  };
+
   // Imtihonni topshirish (Submit)
-  const handleSubmit = async () => {
+  const handleSubmit = async (isAuto = false) => {
+    if (!isAuto && !isAllAnswered) {
+      toast.error(intl.formatMessage({ id: "Iltimos, barcha savollarni belgilang!" }));
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const payload = {
@@ -58,13 +98,11 @@ const ExamPlayground = ({ examData }) => {
       };
 
       await authAxios.post("/submissions/submit-exam/", payload);
-
-      toast.success("Imtihon muvaffaqiyatli topshirildi!");
-      // Natijalar sahifasiga yoki dashboardga yo'naltirish
+      toast.success(intl.formatMessage({ id: "Imtihon yakunlandi!" }));
       router.push("/dashboard/assignments/exam");
     } catch (error) {
       console.error("Submission error:", error);
-      toast.error("Topshirishda xatolik yuz berdi.");
+      toast.error(intl.formatMessage({ id: "Topshirishda xatolik yuz berdi." }));
     } finally {
       setIsSubmitting(false);
     }
@@ -72,12 +110,21 @@ const ExamPlayground = ({ examData }) => {
 
   return (
     <div className="fixed inset-0 bg-slate-50 flex flex-col overflow-hidden select-none">
+      {/* Agar LISTENING bo'lsa va hali boshlanmagan bo'lsa Overlay chiqarish */}
+      {currentSection.section_type === "LISTENING" && !isAudioStarted && (
+        <ListeningOverlay
+          title={currentSection.name}
+          onStart={() => setIsAudioStarted(true)}
+        />
+      )}
+
       <ExamHeader
-        key={currentSection.id} // Section o'zgarganda taymer qayta boshlanishi uchun
+        key={currentSection.id}
         title={examData.exam_paper.title}
         sectionName={currentSection.name}
         duration={currentSection.duration}
-        onTimeUp={isLastSection ? handleSubmit : handleNext}
+        // onTimeUp={isLastSection ? handleSubmit : handleNext}
+        onTimeUp={handleTimeUp}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -90,12 +137,18 @@ const ExamPlayground = ({ examData }) => {
               </span>
             </h2>
 
-            {currentSection.question_groups.map((group) => (
+            {currentSection.question_groups.map((group, index) => (
               <QuestionRenderer
                 key={group.id}
                 group={group}
                 onSelect={handleSelectOption}
                 selectedAnswers={answers}
+                isActiveGroup={
+                  currentSection.section_type === "LISTENING"
+                    ? (isAudioStarted && index === activeGroupIndex)
+                    : true
+                }
+                onAudioEnd={handleAudioEnd}
               />
             ))}
           </div>

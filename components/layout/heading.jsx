@@ -11,6 +11,7 @@ const PageHeader = ({
   onButtonClick,
   extraActions,
   roles = [],
+  icon = <Plus size={18} strokeWidth={3} />,
 }) => {
   const intl = useIntl();
   const { user } = useSelector((state) => state.auth);
@@ -53,7 +54,7 @@ const PageHeader = ({
             className="group bg-heading hover:bg-primary text-white font-semibold sm:font-bold px-6 py-3.5 rounded-[1.4rem] shadow-xl shadow-gray-200 hover:shadow-orange-200 transition-all duration-300 active:scale-95 flex items-center gap-2"
           >
             <div className="bg-white/20 rounded-lg p-0.5 group-hover:rotate-90 transition-transform duration-300">
-              <Plus size={18} strokeWidth={3} />
+              {icon}
             </div>
             <span className="text-sm tracking-wide">
               {intl.formatMessage({ id: buttonLabel })}

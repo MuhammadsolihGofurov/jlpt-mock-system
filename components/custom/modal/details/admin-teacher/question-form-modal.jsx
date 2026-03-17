@@ -9,7 +9,7 @@ import {
   ImageIcon,
   Star,
 } from "lucide-react";
-import { Input, Textarea } from "@/components/ui";
+import { Input, RichTextarea, Textarea } from "@/components/ui";
 import { useModal } from "@/context/modal-context";
 import { useIntl } from "react-intl";
 import { toast } from "react-toastify";
@@ -19,7 +19,7 @@ import { mutate } from "swr";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-const QuestionFormModal = ({ sectionType, groupId, question = null }) => {
+const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = null, question_count = 0 }) => {
   const { closeModal } = useModal();
   const isEdit = !!question;
   const router = useRouter();
@@ -36,7 +36,7 @@ const QuestionFormModal = ({ sectionType, groupId, question = null }) => {
   } = useForm({
     defaultValues: {
       text: "",
-      question_number: 1,
+      question_number: question_count + 1,
       score: 1,
       options: [
         { text: "", is_correct: false },
@@ -70,10 +70,10 @@ const QuestionFormModal = ({ sectionType, groupId, question = null }) => {
       formData.append("score", values.score);
       formData.append("options", JSON.stringify(values.options));
 
-      if (values.image?.[0]) formData.append("image", values.image[0]);
-      if (sectionType === "LISTENING" && values.audio_file?.[0]) {
-        formData.append("audio_file", values.audio_file[0]);
-      }
+      // if (values.image?.[0]) formData.append("image", values.image[0]);
+      // if (sectionType === "LISTENING" && values.audio_file?.[0]) {
+      //   formData.append("audio_file", values.audio_file[0]);
+      // }
 
       const method = isEdit ? "patch" : "post";
       const url = isEdit ? `/questions/${question.id}/` : `/questions/`;
@@ -87,8 +87,9 @@ const QuestionFormModal = ({ sectionType, groupId, question = null }) => {
         autoClose: 3000,
       });
 
-      closeModal("QUESTION_FORM", { refresh: true });
+      mutate([`question-groups/`, router.locale, sectionId]);
       mutate([`questions/`, router.locale, groupId]);
+      closeModal("QUESTION_FORM", { refresh: true });
     } catch (err) {
       toast.dismiss(toastId);
       handleApiError(err, setError);
@@ -131,12 +132,19 @@ const QuestionFormModal = ({ sectionType, groupId, question = null }) => {
           </div>
         </div>
 
-        <Textarea
-          label="Savol matni"
+        <Controller
           name="text"
-          register={register}
-          error={errors.text}
-          placeholder="Savol matni..."
+          control={control}
+          rules={{ required: "Savol matni majburiy" }}
+          render={({ field: { value, onChange }, fieldState: { error } }) => (
+            <RichTextarea
+              label="Savol matni (Rich Text)"
+              value={value}
+              onChange={onChange}
+              error={error}
+              placeholder="Savol matnini bu yerga yozing..."
+            />
+          )}
         />
 
         {/* Variantlar */}
@@ -170,11 +178,10 @@ const QuestionFormModal = ({ sectionType, groupId, question = null }) => {
                             setValue(`options.${i}.is_correct`, i === index),
                           );
                         }}
-                        className={`p-2 rounded-xl transition-all ${
-                          value
-                            ? "bg-green-100 text-green-600"
-                            : "bg-slate-100 text-slate-400"
-                        }`}
+                        className={`p-2 rounded-xl transition-all ${value
+                          ? "bg-green-100 text-green-600"
+                          : "bg-slate-100 text-slate-400"
+                          }`}
                       >
                         <CheckCircle2 size={20} strokeWidth={3} />
                       </button>
