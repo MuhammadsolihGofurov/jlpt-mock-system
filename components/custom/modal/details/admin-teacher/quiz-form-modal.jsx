@@ -231,7 +231,7 @@ const QuizFormModal = ({ quiz = null }) => {
   };
 
   return (
-    <div className="p-8 max-h-[92vh] overflow-y-auto custom-scrollbar bg-white">
+    <div className="p-8 max-h-[92vh] overflow-y-auto custom-scrollbar">
       {/* Header */}
       <div className="flex items-center gap-5 mb-10">
         <div className="bg-orange-100 p-5 rounded-[2rem] text-primary shadow-sm">

@@ -83,7 +83,8 @@ const GroupAndQuestionArea = ({ section }) => {
                         section_type: section?.section_type,
                         groupId: group.id,
                         sectionId: section?.id,
-                        question_count: group?.questions?.length
+                        question_count: group?.questions?.length,
+                        groupName: group?.title
                       },
                       "middle",
                     )
@@ -116,6 +117,7 @@ const GroupAndQuestionArea = ({ section }) => {
                 groupId={group.id}
                 section_type={section?.section_type}
                 sectionId={section?.id}
+                groupName={group?.title}
               />
             </div>
           </div>

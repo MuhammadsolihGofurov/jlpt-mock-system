@@ -18,6 +18,7 @@ import MaterialFormModal from "./details/admin/material-form-modal";
 import UserFilterModal from "./details/admin/user-filter-modal";
 import UserFormModal from "./details/admin/user-form-modal";
 import ConfirmModal from "./details/confirm-modal";
+import NotificationDetailModal from "./details/notification-detail-modal";
 import AdminFormModal from "./details/owner/admin-form-modal";
 import CenterFormModal from "./details/owner/center-form-modal";
 import SubscriptionFormModal from "./details/owner/subscription-modal";
@@ -46,4 +47,5 @@ export const ModalComponents = {
   QUIZ_FORM: QuizFormModal,
   QUIZ_FILTER: QuizFilterModal,
   RESULT_VIEW: ResultViewModal,
+  NOTIFY_MODAL: NotificationDetailModal
 };

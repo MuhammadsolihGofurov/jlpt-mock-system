@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   SubscriptIcon,
   CircleDollarSign,
+  Bell,
 } from "lucide-react";
 import { logout } from "@/redux/slice/auth";
 import { closeSidebar } from "@/redux/slice/ui";
@@ -134,7 +135,7 @@ const Sidebar = () => {
         `}
       >
         {/* Logo Section */}
-        <div className="px-8 py-5">
+        <div className="pl-5 pr-2 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-orange-500 p-2.5 rounded-[14px] shadow-lg shadow-orange-200">
               <Image
@@ -149,6 +150,16 @@ const Sidebar = () => {
               Mikan<span className="text-orange-500">.uz</span>
             </span>
           </div>
+
+          {/* Yangi Notification Icon */}
+          <Link
+            href="/dashboard/notifications"
+            className="relative sm:flex hidden p-2.5 rounded-xl bg-gray-50 text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-all"
+            title={intl.formatMessage({ id: "Bildirishnomalar" })}
+          >
+            <Bell size={20} className="" />
+            <span className="absolute top-2 right-3 w-2 h-2 bg-red-500 text-white text-[10px] font-black rounded-full border-2 border-white flex items-center justify-center"></span>
+          </Link>
         </div>
 
         {/* Navigation */}
@@ -164,10 +175,9 @@ const Sidebar = () => {
                 onClick={() => dispatch(closeSidebar())}
                 className={`
                   group relative flex items-center justify-between rounded-2xl px-4 py-3.5 transition-all duration-200
-                  ${
-                    active
-                      ? "bg-orange-500 text-white shadow-md shadow-orange-100"
-                      : "text-gray-500 hover:bg-orange-50 hover:text-orange-600"
+                  ${active
+                    ? "bg-orange-500 text-white shadow-md shadow-orange-100"
+                    : "text-gray-500 hover:bg-orange-50 hover:text-orange-600"
                   }
                 `}
               >
@@ -182,7 +192,7 @@ const Sidebar = () => {
                     }
                   />
                   <span className="text-[15px] font-bold">
-                    {intl.formatMessage({ id: tab.label }) || tab.label}
+                    {intl.formatMessage({ id: tab.label })}
                   </span>
                 </div>
 
@@ -228,7 +238,7 @@ const Sidebar = () => {
             </span>
           </button>
         </div>
-      </aside>
+      </aside >
     </>
   );
 };

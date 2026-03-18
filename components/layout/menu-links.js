@@ -13,8 +13,7 @@ import {
   Users2Icon,
 } from "lucide-react";
 
-export const menus = [
-  {
+export const menus = [{
     label: "Bosh sahifa",
     href: "/dashboard",
     icon: Home,
@@ -64,6 +63,7 @@ export const menus = [
     href: "/dashboard/mocks",
     icon: BookOpen,
     roles: ["TEACHER", "CENTER_ADMIN"],
+    is_mobile: true
   },
   {
     label: "Assignments",

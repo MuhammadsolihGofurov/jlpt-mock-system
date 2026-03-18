@@ -7,7 +7,7 @@ import useSWR from "swr";
 
 const { useModal } = require("@/context/modal-context");
 
-const QuestionList = ({ groupId, section_type, sectionId }) => {
+const QuestionList = ({ groupId, section_type, sectionId, groupName }) => {
   const { openModal } = useModal();
   const router = useRouter();
   const intl = useIntl();
@@ -57,7 +57,7 @@ const QuestionList = ({ groupId, section_type, sectionId }) => {
                 onClick={() =>
                   openModal(
                     "QUESTION_FORM",
-                    { groupId, question: q, section_type, sectionId },
+                    { groupId, question: q, section_type, sectionId, groupName },
                     "middle",
                   )
                 }

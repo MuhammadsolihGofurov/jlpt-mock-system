@@ -3,8 +3,12 @@ import { useRouter } from "next/router";
 import { BottomNav, Sidebar } from "..";
 import { Menu } from "lucide-react";
 import { toggleSidebar } from "@/redux/slice/ui";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import MobileHeader from "./mobile-header";
+import useSWR, { mutate } from "swr";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import fetcher from "@/utils/fetcher";
 
 const AUTH_PATHS = [
   "/login",
@@ -16,7 +20,25 @@ const AUTH_PATHS = [
 const Layout = ({ children }) => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const { user } = useSelector(state => state.auth);
   const isAuthPage = AUTH_PATHS.some((path) => router.pathname.includes(path));
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const token = localStorage.getItem("access");
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WEB_SOKET_API_URL}ws/notifications/?token=${token}`);
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      toast.success(data.message, {
+        duration: 5000,
+      });
+    };
+
+    return () => ws.close();
+  }, [user?.id]);
 
   return (
     <>

@@ -19,7 +19,7 @@ import { mutate } from "swr";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = null, question_count = 0 }) => {
+const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = null, question_count = 0, groupName }) => {
   const { closeModal } = useModal();
   const isEdit = !!question;
   const router = useRouter();
@@ -107,7 +107,7 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
             {isEdit ? "Savolni tahrirlash" : "Yangi savol"}
           </h2>
           <p className="text-muted text-sm font-medium italic">
-            Guruh: {groupId}
+            Guruh: {groupName}
           </p>
         </div>
       </div>
