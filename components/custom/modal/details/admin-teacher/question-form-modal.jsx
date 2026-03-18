@@ -230,7 +230,7 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
             disabled={isSubmitting}
             className="bg-primary text-white font-black px-10 py-3 rounded-2xl shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2"
           >
-            <Save size={18} /> {isSubmitting ? "Saqlanmoqda..." : "Saqlash"}
+            <Save size={18} /> {intl.formatMessage({ id: isSubmitting ? "Saqlanmoqda..." : "Saqlash" })}
           </button>
         </div>
       </form>
