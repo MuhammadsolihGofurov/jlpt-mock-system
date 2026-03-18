@@ -9,6 +9,7 @@ import { useIntl } from "react-intl";
 import { toast } from "react-toastify";
 import Seo from "@/components/seo/seo";
 import { UserPlus, ShieldCheck, ArrowRight, Ticket } from "lucide-react";
+import { handleApiError } from "@/utils/handle-error";
 
 function Register({ info }) {
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ function Register({ info }) {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -47,8 +49,11 @@ function Register({ info }) {
         query: { email: data.email },
       });
     } catch (err) {
+      const msg = handleApiError(err, setError)
+
+
       toast.update(toastId, {
-        render: err?.detail || "Xatolik! Ma'lumotlarni tekshiring.",
+        render: msg,
         type: "error",
         isLoading: false,
         autoClose: 3000,
