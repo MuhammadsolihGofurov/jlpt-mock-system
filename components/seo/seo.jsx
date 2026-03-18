@@ -17,13 +17,13 @@ const Seo = ({
       <meta property="og:description" content={description} />
       <meta property="og:type" content="website" />
       <meta property="og:url" content={link} />
-      <meta property="og:site_name" content="teplolux" />
+      <meta property="og:site_name" content="mikan" />
 
-      <meta property="og:image" content="/images/favicon.png" />
-      <meta property="og:image:secure_url" content="/images/favicon.png" />
+      <meta property="og:image" content="/images/mikan-logo.png" />
+      <meta property="og:image:secure_url" content="/images/mikan-logo.png" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:image:alt" content="teplolux platform preview" />
+      <meta property="og:image:alt" content="mikan platform preview" />
 
       <meta property="og:locale" content="uz_UZ" />
       <meta property="og:locale:alternate" content="ru_RU" />
@@ -31,7 +31,7 @@ const Seo = ({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content="/images/favicon.png" />
+      <meta name="twitter:image" content="/images/mikan-logo.png" />
       <meta name="twitter:site" content="@mikan.uz" />
       <meta name="twitter:creator" content="@mikan.uz" />
 
