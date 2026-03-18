@@ -187,7 +187,6 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0 }) => {
           <Controller
             name="reading_text"
             control={control}
-            rules={{ required: "Yo'riqnoma majburiy" }}
             render={({ field: { value, onChange }, fieldState: { error } }) => (
               <RichTextarea
                 label="Reading Text / Context"
