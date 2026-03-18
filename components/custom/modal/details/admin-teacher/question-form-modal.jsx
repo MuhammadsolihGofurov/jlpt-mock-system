@@ -62,34 +62,39 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
     const toastId = toast.loading(intl.formatMessage({ id: "Saqlanmoqda..." }));
 
     try {
+      const hasCorrect = values.options.some(opt => opt.is_correct);
+      if (!hasCorrect) {
+        toast.error(intl.formatMessage({ id: "Kamida bitta to'g'ri javobni belgilang!" }));
+        toast.dismiss(toastId);
+        return;
+      }
+
       const formData = new FormData();
       formData.append("group", groupId);
       formData.append("text", values.text);
-      formData.append("question_number", values.question_number);
       formData.append("order", values.question_number);
+      formData.append("question_number", values.question_number);
       formData.append("score", values.score);
       formData.append("options", JSON.stringify(values.options));
 
-      // if (values.image?.[0]) formData.append("image", values.image[0]);
-      // if (sectionType === "LISTENING" && values.audio_file?.[0]) {
-      //   formData.append("audio_file", values.audio_file[0]);
-      // }
-
       const method = isEdit ? "patch" : "post";
       const url = isEdit ? `/questions/${question.id}/` : `/questions/`;
-
       await authAxios[method](url, formData);
 
       toast.update(toastId, {
         render: intl.formatMessage({ id: "Muvaffaqiyatli saqlandi!" }),
         type: "success",
         isLoading: false,
-        autoClose: 3000,
+        autoClose: 2000,
       });
 
       mutate([`question-groups/`, router.locale, sectionId]);
       mutate([`questions/`, router.locale, groupId]);
-      closeModal("QUESTION_FORM", { refresh: true });
+
+      setTimeout(() => {
+        closeModal("QUESTION_FORM");
+      }, 500);
+
     } catch (err) {
       toast.dismiss(toastId);
       handleApiError(err, setError);
@@ -107,7 +112,7 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
             {isEdit ? "Savolni tahrirlash" : "Yangi savol"}
           </h2>
           <p className="text-muted text-sm font-medium italic">
-            Guruh: {groupName}
+            {intl.formatMessage({ id: "Guruh" })}: {groupName}
           </p>
         </div>
       </div>
