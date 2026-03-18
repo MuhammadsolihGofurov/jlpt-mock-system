@@ -17,6 +17,7 @@ import {
   ArrowRight,
   Activity,
   ChevronRight,
+  ArrowLeft,
 } from "lucide-react";
 
 const MyExamResults = () => {
@@ -59,7 +60,10 @@ const MyExamResults = () => {
         <PageHeader
           title={res.assignment_title}
           description={`${res.mock_test_title} • ${res.mock_test_level}`}
-          backButton={true}
+          buttonLabel={"Orqaga"}
+          roles={["STUDENT"]}
+          icon={<ArrowLeft size={18} strokeWidth={2} />}
+          onButtonClick={() => router.push("/dashboard/assignments/exam")}
         />
 
         {/* Hero Section - Score Overview */}

@@ -119,14 +119,21 @@ const HomeworkPlaygroundPage = () => {
   // Barcha vazifalar bajarilganini tekshirish
   const totalItemsCount = (homeworkInfo?.mock_tests?.length || 0) + (homeworkInfo?.quizzes?.length || 0);
   const isAllFinished = homeworkInfo && completedItems.length >= totalItemsCount;
+  const totalFinishedItems =
+    (homeworkInfo?.mock_tests?.filter(i => i.status === "Completed").length || 0) +
+    (homeworkInfo?.quizzes?.filter(i => i.status === "Completed").length || 0);
 
   if (activeItemData) {
     return (
-      <HomeworkPlayground
-        data={activeItemData}
-        onFinish={(answers) => handleFinishItem(answers, activeItemData.item_id)}
-        onBack={() => setActiveItemData(null)}
-      />
+      <>
+        <Seo title={homeworkInfo?.title || "Homework"} />
+
+        <HomeworkPlayground
+          data={activeItemData}
+          onFinish={(answers) => handleFinishItem(answers, activeItemData.item_id)}
+          onBack={() => setActiveItemData(null)}
+        />
+      </>
     );
   }
 
@@ -149,7 +156,9 @@ const HomeworkPlaygroundPage = () => {
             </button>
             <div className="flex items-center gap-2">
               <ShieldCheck className="text-emerald-500" size={16} />
-              <span className="text-[9px] md:text-[10px] font-black uppercase tracking-wider md:tracking-[0.2em] text-slate-400">Homework Environment</span>
+              <span className="text-[9px] md:text-[10px] font-black uppercase tracking-wider md:tracking-[0.2em] text-slate-400">
+                {intl.formatMessage({ id: "Homework Environment" })}
+              </span>
             </div>
           </nav>
 
@@ -163,13 +172,13 @@ const HomeworkPlaygroundPage = () => {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                   </span>
-                  Homework Assignment
+                  {intl.formatMessage({ id: "Homework Assignment" })}
                 </span>
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tight leading-tight mb-4 md:mb-6">
                   {homeworkInfo?.title}
                 </h1>
                 <p className="text-base md:text-lg text-slate-500 font-medium leading-relaxed max-w-2xl">
-                  {homeworkInfo?.description || "Ushbu uy vazifasi sizning o'tilgan mavzular bo'yicha bilimlaringizni mustahkamlash uchun mo'ljallangan."}
+                  {homeworkInfo?.description}
                 </p>
               </div>
 
@@ -177,13 +186,13 @@ const HomeworkPlaygroundPage = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] border border-slate-100 shadow-sm">
                   <Award className="text-emerald-500 mb-2 md:mb-3" size={20} />
-                  <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Jarayon</p>
-                  <p className="text-lg md:text-xl font-black">{completedItems.length} / {totalItemsCount}</p>
+                  <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">{intl.formatMessage({ id: "Jarayon" })}</p>
+                  <p className="text-lg md:text-xl font-black">{totalFinishedItems} / {totalItemsCount}</p>
                 </div>
                 <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] border border-slate-100 shadow-sm col-span-2 md:col-span-1">
                   <BookOpen className="text-blue-500 mb-2 md:mb-3" size={20} />
-                  <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Topshiriqlar</p>
-                  <p className="text-lg md:text-xl font-black">{totalItemsCount} ta element</p>
+                  <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">{intl.formatMessage({ id: "Topshiriqlar" })}</p>
+                  <p className="text-lg md:text-xl font-black">{totalItemsCount} {intl.formatMessage({ id: "ta element" })}</p>
                 </div>
               </div>
 
@@ -193,9 +202,9 @@ const HomeworkPlaygroundPage = () => {
                   <AlertCircle size={20} />
                 </div>
                 <div>
-                  <h4 className="font-black text-blue-900 text-sm md:text-base mb-1">Muhim eslatma</h4>
+                  <h4 className="font-black text-blue-900 text-sm md:text-base mb-1">{intl.formatMessage({ id: "Muhim eslatma" })}</h4>
                   <p className="text-xs md:text-sm text-blue-800/70 font-medium leading-relaxed">
-                    Barcha topshiriqlarni yakunlaganingizdan so'ng, natijalarni saqlash uchun "Vazifani topshirish" tugmasini bosing.
+                    {intl.formatMessage({ id: "Barcha topshiriqlarni yakunlaganingizdan so'ng, 'Topshiriqlar' sahifasida natijalarni ko'rishingiz mumkin." })}
                   </p>
                 </div>
               </div>
@@ -268,7 +277,7 @@ const HomeworkPlaygroundPage = () => {
                 </div>
 
                 {/* FINAL SUBMIT BUTTON - Faqat hamma elementlar bajarilganda chiqadi */}
-                {isAllFinished && (
+                {/* {isAllFinished && (
                   <button
                     onClick={handleSubmitHomework}
                     disabled={isSubmitting}
@@ -286,12 +295,12 @@ const HomeworkPlaygroundPage = () => {
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </button>
-                )}
+                )} */}
 
                 {!isAllFinished && (
                   <div className="text-center">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.1em]">
-                      Davom etish uchun barcha elementlarni yeching
+                      {intl.formatMessage({ id: "Har bir topshiriq ichki sahifasiga kirish uchun bosing" })}
                     </p>
                   </div>
                 )}

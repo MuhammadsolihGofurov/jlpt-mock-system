@@ -6,8 +6,7 @@ const HomeworkQuestionRenderer = ({ group, onSelect, selectedAnswers, isActiveGr
     const intl = useIntl();
 
     return (
-        <div className={`mb-10 p-6 sm:p-8 rounded-[2.5rem] border transition-all duration-500 bg-white ${isListeningMode ? "border-primary shadow-xl shadow-orange-50" : "border-slate-100"
-            }`}>
+        <div className={`mb-10 p-6 sm:p-8 rounded-[2.5rem] border transition-all duration-500 bg-white border-primary shadow-xl shadow-orange-50`}>
 
             <div className="mb-8">
                 <div className="flex justify-between items-center mb-4">

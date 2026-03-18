@@ -57,7 +57,10 @@ const ExamPlaygroundPage = () => {
   };
 
   if (examData) {
-    return <ExamPlayground examData={examData} />;
+    return <>
+      <Seo title={examInfo?.title || "Exam"} />
+      <ExamPlayground examData={examData} />
+    </>;
   }
 
   return (

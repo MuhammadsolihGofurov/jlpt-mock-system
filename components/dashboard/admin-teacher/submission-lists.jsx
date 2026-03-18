@@ -69,7 +69,7 @@ const SubmissionLists = () => {
 
                 {/* Section Headers with Labels */}
                 <th className="px-4 py-6 text-[10px] font-black uppercase tracking-widest text-center">
-                  {intl.formatMessage({ id: "Vocabular" })}
+                  {intl.formatMessage({ id: "Vocabulary" })}
                 </th>
                 <th className="px-4 py-6 text-[10px] font-black uppercase tracking-widest text-center">
                   {intl.formatMessage({ id: "Reading" })}

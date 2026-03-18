@@ -22,6 +22,7 @@ const HomeworkPlayground = ({ data, onFinish, onBack }) => {
 
     const currentSection = sections[currentSectionIndex];
     const isLastSection = currentSectionIndex === sections.length - 1;
+    const sectionDuration = currentSection?.duration || itemData?.duration || 0;
 
     // Progressni hisoblash
     const totalQuestions = sections.reduce((acc, sec) => acc + (sec.question_groups?.reduce((a, g) => a + g.questions.length, 0) || 0), 0);
@@ -44,6 +45,14 @@ const HomeworkPlayground = ({ data, onFinish, onBack }) => {
                 sectionName={currentSection.name}
                 onBack={onBack}
                 progress={progress}
+                duration={sectionDuration}
+                onTimeUp={() => {
+                    if (isLastSection) {
+                        handleFinish();
+                    } else {
+                        setCurrentSectionIndex(prev => prev + 1);
+                    }
+                }}
             />
 
             <main className="flex-1 overflow-y-auto p-6 md:p-10">

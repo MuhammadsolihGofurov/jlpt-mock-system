@@ -33,9 +33,9 @@ const HomeworkCard = ({ item, mutate }) => {
 
   const getResultsLink = () => {
     if (isStudent) {
-      return `/dashboard/homeworks/my-results/${item.id}`;
+      return `/dashboard/results/my-homework-results/${item.id}`;
     }
-    return `/dashboard/homeworks/results/${item.id}`;
+    return `/dashboard/results/homework-results/${item.id}`;
   };
 
   const handleDelete = () => {
