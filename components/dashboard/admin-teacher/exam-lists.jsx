@@ -75,9 +75,7 @@ const ExamLists = () => {
       {/* Pagination */}
       {data?.count > 8 && (
         <div className="pt-10 flex justify-center">
-          <div className="bg-white p-2 rounded-[2rem] shadow-sm border border-slate-50">
-            <Pagination totalCount={data.count} pageSize={8} />
-          </div>
+          <Pagination totalCount={data.count} pageSize={8} />
         </div>
       )}
     </div>

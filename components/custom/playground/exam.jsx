@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { authAxios } from "@/utils/axios";
 import { ListeningOverlay } from "./details/exam-listening-overlay";
 import { useIntl } from "react-intl";
+import { ListeningModeSelector } from "./details/listening-mode-selector";
 
 const ExamPlayground = ({ examData }) => {
   const router = useRouter();
@@ -18,6 +19,7 @@ const ExamPlayground = ({ examData }) => {
   const [activeGroupIndex, setActiveGroupIndex] = useState(0);
   const [isAudioStarted, setIsAudioStarted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [audioMode, setAudioMode] = useState(null);
 
   useEffect(() => {
     setActiveGroupIndex(0);
@@ -51,7 +53,10 @@ const ExamPlayground = ({ examData }) => {
     (q) => answers.hasOwnProperty(q.id) && answers[q.id] !== undefined,
   );
 
-  useExamSecurity(true);
+  useExamSecurity(true, () => {
+    console.error("Foydalanuvchi qoidani buzdi, API'ga xabar berish mumkin.");
+    // Masalan: authAxios.post("/violations/log", { type: "CHEATING_ATTEMPT" });
+  });
 
   const handleSelectOption = (questionId, optionIndex) => {
     setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }));
@@ -111,10 +116,20 @@ const ExamPlayground = ({ examData }) => {
   return (
     <div className="fixed inset-0 bg-slate-50 flex flex-col overflow-hidden select-none">
       {/* Agar LISTENING bo'lsa va hali boshlanmagan bo'lsa Overlay chiqarish */}
-      {currentSection.section_type === "LISTENING" && !isAudioStarted && (
+      {/* {currentSection.section_type === "LISTENING" && !isAudioStarted && (
         <ListeningOverlay
           title={currentSection.name}
           onStart={() => setIsAudioStarted(true)}
+        />
+      )} */}
+
+      {currentSection.section_type === "LISTENING" && !audioMode && (
+        <ListeningModeSelector
+          onSelect={(mode) => {
+            setAudioMode(mode);
+            if (mode === 'auto') setIsAudioStarted(true);
+            else setIsAudioStarted(true);
+          }}
         />
       )}
 
@@ -137,20 +152,30 @@ const ExamPlayground = ({ examData }) => {
               </span>
             </h2>
 
-            {currentSection.question_groups.map((group, index) => (
-              <QuestionRenderer
-                key={group.id}
-                group={group}
-                onSelect={handleSelectOption}
-                selectedAnswers={answers}
-                isActiveGroup={
-                  currentSection.section_type === "LISTENING"
-                    ? (isAudioStarted && index === activeGroupIndex)
-                    : true
-                }
-                onAudioEnd={handleAudioEnd}
-              />
-            ))}
+            {currentSection.question_groups.map((group, index) => {
+              const isActuallyVisible =
+                currentSection.section_type !== "LISTENING" ||
+                audioMode === 'manual' ||
+                (isAudioStarted && index === activeGroupIndex);
+
+              return (
+                <QuestionRenderer
+                  key={group.id}
+                  isActiveGroup={isActuallyVisible}
+                  audioMode={audioMode}
+                  group={group}
+                  onSelect={handleSelectOption}
+                  sectionType={currentSection?.section_type}
+                  selectedAnswers={answers}
+                  // isActiveGroup={
+                  //   currentSection.section_type === "LISTENING"
+                  //     ? (isAudioStarted && index === activeGroupIndex)
+                  //     : true
+                  // }
+                  onAudioEnd={handleAudioEnd}
+                />
+              )
+            })}
           </div>
         </main>
       </div>

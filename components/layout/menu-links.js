@@ -9,6 +9,7 @@ import {
   Settings,
   Ticket,
   User2,
+  UserPlus2,
   Users2,
   Users2Icon,
 } from "lucide-react";
@@ -24,6 +25,13 @@ export const menus = [{
     label: "Markazlar",
     href: "/dashboard/centers",
     icon: Building2,
+    roles: ["OWNER"],
+    is_mobile: true,
+  },
+  {
+    label: "So'rovlar",
+    href: "/dashboard/requests",
+    icon: UserPlus2,
     roles: ["OWNER"],
     is_mobile: true,
   },

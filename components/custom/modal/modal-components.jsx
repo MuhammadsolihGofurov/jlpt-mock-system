@@ -21,6 +21,7 @@ import ConfirmModal from "./details/confirm-modal";
 import NotificationDetailModal from "./details/notification-detail-modal";
 import AdminFormModal from "./details/owner/admin-form-modal";
 import CenterFormModal from "./details/owner/center-form-modal";
+import ContactRequestStatusModal from "./details/owner/contact-request-modal";
 import SubscriptionFormModal from "./details/owner/subscription-modal";
 
 export const ModalComponents = {
@@ -47,5 +48,6 @@ export const ModalComponents = {
   QUIZ_FORM: QuizFormModal,
   QUIZ_FILTER: QuizFilterModal,
   RESULT_VIEW: ResultViewModal,
-  NOTIFY_MODAL: NotificationDetailModal
+  NOTIFY_MODAL: NotificationDetailModal,
+  CONTACT_FORM: ContactRequestStatusModal
 };

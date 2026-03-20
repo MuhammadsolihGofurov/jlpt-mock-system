@@ -84,7 +84,7 @@ const Layout = ({ children }) => {
         <meta name="theme-color" content="#ffffff"></meta>
       </Head>
 
-      {isAuthPage ? (
+      {isAuthPage || router.pathname === "/" ? (
         <>{children}</>
       ) : (
         <>

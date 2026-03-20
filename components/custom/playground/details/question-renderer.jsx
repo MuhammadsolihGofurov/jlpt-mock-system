@@ -6,16 +6,18 @@ export const QuestionRenderer = ({
   onSelect,
   selectedAnswers,
   isActiveGroup,
-  onAudioEnd
+  onAudioEnd,
+  audioMode,
+  sectionType
 }) => {
   const audioRef = useRef(null);
   const intl = useIntl();
 
   useEffect(() => {
-    if (isActiveGroup && group.audio_file && audioRef.current) {
-      audioRef.current.play().catch(err => console.log("Audio autoplay blocked", err));
+    if (audioMode === "auto" && isActiveGroup && group.audio_file && audioRef.current) {
+      audioRef.current.play().catch(err => console.log("Audio blocked", err));
     }
-  }, [isActiveGroup, group.audio_file]);
+  }, [isActiveGroup, group.audio_file, audioMode]);
 
   return (
     <div className={`mb-12 p-4 sm:p-8 rounded-[2.5rem] border transition-all duration-500 ${isActiveGroup ? "bg-white border-primary shadow-2xl shadow-orange-100 scale-[1.01]" : "bg-slate-50 border-slate-100 opacity-60"
@@ -25,7 +27,7 @@ export const QuestionRenderer = ({
           <span className="bg-primary text-white px-5 py-1.5 rounded-2xl text-sm font-black uppercase tracking-wider">
             Mondai {group.mondai_number}
           </span>
-          {group.audio_file && (
+          {audioMode === "auto" && group.audio_file && isActiveGroup && (
             <span className="flex items-center gap-2 text-primary font-bold animate-pulse">
               <div className="w-2 h-2 bg-primary rounded-full" /> {intl.formatMessage({ id: "Tinglanmoqda..." })}
             </span>
