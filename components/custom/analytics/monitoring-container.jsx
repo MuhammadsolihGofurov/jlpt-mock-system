@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import fetcher from "@/utils/fetcher";
 import { useIntl } from "react-intl";
+import { parseSizeToMB } from "@/utils/funcs";
 
 // Yordamchi ranglar
 const COLORS = ["#f97316", "#0ea5e9", "#22c55e", "#a855f7", "#64748b"];
@@ -80,13 +81,22 @@ const MonitoringContainer = () => {
     // Ma'lumotlarni grafiklar uchun tayyorlash (useMemo rerenderlarni oldini oladi)
     const tenantChartData = useMemo(() => {
         if (!tenants?.tenants) return [];
-        return tenants.tenants.map(t => ({
-            name: t.center_name,
-            db: parseFloat(t.db_size),
-            s3: parseFloat(t.s3_size),
-            users: t.user_count
-        }));
+
+        return tenants.tenants.map(t => {
+            const dbMB = parseSizeToMB(t.db_size);
+            const s3MB = parseSizeToMB(t.s3_size);
+
+            return {
+                name: t.center_name,
+                db: dbMB,
+                s3: s3MB,
+                dbRaw: t.db_size,
+                s3Raw: t.s3_size,
+                users: t.user_count
+            };
+        });
     }, [tenants]);
+
 
     const memoryData = useMemo(() => {
         if (!system?.memory) return [];
@@ -141,6 +151,11 @@ const MonitoringContainer = () => {
                                 <Tooltip
                                     cursor={{ fill: '#f8fafc' }}
                                     contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                    formatter={(value, name, props) => {
+                                        if (name === "Database (MB)") return [props.payload.dbRaw, "Database"];
+                                        if (name === "S3 Storage (MB)") return [props.payload.s3Raw, "S3 Storage"];
+                                        return [value, name];
+                                    }}
                                 />
                                 <Bar dataKey="db" name="Database (MB)" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
                                 <Bar dataKey="s3" name="S3 Storage (MB)" fill="#f97316" radius={[4, 4, 0, 0]} />

@@ -95,3 +95,23 @@ export const formatDateTime = (dateString) => {
 
 	return `${day}.${month}.${year} ${hours}:${minutes}`;
 };
+
+export const parseSizeToMB = (sizeStr) => {
+	if (!sizeStr || typeof sizeStr !== 'string') return 0;
+
+	const value = parseFloat(sizeStr);
+	const unit = sizeStr.replace(/[0-9. ]/g, "").toUpperCase();
+
+	switch (unit) {
+		case "GB":
+			return value * 1024;
+		case "MB":
+			return value;
+		case "KB":
+			return value / 1024;
+		case "B":
+			return value / (1024 * 1024);
+		default:
+			return value;
+	}
+};
