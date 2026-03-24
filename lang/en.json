@@ -568,5 +568,12 @@
     "So'rovlar topilmadi": "No requests found",
     "So'nggi so'rovlar": "Latest requests",
     "Sizga bog'lanishni kutayotgan mijozlar": "Clients waiting for you to contact them",
-    "Hozircha so'rovlar mavjud emas.": "No requests available at the moment."
+    "Hozircha so'rovlar mavjud emas.": "No requests available at the moment.",
+    "Monitiring": "Monitoring",
+    "Monitoring_desc": "On this page, you can analyze all system statistics.",
+    "Markazlar Resurs Analitikasi": "Centers Resource Analytics",
+    "Docker Konteynerlar": "Docker Containers",
+    "Konteyner": "Container",
+    "Memory usage": "Memory usage",
+    "Uptime": "Uptime"
 }

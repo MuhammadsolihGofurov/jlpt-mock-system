@@ -568,5 +568,12 @@
   "So'rovlar topilmadi": "データが見つかりません",
   "So'nggi so'rovlar": "最新のお問い合わせ",
   "Sizga bog'lanishni kutayotgan mijozlar": "対応待ちのクライアント",
-  "Hozircha so'rovlar mavjud emas.": "現在、問い合わせはありません。"
+  "Hozircha so'rovlar mavjud emas.": "現在、問い合わせはありません。",
+  "Monitiring": "モニタリング",
+  "Monitoring_desc": "このページでは、システム内のすべての統計を分析できます。",
+  "Markazlar Resurs Analitikasi": "センターリソース分析",
+  "Docker Konteynerlar": "Dockerコンテナ",
+  "Konteyner": "コンテナ",
+  "Memory usage": "メモリ使用量",
+  "Uptime": "稼働時間"
 }
