@@ -42,8 +42,7 @@ module.exports = {
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       screens: {
         small: "360px",
@@ -60,6 +59,8 @@ module.exports = {
 
         lg: "992px",
         // => @media (min-width: 992px) { ... }
+
+        "4xl": "1340px"
       },
     },
   },

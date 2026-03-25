@@ -23,6 +23,7 @@ import AdminFormModal from "./details/owner/admin-form-modal";
 import CenterFormModal from "./details/owner/center-form-modal";
 import ContactRequestStatusModal from "./details/owner/contact-request-modal";
 import SubscriptionFormModal from "./details/owner/subscription-modal";
+import ServiceDetailModal from "./details/service-modal";
 
 export const ModalComponents = {
   centerForm: CenterFormModal,
@@ -49,5 +50,6 @@ export const ModalComponents = {
   QUIZ_FILTER: QuizFilterModal,
   RESULT_VIEW: ResultViewModal,
   NOTIFY_MODAL: NotificationDetailModal,
-  CONTACT_FORM: ContactRequestStatusModal
+  CONTACT_FORM: ContactRequestStatusModal,
+  SERVICE_MODAL: ServiceDetailModal
 };
