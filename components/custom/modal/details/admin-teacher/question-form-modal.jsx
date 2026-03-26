@@ -5,11 +5,10 @@ import {
   Plus,
   Trash2,
   CheckCircle2,
-  Music,
-  ImageIcon,
+  ImageIcon, // Rasm ikonkasi
   Star,
 } from "lucide-react";
-import { Input, RichTextarea, Textarea } from "@/components/ui";
+import { Input, RichTextarea } from "@/components/ui";
 import { useModal } from "@/context/modal-context";
 import { useIntl } from "react-intl";
 import { toast } from "react-toastify";
@@ -17,27 +16,30 @@ import { handleApiError } from "@/utils/handle-error";
 import { authAxios } from "@/utils/axios";
 import { mutate } from "swr";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = null, question_count = 0, groupName }) => {
   const { closeModal } = useModal();
   const isEdit = !!question;
   const router = useRouter();
   const intl = useIntl();
+  const [preview, setPreview] = useState(null); // Rasm preview uchun
 
   const {
     register,
     handleSubmit,
     control,
-    setValue, // Xatolikni tuzatish uchun kerak
+    setValue,
     setError,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       text: "",
       question_number: question_count + 1,
       score: 1,
+      image: null, // Rasm maydoni
       options: [
         { text: "", is_correct: false },
         { text: "", is_correct: false },
@@ -52,9 +54,11 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
     name: "options",
   });
 
+  // Tahrirlash rejimida ma'lumotlarni yuklash
   useEffect(() => {
     if (question) {
       reset(question);
+      if (question.image) setPreview(question.image); // Agar rasm bo'lsa previewga qo'yish
     }
   }, [question, reset]);
 
@@ -77,9 +81,20 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
       formData.append("score", values.score);
       formData.append("options", JSON.stringify(values.options));
 
+      // --- RASMNI FORMDATA'GA QO'SHISH ---
+      if (values.image && values.image[0] instanceof File) {
+        formData.append("image", values.image[0]);
+      }
+
       const method = isEdit ? "patch" : "post";
       const url = isEdit ? `/questions/${question.id}/` : `/questions/`;
-      await authAxios[method](url, formData);
+
+      await authAxios({
+        method,
+        url,
+        data: formData,
+        headers: { "Content-Type": "multipart/form-data" }, // Fayl uchun muhim
+      });
 
       toast.update(toastId, {
         render: intl.formatMessage({ id: "Muvaffaqiyatli saqlandi!" }),
@@ -152,8 +167,33 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
           )}
         />
 
+        {/* --- RASM YUKLASH QISMI --- */}
+        <div className="space-y-2">
+          <label className="text-sm font-black text-heading ml-1 flex items-center gap-2">
+            <ImageIcon size={16} /> Rasm (Optional)
+          </label>
+
+          {preview && (
+            <div className="mb-2 relative w-40 h-24 overflow-hidden rounded-xl border border-slate-200">
+              <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+            </div>
+          )}
+
+          <input
+            type="file"
+            accept="image/*"
+            {...register("image", {
+              onChange: (e) => {
+                const file = e.target.files[0];
+                if (file) setPreview(URL.createObjectURL(file));
+              }
+            })}
+            className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+          />
+        </div>
+
         {/* Variantlar */}
-        <div className="space-y-4">
+        <div className="space-y-4 pt-4 border-t">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-black text-heading flex items-center gap-2">
               <Star size={20} className="text-orange-400" />{" "}

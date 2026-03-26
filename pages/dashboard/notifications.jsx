@@ -151,7 +151,7 @@ const NotificationsPage = () => {
                     )}
 
                     {/* Float Action Button for Mark All */}
-                    {!isLoading && notifications?.results?.some(n => !n.is_read) && (
+                    {/* {!isLoading && notifications?.results?.some(n => !n.is_read) && (
                         <div className="fixed bottom-10 right-10">
                             <button
                                 onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
@@ -161,7 +161,7 @@ const NotificationsPage = () => {
                                 {intl.formatMessage({ id: "Hammasini o'qildi qilish" })}
                             </button>
                         </div>
-                    )}
+                    )} */}
                 </div>
             </AuthGuard>
         </>

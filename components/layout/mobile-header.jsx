@@ -19,20 +19,26 @@ const MobileHeader = () => {
           <Menu size={22} strokeWidth={2.5} />
         </button>
 
-        <div className="flex items-center gap-2">
-          <div className="bg-primary p-1.5 rounded-lg shadow-sm">
-            <Image
+        <Link href={"/dashboard"} className="flex items-center gap-1">
+          <div className="w-10 sm:w-14">
+            <img
               src="/mikan-logo.svg"
-              alt="Mikan"
-              width={20}
-              height={20}
-              className="brightness-0 invert"
+              alt="Logo"
+              width={60}
+              height={60}
+              style={{ height: 'auto' }}
             />
           </div>
-          <span className="text-lg font-black tracking-tight text-heading">
-            Mikan<span className="text-primary">.uz</span>
-          </span>
-        </div>
+          <div className='w-14 sm:w-[100px]'>
+            <img
+              src="/images/mikan-logo-text.svg"
+              alt="Logo"
+              width={80}
+              height={80}
+              style={{ height: 'auto' }}
+            />
+          </div>
+        </Link>
       </div>
 
       {/* O'ng tomonda bildirishnomalar yoki Profil */}

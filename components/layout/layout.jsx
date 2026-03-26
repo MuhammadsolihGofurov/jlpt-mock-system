@@ -57,19 +57,19 @@ const Layout = ({ children }) => {
         <link
           rel="apple-touch-icon"
           sizes="180x180"
-          href="/images/mikan-logo.png"
+          href="/mikan-logo.svg"
         />
         <link
           rel="icon"
           type="image/png"
           sizes="32x32"
-          href="/images/mikan-logo.png"
+          href="/mikan-logo.svg"
         />
         <link
           rel="icon"
           type="image/png"
           sizes="16x16"
-          href="/images/mikan-logo.png"
+          href="/mikan-logo.svg"
         />
         {/* <link rel="manifest" href="/img/icons/favicon/site.webmanifest" /> */}
         <link
@@ -77,7 +77,7 @@ const Layout = ({ children }) => {
           href="/img/icons/favicon/safari-pinned-tab.svg"
           color="#5bbad5"
         />
-        <link rel="shortcut icon" href="/images/mikan-logo.png" />
+        <link rel="shortcut icon" href="/mikan-logo.svg" />
         <meta name="msapplication-TileColor" content="#ffc40d" />
         <meta
           name="msapplication-config"

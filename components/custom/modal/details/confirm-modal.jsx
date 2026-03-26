@@ -57,8 +57,9 @@ const ConfirmModal = ({
 
       closeModal("CONFIRM_MODAL", { refresh: true });
     } catch (error) {
-      toast.dismiss(toastId);
-      handleApiError(error);
+      const msg = handleApiError(error);
+      toast.error(msg);
+      toast.dismiss(toastId)
     } finally {
       setLoading(false);
     }

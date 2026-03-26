@@ -31,13 +31,13 @@ export const handleApiError = (err, setError = null) => {
   } else if (generalMessage) {
     errorMessage = generalMessage;
   }
-  toast.error(errorMessage, {
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-  });
+  // toast.error(errorMessage, {
+  //   autoClose: 5000,
+  //   hideProgressBar: false,
+  //   closeOnClick: true,
+  //   pauseOnHover: true,
+  //   draggable: true,
+  // });
 
   return errorMessage;
 };

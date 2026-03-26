@@ -51,6 +51,14 @@ const HomeworkQuestionRenderer = ({ group, onSelect, selectedAnswers, isActiveGr
             <div className="space-y-8">
                 {group.questions?.map((q, i) => (
                     <div key={q.id} className="border-t pt-8 first:border-t-0 first:pt-0">
+
+                        {/* Savol ichidagi rasm bo'lsa */}
+                        {q?.image && (
+                            <div className="mb-4 max-w-md mx-auto rounded-2xl overflow-hidden shadow-md">
+                                <img src={q?.image} alt="Q" className="w-full h-auto" />
+                            </div>
+                        )}
+
                         <div className="text-slate-800 mb-5 text-lg flex gap-3">
                             <span className="font-black text-primary">{q.question_number || i + 1}.</span>
                             <div dangerouslySetInnerHTML={{ __html: q.text }} />

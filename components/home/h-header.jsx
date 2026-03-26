@@ -14,19 +14,25 @@ export default function HHeader() {
     return (
         <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
             <div className="max-w-[1440px] mx-auto px-3 sm:px-6 4xl:px-0 h-20 flex items-center justify-between">
-                <Link href={"/"} className="text-2xl font-bold tracking-tighter flex items-center gap-2">
-                    <div className="bg-orange-500 p-2.5 rounded-[14px] shadow-lg shadow-orange-200">
-                        <Image
+                <Link href={"/"} className="text-2xl font-bold tracking-tighter flex items-center gap-1">
+                    <div className="w-10 sm:w-14">
+                        <img
                             src="/mikan-logo.svg"
-                            alt="Mikan"
-                            width={28}
-                            height={28}
-                            className="brightness-0 invert"
+                            alt="Logo"
+                            width={100}
+                            height={120}
+                            style={{ height: 'auto' }}
                         />
                     </div>
-                    <span className="text-2xl font-black tracking-tight text-gray-900">
-                        Mikan<span className="text-orange-500">.uz</span>
-                    </span>
+                    <div className='w-14 sm:w-[100px]'>
+                        <img
+                            src="/images/mikan-logo-text.svg"
+                            alt="Logo"
+                            width={100}
+                            height={120}
+                            style={{ height: 'auto' }}
+                        />
+                    </div>
                 </Link>
 
                 <div className="hidden md:flex gap-10 text-[14px] font-bold uppercase tracking-widest text-slate-500">

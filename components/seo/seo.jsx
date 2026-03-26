@@ -31,7 +31,7 @@ const Seo = ({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content="/images/mikan-logo.png" />
+      <meta name="twitter:image" content="/mikan-logo.svg" />
       <meta name="twitter:site" content="@mikan.uz" />
       <meta name="twitter:creator" content="@mikan.uz" />
 

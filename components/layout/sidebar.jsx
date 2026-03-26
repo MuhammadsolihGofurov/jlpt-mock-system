@@ -136,20 +136,26 @@ const Sidebar = () => {
       >
         {/* Logo Section */}
         <div className="pl-5 pr-2 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-orange-500 p-2.5 rounded-[14px] shadow-lg shadow-orange-200">
-              <Image
+          <Link href={"/dashboard"} className="flex items-center gap-1">
+            <div className="w-10 sm:w-14">
+              <img
                 src="/mikan-logo.svg"
-                alt="Mikan"
-                width={28}
-                height={28}
-                className="brightness-0 invert"
+                alt="Logo"
+                width={60}
+                height={60}
+                style={{ height: 'auto' }}
               />
             </div>
-            <span className="text-2xl font-black tracking-tight text-gray-900">
-              Mikan<span className="text-orange-500">.uz</span>
-            </span>
-          </div>
+            <div className='w-14 sm:w-[100px]'>
+              <img
+                src="/images/mikan-logo-text.svg"
+                alt="Logo"
+                width={80}
+                height={80}
+                style={{ height: 'auto' }}
+              />
+            </div>
+          </Link>
 
           {/* Yangi Notification Icon */}
           <Link
