@@ -13,6 +13,7 @@ import {
   Calendar,
   Trash2,
   Edit2,
+  Clock,
 } from "lucide-react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
@@ -88,6 +89,24 @@ const MaterialCard = ({ item }) => {
     );
   };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return { full: "---", time: "--:--" };
+    const date = new Date(dateStr);
+    return {
+      full: date.toLocaleDateString("uz-UZ", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }),
+      time: date.toLocaleTimeString("uz-UZ", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+  };
+
+  const dateInfo = formatDate(item.created_at);
+
   return (
     <div className="group bg-white border border-slate-100 p-5 rounded-[2.25rem] shadow-sm hover:shadow-2xl hover:shadow-orange-100/50 hover:border-orange-100 transition-all duration-500 flex flex-col h-full relative overflow-hidden">
       {/* Hover Decoration */}
@@ -106,11 +125,10 @@ const MaterialCard = ({ item }) => {
 
           <div className="flex items-center gap-1.5">
             <div
-              className={`px-3 py-1.5 rounded-xl flex items-center gap-1.5 border backdrop-blur-sm ${
-                item.is_public
-                  ? "bg-green-50/50 border-green-100 text-green-600"
-                  : "bg-slate-50/50 border-slate-100 text-slate-400"
-              }`}
+              className={`px-3 py-1.5 rounded-xl flex items-center gap-1.5 border backdrop-blur-sm ${item.is_public
+                ? "bg-green-50/50 border-green-100 text-green-600"
+                : "bg-slate-50/50 border-slate-100 text-slate-400"
+                }`}
             >
               {item.is_public ? (
                 <Globe size={12} strokeWidth={3} />
@@ -118,7 +136,7 @@ const MaterialCard = ({ item }) => {
                 <Lock size={12} strokeWidth={3} />
               )}
               <span className="text-[10px] font-black uppercase tracking-tighter">
-                {item.is_public ? "Public" : "Private"}
+                {intl.formatMessage({ id: item.is_public ? "Public" : "Private" })}
               </span>
             </div>
           </div>
@@ -157,41 +175,49 @@ const MaterialCard = ({ item }) => {
       <div className="flex items-center justify-between pt-5 border-t border-slate-50 relative">
         <div className="flex items-center gap-2 text-slate-400">
           <Calendar size={14} />
-          <span className="text-xs font-bold">
-            {new Date(item.created_at).toLocaleDateString()}
+          <span>
+            {item.created_at ? (
+              <div className="flex items-center gap-2.5 text-slate-800">
+                <span className="text-xs font-semibold tracking-tight">
+                  {dateInfo.full} {dateInfo.time}
+                </span>
+              </div>
+            ) : (
+              intl.formatMessage({ id: "Vaqt belgilanmagan" })
+            )}
           </span>
         </div>
 
         <div className="flex items-center gap-2">
           {(user?.role === "CENTER_ADMIN" ||
             (user?.role === "TEACHER" && user?.id == item?.created_by?.id)) && (
-            <div className="flex items-center">
-              <button
-                onClick={() =>
-                  openModal("MATERIAL_FORM", { material: item }, "middle")
-                }
-                className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all duration-200 active:scale-90 group/edit"
-                title="Tahrirlash"
-              >
-                <Edit2
-                  size={16}
-                  className="group-hover/edit:rotate-12 transition-transform"
-                />
-              </button>
+              <div className="flex items-center">
+                <button
+                  onClick={() =>
+                    openModal("MATERIAL_FORM", { material: item }, "middle")
+                  }
+                  className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all duration-200 active:scale-90 group/edit"
+                  title="Tahrirlash"
+                >
+                  <Edit2
+                    size={16}
+                    className="group-hover/edit:rotate-12 transition-transform"
+                  />
+                </button>
 
-              {/* Delete Button */}
-              <button
-                onClick={() => handleDelete(item?.id)}
-                className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200 active:scale-90 group/del"
-                title="O'chirish"
-              >
-                <Trash2
-                  size={16}
-                  className="group-hover/del:shake transition-transform"
-                />
-              </button>
-            </div>
-          )}
+                {/* Delete Button */}
+                <button
+                  onClick={() => handleDelete(item?.id)}
+                  className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200 active:scale-90 group/del"
+                  title="O'chirish"
+                >
+                  <Trash2
+                    size={16}
+                    className="group-hover/del:shake transition-transform"
+                  />
+                </button>
+              </div>
+            )}
           <button
             onClick={handleDownload}
             className="relative overflow-hidden group/btn bg-slate-900 hover:bg-primary text-white p-3.5 rounded-[1.25rem] shadow-lg shadow-slate-200 hover:shadow-orange-200 transition-all duration-300 active:scale-90"

@@ -139,14 +139,13 @@ const ExamCard = ({ item, mutate }) => {
       {/* Badge: Status */}
       <div className="flex justify-between items-start mb-6">
         <div
-          className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${
-            isOpen ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
-          }`}
+          className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${isOpen ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
+            }`}
         >
           <div
             className={`w-1.5 h-1.5 rounded-full animate-pulse ${isOpen ? "bg-emerald-600" : "bg-red-600"}`}
           />
-          {isOpen ? "Ochiq" : "Yopiq"}
+          {intl.formatMessage({ id: isOpen ? "Ochiq" : "Yopiq" })}
         </div>
 
         {canManage && (
@@ -213,11 +212,10 @@ const ExamCard = ({ item, mutate }) => {
         <div className="grid grid-cols-2 gap-2 mb-4">
           <button
             onClick={handleToggleStatus}
-            className={`flex items-center justify-center gap-2 py-3 rounded-2xl text-[11px] font-black uppercase tracking-tighter transition-all ${
-              isOpen
+            className={`flex items-center justify-center gap-2 py-3 rounded-2xl text-[11px] font-black uppercase tracking-tighter transition-all ${isOpen
                 ? "bg-red-50 text-red-600 hover:bg-red-100"
                 : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
-            }`}
+              }`}
           >
             {isOpen ? <Lock size={14} /> : <Unlock size={14} />}
             {intl.formatMessage({ id: isOpen ? "Yopish" : "Ochish" })}
@@ -225,11 +223,10 @@ const ExamCard = ({ item, mutate }) => {
 
           <button
             onClick={handleTogglePublish}
-            className={`flex items-center justify-center gap-2 py-3 rounded-2xl text-[11px] font-black uppercase tracking-tighter transition-all ${
-              isPublished
+            className={`flex items-center justify-center gap-2 py-3 rounded-2xl text-[11px] font-black uppercase tracking-tighter transition-all ${isPublished
                 ? "bg-slate-900 text-white"
                 : "bg-orange-50 text-orange-600 hover:bg-orange-100"
-            }`}
+              }`}
           >
             {isPublished ? <EyeOff size={14} /> : <Eye size={14} />}
             {intl.formatMessage({

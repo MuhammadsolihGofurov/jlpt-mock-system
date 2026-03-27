@@ -19,7 +19,10 @@ import {
     ArrowLeft,
     LayoutGrid,
     CheckCircle2,
+    Download,
 } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const HomeworkResults = () => {
     const router = useRouter();
@@ -52,18 +55,134 @@ const HomeworkResults = () => {
         return mins > 0 ? `${mins} min` : `${seconds} sec`;
     };
 
+    const downloadFullPDF = () => {
+        const doc = new jsPDF('p', 'mm', 'a4');
+
+        data.submissions.forEach((submission, index) => {
+            const isMock = submission.item_type === "mock_test";
+            const res = submission.results;
+            const isPassed = isMock ? res.jlpt_result?.passed : (res.percentage >= 50);
+
+            if (index > 0) doc.addPage();
+
+            // --- 1. Header ---
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.setTextColor(30, 41, 59);
+            doc.text("HOMEWORK ANALYSIS", 15, 20);
+
+            doc.setFontSize(10);
+            doc.setTextColor(150, 150, 150);
+            doc.text("mikan.uz", 195, 20, { align: 'right' });
+
+            doc.setDrawColor(226, 232, 240);
+            doc.line(15, 25, 195, 25);
+
+            // --- 2. Title Banner ---
+            doc.setFillColor(15, 23, 42);
+            doc.rect(15, 30, 180, 22, "F");
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(11);
+            doc.text(data.homework_title.toUpperCase(), 105, 39, { align: 'center' });
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.text(`${submission.item_title} • Part ${index + 1} of ${data.submissions.length}`, 105, 46, { align: 'center' });
+
+            // --- 3. Info Grid (Custom Boxes) ---
+            const drawBox = (x, y, w, h, label, value, highlight = false) => {
+                doc.setDrawColor(226, 232, 240);
+                doc.rect(x, y, w, h);
+                doc.setFontSize(7);
+                doc.setTextColor(100, 100, 100);
+                doc.text(label, x + 2, y + 4);
+                doc.setFontSize(10);
+                doc.setFont("helvetica", "bold");
+
+                if (highlight) {
+                    const passColor = [34, 197, 94]; // Green
+                    const failColor = [239, 68, 68]; // Red
+                    doc.setTextColor(...(isPassed ? passColor : failColor));
+                } else {
+                    doc.setTextColor(30, 41, 59);
+                }
+
+                doc.text(String(value), x + w / 2, y + 12, { align: 'center' });
+                doc.setFont("helvetica", "normal");
+            };
+
+            const infoY = 60;
+            drawBox(15, infoY, 45, 18, "SUBMISSION ID", `#${submission.submission_id}`);
+            drawBox(60, infoY, 45, 18, "COMPLETED DATE", new Date(submission.completed_at).toLocaleDateString());
+            drawBox(105, infoY, 45, 18, "TIME SPENT", formatTime(submission.time_taken_seconds));
+            drawBox(150, infoY, 45, 18, "RESULT STATUS", isPassed ? "PASSED" : "FAILED", true);
+
+            // --- 4. Score Table ---
+            doc.setFontSize(12);
+            doc.setTextColor(30, 41, 59);
+            doc.setFont("helvetica", "bold");
+            doc.text("Detailed Analysis", 15, 95);
+
+            let tableBody = [];
+            if (isMock) {
+                const sections = res.jlpt_result?.section_results;
+                tableBody = [
+                    ["Language Knowledge", `${sections?.language_knowledge?.score || 0} / 60`, sections?.language_knowledge?.passed ? "Pass" : "Fail"],
+                    ["Reading", `${sections?.reading?.score || 0} / 60`, sections?.reading?.passed ? "Pass" : "Fail"],
+                    ["Listening", `${sections?.listening?.score || 0} / 60`, sections?.listening?.passed ? "Pass" : "Fail"],
+                    [{ content: "TOTAL SCORE", styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } },
+                    { content: `${Math.round(submission.score)} / 180`, styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } },
+                    { content: isPassed ? "PASSED" : "FAILED", styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }]
+                ];
+            } else {
+                tableBody = [
+                    ["Correct Answers", `${res.correct_count} / ${res.total_questions ? res.total_questions : ""}`, ""],
+                    ["Accuracy Percentage", `${res.percentage}%`, ""],
+                    [{ content: "TOTAL SCORE", styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } },
+                    { content: `${Math.round(submission.score)} / ${res.max_score}`, styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, ""]
+                ];
+            }
+
+            autoTable(doc, {
+                startY: 100,
+                head: [['Section Name', 'Obtained Score', 'Status']],
+                body: tableBody,
+                theme: 'grid',
+                headStyles: { fillColor: [79, 70, 229], fontSize: 10 },
+                styles: { font: "helvetica", fontSize: 9, cellPadding: 4 }
+            });
+
+            // --- 5. Footer ---
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(`Generated on: ${new Date().toLocaleString()} • Page ${index + 1} of ${data.submissions.length}`, 105, 285, { align: 'center' });
+        });
+
+        doc.save(`${data.homework_title.replace(/\s+/g, '_')}_Results.pdf`);
+    };
+
     return (
         <>
             <Seo title={`${data.homework_title} - Natijalar`} />
             <AuthGuard roles={["STUDENT"]}>
                 <PageHeader
                     title={data.homework_title}
-                    description={intl.formatMessage({ id: "Uy vazifasi natijalari tahlili" })}
-                    buttonLabel={intl.formatMessage({ id: "Orqaga" })}
+                    description={"Uy vazifasi natijalari tahlili"}
+                    buttonLabel={"Orqaga"}
                     roles={["STUDENT"]}
                     icon={<ArrowLeft size={18} strokeWidth={2} />}
                     onButtonClick={() => router.push("/dashboard/assignments/homework")}
                 />
+
+                {/* PageHeader ichida yoki ostida qo'shimcha tugma */}
+                <div className="flex justify-end">
+                    <button
+                        onClick={downloadFullPDF}
+                        className="group flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-primary transition-all shadow-xl hover:shadow-primary/20 active:scale-95"
+                    >
+                        <Download size={18} className="group-hover:animate-bounce" />
+                        {intl.formatMessage({ id: "Natijalarni yuklash" })}
+                    </button>
+                </div>
 
                 <div className="space-y-12">
                     {data.submissions.map((submission) => {
@@ -110,7 +229,7 @@ const HomeworkResults = () => {
                                             />
                                             <StatBox
                                                 icon={<Activity size={16} />}
-                                                label="Aniqdik"
+                                                label="Aniqlik"
                                                 value={`${Math.round(isMock ? (submission.score / 180) * 100 : results.percentage)}%`}
                                                 color="orange"
                                             />

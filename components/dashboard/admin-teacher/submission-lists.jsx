@@ -12,8 +12,13 @@ import {
   Type, // Vocabulary/Grammar uchun
   BookOpen, // Reading uchun
   Headphones, // Listening uchun
+  Download, FileSpreadsheet, FileText
 } from "lucide-react";
 import { useModal } from "@/context/modal-context";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 const SubmissionLists = () => {
   const router = useRouter();
@@ -53,8 +58,77 @@ const SubmissionLists = () => {
     );
   }
 
+  const exportToExcel = () => {
+    const tableData = data.results.map((sub, index) => ({
+      "№": index + 1,
+      "Talaba": sub.student_display,
+      "Vocabulary": Object.values(sub.results?.sections || {}).find(s => s.section_type === "VOCAB")?.score || 0,
+      "Reading": Object.values(sub.results?.sections || {}).find(s => s.section_type === "GRAMMAR_READING")?.score || 0,
+      "Listening": Object.values(sub.results?.sections || {}).find(s => s.section_type === "LISTENING")?.score || 0,
+      "Jami": Math.round(sub.score),
+      "Holat": sub.results?.jlpt_result?.passed ? "O'tdi" : "Yiqildi",
+      "Sana": formatDate(sub.completed_at)
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(tableData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Natijalar");
+    XLSX.writeFile(workbook, `Imtihon_Natijalari_${examId}.xlsx`);
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    // Sarlavha qo'shish
+    doc.setFontSize(16);
+    doc.text("Imtihon Natijalari", 14, 15);
+
+    const tableRows = data.results.map((sub, index) => [
+      (page - 1) * 8 + (index + 1),
+      sub.student_display,
+      Object.values(sub.results?.sections || {}).find(s => s.section_type === "VOCAB")?.score || 0,
+      Object.values(sub.results?.sections || {}).find(s => s.section_type === "GRAMMAR_READING")?.score || 0,
+      Object.values(sub.results?.sections || {}).find(s => s.section_type === "LISTENING")?.score || 0,
+      Math.round(sub.score),
+      sub.results?.jlpt_result?.passed ? "Pass" : "Fail",
+    ]);
+
+    // DIQQAT: doc.autoTable o'rniga to'g'ridan-to'g'ri autoTable chaqiriladi
+    autoTable(doc, {
+      head: [['№', 'Talaba', 'Vocab', 'Reading', 'Listening', 'Jami', 'Holat']],
+      body: tableRows,
+      startY: 25,
+      styles: { font: "helvetica", fontSize: 10 },
+      headStyles: { fillColor: [71, 85, 105] },
+    });
+
+    doc.save(`Natijalar_${examId}_page_${page}.pdf`);
+  };
+
   return (
     <div className="flex flex-col space-y-6 pb-10">
+      <div className="flex justify-between sm:flex-row flex-col gap-2 sm:items-center bg-white p-4 rounded-3xl border border-slate-100">
+        <h2 className="text-base font-semibold text-slate-800 ml-2">
+          {intl.formatMessage({ id: "Natijalarni yuklash" })}
+        </h2>
+        <div className="flex gap-2">
+          <button
+            onClick={exportToExcel}
+            className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 hover:bg-green-100 rounded-xl font-bold text-sm transition-all"
+          >
+            <FileSpreadsheet size={18} />
+            Excel
+          </button>
+          <button
+            onClick={exportToPDF}
+            className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl font-bold text-sm transition-all"
+          >
+            <FileText size={18} />
+            PDF
+          </button>
+        </div>
+      </div>
+
       <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden text-slate-900">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[1000px]">

@@ -155,7 +155,6 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
         <Controller
           name="text"
           control={control}
-          rules={{ required: "Savol matni majburiy" }}
           render={({ field: { value, onChange }, fieldState: { error } }) => (
             <RichTextarea
               label="Savol matni (Rich Text)"

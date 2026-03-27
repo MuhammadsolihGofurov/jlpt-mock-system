@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { MoreVertical } from "lucide-react";
+import { useIntl } from "react-intl";
 
 const ActionDropdown = ({ children, trigger }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,8 +26,8 @@ const ActionDropdown = ({ children, trigger }) => {
       </div>
 
       {isOpen && (
-        <div 
-          onClick={() => setIsOpen(false)} 
+        <div
+          onClick={() => setIsOpen(false)}
           className="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-[1.5rem] shadow-2xl z-[100] overflow-hidden animate-in fade-in zoom-in slide-in-from-top-2 duration-200"
         >
           <div className="py-2">
@@ -44,6 +45,7 @@ export const DropdownItem = ({ onClick, icon: Icon, label, variant = "default" }
     danger: "text-danger hover:bg-red-50 hover:text-red-600",
     blue: "text-heading hover:bg-blue-50 hover:text-blue-600",
   };
+  const intl = useIntl();
 
   return (
     <button
@@ -51,7 +53,7 @@ export const DropdownItem = ({ onClick, icon: Icon, label, variant = "default" }
       className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold transition-all duration-200 ${variants[variant]}`}
     >
       {Icon && <Icon size={18} />}
-      {label}
+      {intl.formatMessage({id: label})}
     </button>
   );
 };

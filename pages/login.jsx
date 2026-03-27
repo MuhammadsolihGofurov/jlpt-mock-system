@@ -135,7 +135,7 @@ function Login({ info }) {
               disabled={loading}
               className="w-full flex items-center justify-center py-3.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-black shadow-lg shadow-orange-100 transition-all active:scale-[0.98] gap-2 group"
             >
-              <span className="text-sm">Tizimga kirish</span>
+              <span className="text-sm">{intl.formatMessage({ id: "Kirish" })}</span>
               <ArrowRight
                 size={18}
                 className="group-hover:translate-x-1 transition-transform"

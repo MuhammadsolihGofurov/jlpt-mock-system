@@ -104,7 +104,7 @@ const Sidebar = () => {
       "CONFIRM_MODAL",
       {
         title: "Chiqish",
-        body: "Tizimdan chiqmoqchimisiz?",
+        body: "Tizimdan chiqmoqchimisiz? Tizimga qayta kirishingiz uchun login sahifasiga o'tishingiz kerak.",
         confirmText: "Ha",
         variant: "danger",
         local: "clear",

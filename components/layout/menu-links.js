@@ -75,7 +75,7 @@ export const menus = [{
     roles: ["CENTER_ADMIN"],
   },
   {
-    label: "Mocklar",
+    label: "mock_title",
     href: "/dashboard/mocks",
     icon: BookOpen,
     roles: ["TEACHER", "CENTER_ADMIN"],

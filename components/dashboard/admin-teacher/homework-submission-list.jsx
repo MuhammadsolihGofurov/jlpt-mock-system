@@ -12,8 +12,12 @@ import {
     BookOpen,
     Headphones,
     LayoutGrid,
+    FileSpreadsheet, FileText
 } from "lucide-react";
 import { useModal } from "@/context/modal-context";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const HomeworkSubmissionList = () => {
     const router = useRouter();
@@ -48,8 +52,115 @@ const HomeworkSubmissionList = () => {
         );
     }
 
+
+    const exportToExcel = () => {
+        const tableData = data.results.map((sub, index) => {
+            const isMock = sub.results?.resource_type === "mock_test";
+            const sections = sub.results?.sections || {};
+
+            return {
+                "№": (page - 1) * 10 + (index + 1),
+                "Talaba": sub.student_display,
+                "Topshiriq": sub.assignment_title,
+                "Turi": sub.results?.resource_type,
+                "Vocab / Quiz": isMock ? (Object.values(sections).find(s => s.section_type === "VOCAB")?.score || 0) : sub.results?.total_score,
+                "Reading": isMock ? (Object.values(sections).find(s => s.section_type === "GRAMMAR_READING")?.score || 0) : "—",
+                "Listening": isMock ? (Object.values(sections).find(s => s.section_type === "LISTENING")?.score || 0) : "—",
+                "Jami Ball": Math.round(sub.score),
+                "Holat": (isMock ? sub.results?.jlpt_result?.passed : sub.results?.percentage >= 50) ? "O'tdi" : "Yiqildi",
+                "Sana": formatDate(sub.completed_at)
+            };
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(tableData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Uy vazifalari");
+        XLSX.writeFile(workbook, `Vazifalar_${homeworkId}.xlsx`);
+    };
+
+    const exportToPDF = () => {
+        const doc = new jsPDF("l", "mm", "a4"); // "l" - landscape (albom) ko'rinishi, ustunlar ko'p bo'lgani uchun
+
+        doc.setFontSize(16);
+        doc.text("Uy vazifasi natijalari (Batafsil)", 14, 15);
+
+        // Jadval sarlavhalari
+        const tableHeaders = [
+            ['№', 'Talaba', 'Topshiriq turi', 'Vocab/Quiz', 'Reading', 'Listening', 'Jami', 'Holat', 'Sana']
+        ];
+
+        const tableRows = data.results.map((sub, index) => {
+            const isMock = sub.results?.resource_type === "mock_test";
+            const sections = sub.results?.sections || {};
+
+            // Mock bo'lsa bo'limlarni topamiz, bo'lmasa Quiz ballini Vocab ustuniga yozamiz
+            const vocabScore = isMock
+                ? (Object.values(sections).find(s => s.section_type === "VOCAB")?.score || 0)
+                : (sub.results?.total_score || 0);
+
+            const readingScore = isMock
+                ? (Object.values(sections).find(s => s.section_type === "GRAMMAR_READING")?.score || 0)
+                : "—";
+
+            const listeningScore = isMock
+                ? (Object.values(sections).find(s => s.section_type === "LISTENING")?.score || 0)
+                : "—";
+
+            const status = (isMock ? sub.results?.jlpt_result?.passed : sub.results?.percentage >= 50)
+                ? "Pass"
+                : "Fail";
+
+            return [
+                (page - 1) * 10 + (index + 1),
+                sub.student_display,
+                sub.results?.resource_type?.toUpperCase(),
+                vocabScore,
+                readingScore,
+                listeningScore,
+                Math.round(sub.score),
+                status,
+                formatDate(sub.completed_at).split(',')[0]
+            ];
+        });
+
+        autoTable(doc, {
+            head: tableHeaders,
+            body: tableRows,
+            startY: 25,
+            theme: 'grid',
+            styles: { fontSize: 8, halign: 'center' },
+            headStyles: { fillColor: [79, 70, 229], fontStyle: 'bold' },
+            columnStyles: {
+                1: { halign: 'left', fontStyle: 'bold' },
+            },
+        });
+
+        doc.save(`Batafsil_Natijalar_${homeworkId}.pdf`);
+    };
+
     return (
         <div className="flex flex-col space-y-6 pb-10">
+            <div className="flex justify-between sm:flex-row flex-col gap-2 sm:items-center bg-white p-4 rounded-3xl border border-slate-100">
+                <h2 className="text-base font-semibold text-slate-800 ml-2">
+                    {intl.formatMessage({ id: "Natijalarni yuklash" })}
+                </h2>
+                <div className="flex gap-2">
+                    <button
+                        onClick={exportToExcel}
+                        className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 hover:bg-green-100 rounded-xl font-bold text-sm transition-all"
+                    >
+                        <FileSpreadsheet size={18} />
+                        Excel
+                    </button>
+                    <button
+                        onClick={exportToPDF}
+                        className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl font-bold text-sm transition-all"
+                    >
+                        <FileText size={18} />
+                        PDF
+                    </button>
+                </div>
+            </div>
             <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[1000px]">

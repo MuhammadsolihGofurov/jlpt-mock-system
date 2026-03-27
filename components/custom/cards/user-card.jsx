@@ -102,11 +102,10 @@ export const UserCard = ({ item }) => {
               {intl.formatMessage({ id: "Rol" })}
             </span>
             <span
-              className={`text-[11px] font-black tracking-wide px-2.5 py-1 rounded-lg border ${
-                item.role === "OWNER"
+              className={`text-[11px] font-black tracking-wide px-2.5 py-1 rounded-lg border ${item.role === "OWNER"
                   ? "bg-purple-50 text-purple-600 border-purple-100"
                   : "bg-blue-50 text-blue-600 border-blue-100"
-              }`}
+                }`}
             >
               {item.role}
             </span>
@@ -121,7 +120,7 @@ export const UserCard = ({ item }) => {
               <div
                 className={`w-1.5 h-1.5 rounded-full ${item.is_approved ? "bg-emerald-500" : "bg-amber-500 animate-pulse"}`}
               />
-              {item.is_approved ? "Tasdiqlangan" : "Kutilmoqda"}
+              {intl.formatMessage({ id: item.is_approved ? "Tasdiqlangan" : "Kutilmoqda" })}
             </div>
           </div>
         </div>
