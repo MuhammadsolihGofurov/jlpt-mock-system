@@ -691,5 +691,7 @@
     "Ochiq": "Open",
     "Yopiq": "Closed",
     "Public": "Public",
-    "Private": "Private"
+    "Private": "Private",
+    "Rasm (Optional)": "Image (Optional)",
+    "Rasm yuklandi (Clipboard)": "Image uploaded (from Clipboard)"
 }

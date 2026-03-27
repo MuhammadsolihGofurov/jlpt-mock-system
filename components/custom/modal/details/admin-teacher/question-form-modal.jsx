@@ -58,9 +58,37 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
   useEffect(() => {
     if (question) {
       reset(question);
-      if (question.image) setPreview(question.image); // Agar rasm bo'lsa previewga qo'yish
+      if (question.image) setPreview(question.image);
     }
   }, [question, reset]);
+
+  const handlePaste = (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf("image") !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+
+          setValue("image", dataTransfer.files);
+
+          setPreview(URL.createObjectURL(file));
+
+          toast.info(intl.formatMessage({ id: "Rasm yuklandi (Clipboard)" }), { autoClose: 1000 });
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("paste", handlePaste);
+    return () => {
+      window.removeEventListener("paste", handlePaste);
+    };
+  }, [setValue, preview]);
 
   const onSubmit = async (values) => {
     const toastId = toast.loading(intl.formatMessage({ id: "Saqlanmoqda..." }));
@@ -169,7 +197,7 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
         {/* --- RASM YUKLASH QISMI --- */}
         <div className="space-y-2">
           <label className="text-sm font-black text-heading ml-1 flex items-center gap-2">
-            <ImageIcon size={16} /> Rasm (Optional)
+            <ImageIcon size={16} /> {intl.formatMessage({ id: "Rasm (Optional)" })}
           </label>
 
           {preview && (

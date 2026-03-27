@@ -691,5 +691,7 @@
   "Ochiq": "公開中",
   "Yopiq": "締切",
   "Public": "公開",
-  "Private": "非公開"
+  "Private": "非公開",
+  "Rasm (Optional)": "画像（任意）",
+  "Rasm yuklandi (Clipboard)": "画像を貼り付けました（クリップボードより）"
 }
