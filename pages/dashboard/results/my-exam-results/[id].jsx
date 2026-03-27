@@ -268,6 +268,39 @@ const MyExamResults = () => {
               )
             }
           />
+          {
+            jlpt?.section_results?.language_reading_combined &&
+            <AnalysisCard
+              title="Reading"
+              subtitle="Comprehension"
+              icon={<BookOpen size={22} />}
+              color="amber"
+              data={jlpt?.section_results?.language_reading_combined}
+              onOpen={() =>
+                openModal(
+                  "RESULT_VIEW",
+                  {
+                    data: Object.values(sections).find(
+                      (s) => s.section_type === "GRAMMAR_READING",
+                    ),
+                  },
+                  "middle",
+                )
+              }
+              showExtraButton={"Vocabulary"}
+              onOpenExtra={() =>
+                openModal(
+                  "RESULT_VIEW",
+                  {
+                    data: Object.values(sections).find(
+                      (s) => s.section_type === "VOCAB",
+                    ),
+                  },
+                  "middle",
+                )
+              }
+            />
+          }
           <AnalysisCard
             title="Reading"
             subtitle="Comprehension"
@@ -303,6 +336,7 @@ const MyExamResults = () => {
                 "middle",
               )
             }
+
           />
         </div>
 
@@ -343,7 +377,7 @@ const StatBox = ({ icon, label, value, color }) => {
 };
 
 // Bo'limlar uchun yangi dizayndagi Card
-const AnalysisCard = ({ title, subtitle, icon, color, data, onOpen }) => {
+const AnalysisCard = ({ title, subtitle, icon, color, data, onOpen, showExtraButton, onOpenExtra }) => {
   if (!data) return null;
   const intl = useIntl();
 
@@ -391,13 +425,25 @@ const AnalysisCard = ({ title, subtitle, icon, color, data, onOpen }) => {
         </span>
       </div>
 
-      <button
-        onClick={onOpen}
-        className="w-full py-4 rounded-2xl bg-slate-50 group-hover:bg-slate-900 group-hover:text-white text-slate-500 font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2"
-      >
-        {intl.formatMessage({ id: "Review Questions" })}
-        <ChevronRight size={14} />
-      </button>
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={onOpen}
+          className="w-full py-4 rounded-2xl bg-slate-50 group-hover:bg-slate-900 group-hover:text-white text-slate-500 font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+        >
+          {intl.formatMessage({ id: "Review Questions" })} {title}
+          <ChevronRight size={14} />
+        </button>
+
+        {showExtraButton && (
+          <button
+            onClick={onOpenExtra}
+            className="w-full py-4 rounded-2xl bg-primary/10 text-primary hover:bg-primary hover:text-white font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+          >
+            {intl.formatMessage({ id: "Review Questions" })}  {intl.formatMessage({ id: showExtraButton })}
+            <Activity size={14} />
+          </button>
+        )}
+      </div>
     </div>
   );
 };
