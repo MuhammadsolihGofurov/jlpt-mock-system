@@ -147,11 +147,10 @@ const InvitationCard = ({ item }) => {
               {intl.formatMessage({ id: "Rol" })}
             </span>
             <span
-              className={`text-[11px] font-black tracking-wide px-2.5 py-1 rounded-lg ${
-                item.role === "TEACHER"
+              className={`text-[11px] font-black tracking-wide px-2.5 py-1 rounded-lg ${item.role === "TEACHER"
                   ? "bg-blue-50 text-blue-600 border border-blue-100"
                   : "bg-primary/5 text-primary border border-primary/10"
-              }`}
+                }`}
             >
               {item.role}
             </span>
@@ -177,7 +176,7 @@ const InvitationCard = ({ item }) => {
         <div className="flex items-center gap-4 lg:gap-8 flex-1 lg:justify-end border-t lg:border-none pt-3 lg:pt-0 mt-2 lg:mt-0">
           <div className="flex flex-col lg:text-right">
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 opacity-60">
-              {intl.formatMessage({id: "Yaratilgan"})}
+              {intl.formatMessage({ id: "Yaratilgan" })}
             </span>
             <div className="flex items-center gap-2.5 text-slate-800">
               <span className="text-[12px] font-black tracking-tight">

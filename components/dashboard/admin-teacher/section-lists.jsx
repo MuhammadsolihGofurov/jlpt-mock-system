@@ -7,6 +7,7 @@ import {
   Clock,
   ChevronRight,
   BookAlertIcon,
+  CirclePlus,
 } from "lucide-react";
 import { useModal } from "@/context/modal-context";
 import { useRouter } from "next/router";
@@ -68,20 +69,18 @@ const SectionList = ({ mockId, activeSection, sections, onSelect }) => {
           <div
             key={section.id}
             onClick={() => onSelect(section)}
-            className={`group relative p-4 rounded-2xl border transition-all cursor-pointer ${
-              activeSection?.id === section.id
-                ? "bg-primary border-primary shadow-lg shadow-orange-100 text-white"
-                : "bg-white border-slate-100 hover:border-orange-200 text-slate-600"
-            }`}
+            className={`group relative p-4 rounded-2xl border transition-all cursor-pointer ${activeSection?.id === section.id
+              ? "bg-primary border-primary shadow-lg shadow-orange-100 text-white"
+              : "bg-white border-slate-100 hover:border-orange-200 text-slate-600"
+              }`}
           >
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-start">
                 <h4
-                  className={`font-black text-sm uppercase tracking-tight leading-tight pr-8 ${
-                    activeSection?.id === section.id
-                      ? "text-white"
-                      : "text-heading"
-                  }`}
+                  className={`font-black text-sm uppercase tracking-tight leading-tight pr-8 ${activeSection?.id === section.id
+                    ? "text-white"
+                    : "text-heading"
+                    }`}
                 >
                   {section.name}
                 </h4>
@@ -118,34 +117,44 @@ const SectionList = ({ mockId, activeSection, sections, onSelect }) => {
                     {section.duration || 0} daqiqa
                   </span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <CirclePlus
+                    size={12}
+                    className={
+                      activeSection?.id === section.id
+                        ? "text-white/80"
+                        : "text-slate-400"
+                    }
+                  />
+                  <span className="text-[10px] font-bold">
+                    {section.total_score || 0} ball
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Hover Actions */}
             <div
-              className={`absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity ${
-                activeSection?.id === section.id
-                  ? "text-white"
-                  : "text-slate-400"
-              }`}
+              className={`absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity ${activeSection?.id === section.id
+                ? "text-white"
+                : "text-slate-400"
+                }`}
             >
               <button
                 onClick={(e) => handleEditSection(e, section)}
-                className={`p-1.5 rounded-lg transition-colors ${
-                  activeSection?.id === section.id
-                    ? "hover:bg-white/20"
-                    : "hover:bg-slate-100 hover:text-primary"
-                }`}
+                className={`p-1.5 rounded-lg transition-colors ${activeSection?.id === section.id
+                  ? "hover:bg-white/20"
+                  : "hover:bg-slate-100 hover:text-primary"
+                  }`}
               >
                 <Edit2 size={12} />
               </button>
               <button
                 onClick={(e) => handleDeleteSection(e, section)}
-                className={`p-1.5 rounded-lg transition-colors ${
-                  activeSection?.id === section.id
-                    ? "hover:bg-white/20"
-                    : "hover:bg-slate-100 hover:text-red-500"
-                }`}
+                className={`p-1.5 rounded-lg transition-colors ${activeSection?.id === section.id
+                  ? "hover:bg-white/20"
+                  : "hover:bg-slate-100 hover:text-red-500"
+                  }`}
               >
                 <Trash2 size={12} />
               </button>
