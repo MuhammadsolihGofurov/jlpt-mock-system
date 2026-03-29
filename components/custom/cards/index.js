@@ -33,4 +33,8 @@ from "./quiz-card";
 export {
     default as RequestCard
 }
-from './request-card'
+from './request-card';
+export {
+    default as FlashcardDeckCard
+}
+from "./flashcard-card";

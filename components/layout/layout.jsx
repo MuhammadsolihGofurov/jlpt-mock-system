@@ -16,7 +16,8 @@ const AUTH_PATHS = [
   "/dashboard/mock-tests",
   "/playground",
   "/privacy",
-  "/terms"
+  "/terms",
+  "/dashboard/flashcards/create"
 ];
 
 const Layout = ({ children }) => {

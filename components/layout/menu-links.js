@@ -89,6 +89,13 @@ export const menus = [{
     is_mobile: true,
   },
   {
+    label: "flashcards_title",
+    href: "/dashboard/flashcards",
+    icon: FileQuestion,
+    roles: ["STUDENT"],
+    is_mobile: true,
+  },
+  {
     label: "Profil",
     href: "/dashboard/profile",
     icon: User2,

@@ -694,5 +694,11 @@
   "Public": "Ommaviy",
   "Private": "Shaxsiy",
   "Rasm (Optional)": "Rasm (Optional)",
-  "Rasm yuklandi (Clipboard)": "Rasm yuklandi (Clipboard)"
+  "Rasm yuklandi (Clipboard)": "Rasm yuklandi (Clipboard)",
+  "--flashcards--": "",
+  "flashcards_title": "AI Smart Flashcards",
+  "flashcards_desc": "Vizual xotira va Spaced Repetition algoritmi asosidagi so'z yodlash.",
+  "flashcards_key": "Bu shunchaki karta emas. Tizim har bir so'zga mos rasmlarni avtomatik generatsiya qiladi. Unutilgan so'zlar uchun maxsus takrorlash intervallari va bilimni tekshirish testlari mavjud.",
+  "Flash kart qo'shish": "Flashcard qo'shish",
+  "---flashcards---": ""
 }
