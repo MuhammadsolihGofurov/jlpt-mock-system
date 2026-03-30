@@ -83,15 +83,14 @@ export const formatDateTime = (dateString) => {
 	if (!dateString) return "";
 
 	const date = new Date(dateString);
+	if (isNaN(date.getTime())) return "";
 
-	// Kun, oy va yilni olish
-	const day = String(date.getDate()).padStart(2, '0');
-	const month = String(date.getMonth() + 1).padStart(2, '0'); // Oy 0 dan boshlangani uchun +1
-	const year = date.getFullYear();
+	const day = String(date.getUTCDate()).padStart(2, '0');
+	const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+	const year = date.getUTCFullYear();
 
-	// Soat va minutni olish
-	const hours = String(date.getHours()).padStart(2, '0');
-	const minutes = String(date.getMinutes()).padStart(2, '0');
+	const hours = String(date.getUTCHours()).padStart(2, '0');
+	const minutes = String(date.getUTCMinutes()).padStart(2, '0');
 
 	return `${day}.${month}.${year} ${hours}:${minutes}`;
 };
@@ -114,4 +113,24 @@ export const parseSizeToMB = (sizeStr) => {
 		default:
 			return value;
 	}
+};
+
+
+export const formatDate = (dateStr) => {
+	if (!dateStr) return {
+		full: "---",
+		time: "--:--"
+	};
+	const date = new Date(dateStr);
+	return {
+		full: date.toLocaleDateString("uz-UZ", {
+			day: "2-digit",
+			month: "2-digit",
+			year: "numeric",
+		}),
+		time: date.toLocaleTimeString("uz-UZ", {
+			hour: "2-digit",
+			minute: "2-digit",
+		}),
+	};
 };

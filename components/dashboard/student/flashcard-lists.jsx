@@ -18,8 +18,8 @@ const FlashcardList = () => {
     const currentPage = router.query.page || 1;
 
     const { data, mutate, isLoading } = useSWR(
-        [`flashcard-sets/?page=${currentPage}`, router.locale],
-        (url, locale) => fetcher(url, { headers: { "Accept-Language": locale } }, {}, true)
+        [`flashcard-sets/`, router.locale, currentPage],
+        (url, locale, page) => fetcher(`${url}?page=${page}&page_size=6`, { headers: { "Accept-Language": locale } }, {}, true)
     );
 
     useEffect(() => {
@@ -28,12 +28,8 @@ const FlashcardList = () => {
         }
     }, [modalClosed, mutate]);
 
-    const handleCreate = () => {
-        openModal("CREATE_FLASHCARD_DECK", { title: "Yangi to'plam yaratish" });
-    };
-
     const handleCardClick = (id) => {
-        router.push(`/flashcards/${id}`);
+        router.push(`/dashboard/flashcards/practise/${id}`);
     };
 
     if (isLoading) {
@@ -72,7 +68,7 @@ const FlashcardList = () => {
 
             {/* Pagination */}
             {data?.count > 0 && (
-                <div className="pt-10 border-t border-slate-100">
+                <div className="border-t border-slate-100">
                     <Pagination totalCount={data.count} pageSize={6} />
                 </div>
             )}

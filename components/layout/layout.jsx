@@ -10,21 +10,24 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import fetcher from "@/utils/fetcher";
 
-const AUTH_PATHS = [
+const WITHOUT_SIDEBAR = [
   "/login",
   "/register",
   "/dashboard/mock-tests",
   "/playground",
   "/privacy",
   "/terms",
-  "/dashboard/flashcards/create"
+  "/dashboard/flashcards/create",
+  "/dashboard/flashcards/edit",
+  "/dashboard/flashcards/practice",
+  "/dashboard/flashcards/study",
 ];
 
 const Layout = ({ children }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
-  const isAuthPage = AUTH_PATHS.some((path) => router.pathname.includes(path));
+  const hasSidebar = WITHOUT_SIDEBAR.some((path) => router.pathname.includes(path));
 
   useEffect(() => {
     if (!user?.id) return;
@@ -87,7 +90,7 @@ const Layout = ({ children }) => {
         <meta name="theme-color" content="#ffffff"></meta>
       </Head>
 
-      {isAuthPage || router.pathname === "/" ? (
+      {hasSidebar || router.pathname === "/" ? (
         <>{children}</>
       ) : (
         <>

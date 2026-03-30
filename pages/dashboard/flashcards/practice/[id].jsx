@@ -1,23 +1,14 @@
 import { useIntl } from "react-intl";
 import Seo from "@/components/seo/seo";
 import { AuthGuard } from "@/components/guard";
-import { PageHeader } from "@/components/layout";
-import { FileText, Filter, GraduationCap, Search } from "lucide-react";
-import { useModal } from "@/context/modal-context";
-import {
-    AssignmentTabs,
-    ExamLists,
-} from "@/components/dashboard/admin-teacher";
-import { SearchInput } from "@/components/ui";
-import { FlashcardList } from "@/components/dashboard/student";
+import { FlashcardPractice } from "@/components/dashboard/student";
 import { useRouter } from "next/router";
-import useSWR from "swr";
 
-function FlashcardsPage({ info }) {
+function FlashcardPracticePage({ info }) {
     const intl = useIntl();
     const router = useRouter();
-
-
+    const { query } = router;
+    const setId = query?.id;
 
     return (
         <>
@@ -27,20 +18,13 @@ function FlashcardsPage({ info }) {
                 keywords={intl.formatMessage({ id: "flashcards_key" })}
             />
             <AuthGuard roles={["STUDENT"]}>
-                <PageHeader
-                    title="flashcards_title"
-                    description="flashcards_desc"
-                    badge="Faol"
-                    buttonLabel="Flash kart qo'shish"
-                    roles={["STUDENT"]}
-                    onButtonClick={() => router.push("/dashboard/flashcards/create")}
-                    extraActions={
-                        <>
-                            <SearchInput />
-                        </>
-                    }
-                />
-                <FlashcardList />
+                <div className="container mx-auto py-12 px-6">
+                    {setId ? (
+                        <FlashcardPractice setId={setId} />
+                    ) : (
+                        <div className="text-center text-slate-400">{intl.formatMessage({ id: "Yuklanmoqda..." })}</div>
+                    )}
+                </div>
             </AuthGuard>
         </>
     );
@@ -69,4 +53,4 @@ export async function getServerSideProps() {
     }
 }
 
-export default FlashcardsPage;
+export default FlashcardPracticePage;
