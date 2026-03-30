@@ -2,9 +2,11 @@ import React from "react";
 import { ShieldAlert, XCircle, Ban, AlertTriangle, FileText } from "lucide-react";
 import { useIntl } from "react-intl";
 import Head from "next/head";
+import { useRouter } from "next/router";
 
 const ExamBlockedPage = () => {
     const intl = useIntl();
+    const router = useRouter();
 
     const violations = [
         { id: 1, text: "To'liq ekran (Fullscreen) rejimidan chiqish" },
@@ -21,7 +23,7 @@ const ExamBlockedPage = () => {
             </Head>
 
             {/* Asosiy konteyner - Oq fon */}
-            <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-[200]">
+            <div className="inset-0 bg-slate-50 flex items-center justify-center p-4 z-[200]">
                 <div className="max-w-xl w-full bg-white border-2 border-red-100 p-8 md:p-12 rounded-[2rem] text-center shadow-[0_20px_50px_rgba(220,38,38,0.1)] animate-in fade-in slide-in-from-bottom-4 duration-700">
 
                     {/* Yuqori qism: Ikonka va Status */}
@@ -69,9 +71,17 @@ const ExamBlockedPage = () => {
                     </div>
 
                     {/* Pastki qism */}
-                    <p className="text-slate-400 text-[11px] font-medium max-w-xs mx-auto italic">
+                    <p className="text-slate-400 text-[11px] font-medium max-w-xs mx-auto italic pb-5">
                         {intl.formatMessage({ id: "Ushbu xabar xavfsizlik protokoli (SecureExam Engine) tomonidan avtomatik ravishda yaratildi." })}
                     </p>
+
+                    {/* asosiy sahifaga qaytish */}
+                    <button
+                        onClick={() => router.push("/login")}
+                        className="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+                    >
+                        {intl.formatMessage({ id: "Orqaga" })}
+                    </button>
                 </div>
             </div>
         </>

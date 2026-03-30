@@ -7,10 +7,12 @@ import { useModal } from "@/context/modal-context";
 import { authAxios } from "@/utils/axios";
 import { DropdownItem } from "@/components/ui/action-dropdown";
 import { formatDateTime } from "@/utils/funcs";
+import { useIntl } from "react-intl";
 
 const FlashcardDeckCard = ({ deck }) => {
     const router = useRouter();
     const { openModal } = useModal();
+    const intl = useIntl();
 
     const handleDelete = (id) => {
         openModal(
@@ -70,7 +72,7 @@ const FlashcardDeckCard = ({ deck }) => {
                 </p>
                 <div className="flex items-center gap-2 pt-2">
                     <span className="px-3 py-1 bg-slate-100 rounded-full text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                        {deck.cards_count} kartalar
+                        {deck.cards_count} {deck.cards_count === 1 ? "kart" : "kartlar"}
                     </span>
                     <span className="text-[10px] text-slate-300 font-bold">•</span>
                     <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
@@ -86,7 +88,7 @@ const FlashcardDeckCard = ({ deck }) => {
                     onClick={() => router.push(`/dashboard/flashcards/study/${deck.id}`)}
                     className="flex items-center justify-center gap-2 py-3 bg-orange-50 text-orange-600 rounded-2xl font-bold text-xs hover:bg-orange-500 hover:text-white transition-all active:scale-95"
                 >
-                    <BookOpen size={16} /> Yodlash
+                    <BookOpen size={16} /> {intl.formatMessage({ id: "Yodlash" })}
                 </button>
 
                 {/* Practice Button */}
@@ -94,7 +96,7 @@ const FlashcardDeckCard = ({ deck }) => {
                     onClick={handlePractice}
                     className="flex items-center justify-center gap-2 py-3 bg-[#1e293b] text-white rounded-2xl font-bold text-xs hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-100"
                 >
-                    <Brain size={16} /> Mashq
+                    <Brain size={16} /> {intl.formatMessage({ id: "Mashq" })}
                 </button>
             </div>
         </motion.div>

@@ -1,5 +1,6 @@
 import {
-  useEffect
+  useEffect,
+  useCallback
 } from "react";
 import {
   useRouter
@@ -10,15 +11,39 @@ import {
 import {
   useIntl
 } from "react-intl";
+import axios from "axios"; // Yoki o'zingizning authAxios'ingiz
+import {
+  authAxios
+} from "@/utils/axios";
 
-export const useExamSecurity = (isActive, onViolation) => {
+export const useExamSecurity = (isActive, submissionId, onViolation) => {
   const router = useRouter();
   const intl = useIntl();
 
-  useEffect(() => {
-    if (!isActive) return;
+  // API ga xabar yuborish funksiyasi
+  const reportViolation = useCallback(async (type) => {
+    const payload = {
+      submission_id: submissionId,
+      incident: {
+        events: [{
+          type: message,
+          at: new Date().toISOString(),
+        }, ],
+      },
+    };
 
-    // Fullscreen'ni yoqish funksiyasi
+    try {
+      // API manzilingizni kiriting
+      await authAxios.post("/submissions/report-exam-integrity/", JSON.stringify(payload));
+      console.log(`Violation reported: ${type}`);
+    } catch (error) {
+      console.error("API Error reporting violation:", error);
+    }
+  }, [submissionId]);
+
+  useEffect(() => {
+    if (!isActive || !submissionId) return;
+
     const enterFullScreen = () => {
       const element = document.documentElement;
       if (!document.fullscreenElement) {
@@ -28,13 +53,15 @@ export const useExamSecurity = (isActive, onViolation) => {
       }
     };
 
-    // Sahifaga kirganda birinchi marta bosganda fullscreenga o'tkazish
-    // Odatda ModeSelector click qilinganda ishga tushadi
     window.addEventListener("click", enterFullScreen, {
       once: true
     });
 
-    const handleViolation = (message) => {
+    const handleViolation = (message, violationType) => {
+      // 1. API ga xabar berish
+      reportViolation(message);
+
+      // 2. Foydalanuvchiga bildirishnoma
       toast.error(intl.formatMessage({
         id: message
       }), {
@@ -42,63 +69,67 @@ export const useExamSecurity = (isActive, onViolation) => {
         autoClose: 3000,
       });
 
-      if (onViolation) onViolation();
+      // 3. Callback funksiyani chaqirish (agar bo'lsa)
+      if (onViolation) onViolation(violationType);
 
-      // Imtihondan chiqarish
+      // 4. Imtihondan chiqarish (kechiktirilgan)
       setTimeout(() => {
         router.push("/blocked");
-      }, 2000);
+      }, 2500);
     };
 
     // 1. Klaviaturani bloklash
     const handleKeyDown = (e) => {
-      // F12, F5, Ctrl+R, Ctrl+U, Ctrl+S, Ctrl+C, Ctrl+V
-      if (
-        e.key === "F12" ||
-        e.key === "F5" ||
-        (e.ctrlKey && ["r", "u", "s", "c", "v"].includes(e.key.toLowerCase()))
-      ) {
-        e.preventDefault();
-        handleViolation("Xavfsizlik qoidasi: Taqiqlangan tugma bosildi!");
-      }
+      const forbiddenKeys = ["f12", "f5", "f11"];
+      const forbiddenCtrlKeys = ["r", "u", "s", "c", "v"];
+      const key = e.key.toLowerCase();
 
-      // F11 ni bloklash (Ekranni kichraytirishga yo'l qo'ymaslik)
-      if (e.key === "F11") {
+      if (forbiddenKeys.includes(key) || (e.ctrlKey && forbiddenCtrlKeys.includes(key))) {
         e.preventDefault();
-        handleViolation("Fullscreen rejimidan chiqish taqiqlanadi!");
+        const type = key === "f12" ? "devtools_attempt" : `forbidden_key_${key}`;
+        handleViolation("Xavfsizlik qoidasi: Taqiqlangan tugma bosildi!", type);
       }
     };
 
-    // 2. Fullscreen'dan chiqishni nazorat qilish
+    // 2. Fullscreen'dan chiqish
     const handleFullScreenChange = () => {
       if (!document.fullscreenElement) {
-        // Agar foydalanuvchi Esc yoki boshqa yo'l bilan chiqsa
-        handleViolation("Fullscreen rejimidan chiqdingiz! Imtihon bekor qilindi.");
+        handleViolation("Fullscreen rejimidan chiqdingiz!", "fullscreen_exit");
       }
     };
 
-    // 3. Tab almashishni nazorat qilish
+    // 3. Tab almashish
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        handleViolation("Boshqa oynaga o'tish taqiqlanadi!");
+        handleViolation("Boshqa oynaga o'tish taqiqlanadi!", "tab_switch");
       }
     };
 
-    // 4. Context Menu (O'ng tugma)
-    const handleContextMenu = (e) => e.preventDefault();
+    // 4. Sichqoncha o'ng tugmasi
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+      // Ixtiyoriy: O'ng tugmani ham report qilish mumkin
+      // reportViolation("context_menu_attempt"); 
+    };
 
-    // Eventlarni bog'lash
+    // 5. Sahifadan chiqib ketishga urinish (beforeunload)
+    const handleBeforeUnload = () => {
+      reportViolation("beforeunload");
+    };
+
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("contextmenu", handleContextMenu);
+    window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("fullscreenchange", handleFullScreenChange);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("contextmenu", handleContextMenu);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("fullscreenchange", handleFullScreenChange);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("click", enterFullScreen);
     };
-  }, [isActive, router, onViolation]);
+  }, [isActive, submissionId, router, intl, onViolation, reportViolation]);
 };

@@ -40,7 +40,7 @@ const SortableCardRow = ({ id, index, register, remove }) => {
                         <textarea
                             {...register(`cards.${index}.term`)}
                             rows={1}
-                            placeholder="Masalan: Architecture"
+                            placeholder={intl.formatMessage({ id: "Masalan: こんにちは" })}
                             className="w-full bg-transparent border-b border-slate-200 py-1 text-base font-bold outline-none focus:border-orange-500 transition-all resize-none overflow-hidden"
                             onInput={(e) => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
                         />
@@ -50,7 +50,7 @@ const SortableCardRow = ({ id, index, register, remove }) => {
                         <textarea
                             {...register(`cards.${index}.definition`)}
                             rows={1}
-                            placeholder="Izoh yozing..."
+                            placeholder={intl.formatMessage({ id: "Izoh yozing..." })}
                             className="w-full bg-transparent border-b border-slate-200 py-1 text-base font-medium outline-none focus:border-blue-500 transition-all resize-none overflow-hidden text-slate-600"
                             onInput={(e) => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
                         />
@@ -265,8 +265,8 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                         <h2 className="text-lg font-black uppercase tracking-wider">{intl.formatMessage({ id: "Ma'lumotlar" })}</h2>
                     </div>
                     <div className="grid grid-cols-1 gap-5">
-                        <Input label="To'plam nomi" placeholder="IELTS Reading - Unit 5" register={register} name="title" required />
-                        <Input label="Tavsif (Ixtiyoriy)" placeholder="Bu to'plam nima haqida?" register={register} name="description" />
+                        <Input label="To'plam nomi" placeholder={intl.formatMessage({ id: "Dars 5" })} register={register} name="title" required />
+                        <Input label="Tavsif (Ixtiyoriy)" placeholder={intl.formatMessage({ id: "Bu to'plam nima haqida?" })} register={register} name="description" />
                     </div>
                 </section>
 

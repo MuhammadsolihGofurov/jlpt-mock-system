@@ -85,8 +85,8 @@ const MockFormModal = ({ mock = null }) => {
         </div>
         <div>
           <h2 className="text-2xl font-black text-heading">
-            {intl.formatMessage({ 
-              id: isEdit ? "Mockni tahrirlash" : "Yangi Mock yaratish" 
+            {intl.formatMessage({
+              id: isEdit ? "Mockni tahrirlash" : "Yangi Mock yaratish"
             })}
           </h2>
           <p className="text-muted text-sm font-medium">
@@ -137,19 +137,21 @@ const MockFormModal = ({ mock = null }) => {
           placeholder="Amaliy test to'plami haqida..."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="relative">
-            <Input
-              label="Umumiy ball"
-              name="total_score"
-              type="number"
-              register={register}
-              error={errors.total_score}
-            />
-            <div className="absolute right-4 top-[38px] text-slate-300">
-              <Award size={20} />
+        <div className={`grid ${!isEdit ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-6`}>
+          {
+            !isEdit && <div className="relative">
+              <Input
+                label="Umumiy ball"
+                name="total_score"
+                type="number"
+                register={register}
+                error={errors.total_score}
+              />
+              <div className="absolute right-4 top-[38px] text-slate-300">
+                <Award size={20} />
+              </div>
             </div>
-          </div>
+          }
 
           <div className="relative">
             <Input
@@ -170,9 +172,8 @@ const MockFormModal = ({ mock = null }) => {
           <span className="text-xs font-black text-muted uppercase tracking-widest">
             {intl.formatMessage({ id: "Imtihon holati" })}
           </span>
-          <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase ${
-            isEdit && mock.status === 'PUBLISHED' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-primary'
-          }`}>
+          <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase ${isEdit && mock.status === 'PUBLISHED' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-primary'
+            }`}>
             {isEdit ? mock.status : "DRAFT"}
           </span>
         </div>

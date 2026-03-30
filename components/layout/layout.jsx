@@ -21,6 +21,7 @@ const WITHOUT_SIDEBAR = [
   "/dashboard/flashcards/edit",
   "/dashboard/flashcards/practice",
   "/dashboard/flashcards/study",
+  "blocked"
 ];
 
 const Layout = ({ children }) => {

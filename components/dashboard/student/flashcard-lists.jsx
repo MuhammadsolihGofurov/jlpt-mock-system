@@ -16,10 +16,11 @@ const FlashcardList = () => {
     const { openModal, modalClosed } = useModal();
 
     const currentPage = router.query.page || 1;
+    const searchTerms = router.query.search || "";
 
     const { data, mutate, isLoading } = useSWR(
-        [`flashcard-sets/`, router.locale, currentPage],
-        (url, locale, page) => fetcher(`${url}?page=${page}&page_size=6`, { headers: { "Accept-Language": locale } }, {}, true)
+        [`flashcard-sets/`, router.locale, currentPage, searchTerms],
+        (url, locale, page, search) => fetcher(`${url}?page=${page}&page_size=6&search=${search}`, { headers: { "Accept-Language": locale } }, {}, true)
     );
 
     useEffect(() => {

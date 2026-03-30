@@ -53,9 +53,8 @@ const ExamPlayground = ({ examData }) => {
     (q) => answers.hasOwnProperty(q.id) && answers[q.id] !== undefined,
   );
 
-  useExamSecurity(true, () => {
-    console.error("Foydalanuvchi qoidani buzdi, API'ga xabar berish mumkin.");
-    // Masalan: authAxios.post("/violations/log", { type: "CHEATING_ATTEMPT" });
+  useExamSecurity(true, examData?.submission_id, (type) => {
+    console.log("Qoidabuzarlik turi:", type);
   });
 
   const handleSelectOption = (questionId, optionIndex) => {
