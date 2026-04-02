@@ -165,12 +165,12 @@ const MaterialFormModal = ({ material = null }) => {
         {/* File Upload Input */}
         <div className="space-y-2">
           <label className="text-sm font-bold text-heading px-1">
-            Faylni tanlang
+            {intl.formatMessage({ id: "Faylni tanlang" })}
           </label>
           <input
             type="file"
             {...register("file", {
-              required: !isEdit && "Fayl yuklash majburiy",
+              required: !isEdit && intl.formatMessage({ id: "Fayl yuklash majburiy" }),
             })}
             className="w-full px-5 py-3 rounded-2xl border-2 border-dashed border-gray-200 hover:border-primary transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-primary"
           />

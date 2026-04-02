@@ -115,7 +115,7 @@ const GroupCard = ({ item }) => {
         ))}
         {item.teachers?.length > 0 && (
           <span className="pl-5 text-[11px] font-bold text-muted uppercase tracking-tighter">
-            {item.teachers?.length} ta o'qituvchi
+            {item.teachers?.length} {intl.formatMessage({ id: "ta o'qituvchi" })}
           </span>
         )}
       </div>

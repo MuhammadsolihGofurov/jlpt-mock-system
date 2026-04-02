@@ -49,11 +49,10 @@ const QuizCard = ({ item, mutate }) => {
       {/* Status Badge & Actions */}
       <div className="flex items-center justify-between mb-5">
         <div
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-            item.is_active
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${item.is_active
               ? "bg-emerald-50 text-emerald-600"
               : "bg-red-50 text-red-600"
-          }`}
+            }`}
         >
           {item.is_active ? (
             <>
@@ -69,7 +68,7 @@ const QuizCard = ({ item, mutate }) => {
         {canManage && (
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
             <button
-              onClick={() => openModal("QUIZ_FORM", { quiz: item }, "middle")}
+              onClick={() => openModal("QUIZ_FORM", { quiz: item }, "video")}
               className="p-2 bg-slate-50 text-slate-600 rounded-xl hover:bg-blue-500 hover:text-white transition-all"
             >
               <Edit2 size={14} />
@@ -95,7 +94,7 @@ const QuizCard = ({ item, mutate }) => {
         </h3>
 
         <p className="text-muted text-xs line-clamp-2 mb-5 font-medium">
-          {item.description || "Ushbu quiz uchun tavsif kiritilmagan."}
+          {item.description || intl.formatMessage({ id: "Tavsif berilmagan" })}
         </p>
 
         {/* Quick Stats */}
@@ -105,7 +104,7 @@ const QuizCard = ({ item, mutate }) => {
               {intl.formatMessage({ id: "Savollar" })}
             </span>
             <span className="text-sm font-black text-heading">
-              {item.questions?.length || 0} ta
+              {item.questions?.length || 0} {intl.formatMessage({ id: "ta" })}
             </span>
           </div>
           <div className="bg-slate-50 p-3 rounded-2xl flex flex-col gap-1">

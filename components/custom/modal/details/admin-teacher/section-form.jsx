@@ -188,7 +188,7 @@ const SectionFormModal = ({ mockId, section = null, section_count = 0, }) => {
             className="bg-primary hover:bg-primary-dark text-white font-black px-8 py-3.5 rounded-2xl shadow-xl shadow-orange-200 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
           >
             <Save size={18} />
-            {isSubmitting ? "Saqlanmoqda..." : "Saqlash"}
+            {intl.formatMessage({ id: isSubmitting ? "Saqlanmoqda..." : "Saqlash" })}
           </button>
         </div>
       </form>

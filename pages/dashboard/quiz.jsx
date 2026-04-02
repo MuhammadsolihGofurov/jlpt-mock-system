@@ -31,7 +31,7 @@ function QuizPage({ info }) {
           badge="Faol"
           buttonLabel="Quiz qo'shish"
           roles={["CENTER_ADMIN", "TEACHER"]}
-          onButtonClick={() => openModal("QUIZ_FORM", {}, "middle")}
+          onButtonClick={() => openModal("QUIZ_FORM", {}, "video")}
           extraActions={
             <>
               <SearchInput />

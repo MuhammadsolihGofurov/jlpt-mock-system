@@ -67,11 +67,10 @@ const OptionsList = ({ qIndex, control, register, setValue, errors }) => {
                         ),
                       );
                     }}
-                    className={`p-2 rounded-xl transition-all ${
-                      value
-                        ? "bg-green-100 text-green-600 shadow-sm"
-                        : "bg-slate-100 text-slate-300 hover:bg-slate-200"
-                    }`}
+                    className={`p-2 rounded-xl transition-all ${value
+                      ? "bg-green-100 text-green-600 shadow-sm"
+                      : "bg-slate-100 text-slate-300 hover:bg-slate-200"
+                      }`}
                   >
                     <CheckCircle2 size={20} strokeWidth={3} />
                   </button>
@@ -102,7 +101,7 @@ const OptionsList = ({ qIndex, control, register, setValue, errors }) => {
       </div>
       {errors?.questions?.[qIndex]?.options?.root && (
         <p className="text-red-500 text-[10px] font-bold flex items-center gap-1">
-          <AlertCircle size={12} /> Kamida bitta to'g'ri javobni belgilang
+          <AlertCircle size={12} /> {intl.formatMessage({ id: "Kamida bitta to'g'ri javobni belgilang" })}
         </p>
       )}
     </div>
@@ -239,7 +238,7 @@ const QuizFormModal = ({ quiz = null }) => {
         </div>
         <div>
           <h2 className="text-3xl font-black text-heading tracking-tight">
-            {isEdit ? "Quizni tahrirlash" : "Yangi Quiz"}
+            {intl.formatMessage({ id: isEdit ? "Quizni tahrirlash" : "Yangi Quiz" })}
           </h2>
           <p className="text-muted text-sm font-semibold italic opacity-70">
             {intl.formatMessage({
@@ -366,7 +365,7 @@ const QuizFormModal = ({ quiz = null }) => {
                   label="Savol matni"
                   name={`questions.${qIndex}.text`}
                   register={register}
-                  placeholder="Savol matnini bu yerga yozing..."
+                  placeholder={intl.formatMessage({ id: "Savol matnini bu yerga yozing..." })}
                   rows={3}
                 />
 
@@ -397,7 +396,7 @@ const QuizFormModal = ({ quiz = null }) => {
             disabled={isSubmitting}
             className="bg-primary text-white font-black px-14 py-4 rounded-2xl shadow-[0_20px_40px_-10px_rgba(255,107,0,0.3)] active:scale-95 disabled:opacity-50 flex items-center gap-3 transition-all"
           >
-            <Save size={22} /> {isSubmitting ? "Saqlanmoqda..." : "Saqlash"}
+            <Save size={22} /> {intl.formatMessage({ id: isSubmitting ? "Saqlanmoqda..." : "Saqlash" })}
           </button>
         </div>
       </form>

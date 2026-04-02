@@ -2,6 +2,7 @@ import React from "react";
 import { Plus } from "lucide-react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
+import { PageHeaderSkeleton } from "../skeleton";
 
 const PageHeader = ({
   title,
@@ -14,7 +15,13 @@ const PageHeader = ({
   icon = <Plus size={18} strokeWidth={3} />,
 }) => {
   const intl = useIntl();
-  const { user } = useSelector((state) => state.auth);
+  const { user, loading } = useSelector((state) => state.auth);
+
+
+  if (loading) {
+    return <PageHeaderSkeleton />
+  }
+
   return (
     <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-5">
       <div className="relative w-full flex-1">

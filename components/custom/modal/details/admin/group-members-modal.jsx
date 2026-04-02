@@ -104,21 +104,20 @@ const GroupMembersModal = ({ group }) => {
           <div>
             <h2 className="text-xl font-black text-heading">{group.name}</h2>
             <p className="text-muted text-sm font-medium italic">
-              Guruh a'zolarini boshqarish
+              {intl.formatMessage({ id: "Guruh a'zolarini boshqarish" })}
             </p>
           </div>
         </div>
 
         <button
           onClick={() => setIsAdding(!isAdding)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${
-            isAdding
-              ? "bg-slate-100 text-slate-600"
-              : "bg-primary text-white shadow-lg shadow-orange-100"
-          }`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${isAdding
+            ? "bg-slate-100 text-slate-600"
+            : "bg-primary text-white shadow-lg shadow-orange-100"
+            }`}
         >
           {isAdding ? <X size={18} /> : <UserPlus size={18} />}
-          {isAdding ? "Yopish" : "A'zo qo'shish"}
+          {intl.formatMessage({ id: isAdding ? "Yopish" : "A'zo qo'shish" })}
         </button>
       </div>
 

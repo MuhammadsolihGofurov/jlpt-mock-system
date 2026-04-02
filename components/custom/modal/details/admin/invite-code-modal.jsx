@@ -158,7 +158,7 @@ const InvitationFormModal = () => {
         <div className="flex sm:flex-row flex-col-reverse items-center justify-end gap-3 pt-6 border-t border-gray-100">
           <button
             type="button"
-            onClick={() => closeModal("invitationForm")}
+            onClick={() => closeModal("INVITE_FORM")}
             className="px-6 py-3.5 rounded-2xl font-bold text-muted hover:bg-gray-100 transition-all w-full sm:w-auto"
           >
             {intl.formatMessage({ id: "Bekor qilish" })}

@@ -91,7 +91,7 @@ const UserFilterModal = () => {
             control={control}
             render={({ field }) => (
               <Select
-                label="Holati"
+                label="Holat"
                 options={[
                   { value: "", label: "Barchasi" },
                   { value: "true", label: "Faol" },

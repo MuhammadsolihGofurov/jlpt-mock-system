@@ -210,7 +210,7 @@ const CenterCard = ({ center, onEdit, onDelete }) => {
           {new Date(center.created_at).toLocaleDateString()}
         </div>
         <button className="text-primary font-bold hover:underline">
-          Batafsil
+          {intl.formatMessage({ id: "Batafsil" })}
         </button>
       </div>
     </div>

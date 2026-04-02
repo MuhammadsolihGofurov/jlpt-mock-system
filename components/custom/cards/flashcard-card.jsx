@@ -68,11 +68,11 @@ const FlashcardDeckCard = ({ deck }) => {
                     {deck.title}
                 </h3>
                 <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed min-h-[40px]">
-                    {deck.description || "Tavsif berilmagan"}
+                    {deck.description || intl.formatMessage({ id: "Tavsif berilmagan" })}
                 </p>
                 <div className="flex items-center gap-2 pt-2">
                     <span className="px-3 py-1 bg-slate-100 rounded-full text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                        {deck.cards_count} {deck.cards_count === 1 ? "kart" : "kartlar"}
+                        {deck.cards_count} {intl.formatMessage({ id: deck.cards_count === 1 ? "kart" : "kartlar" })}
                     </span>
                     <span className="text-[10px] text-slate-300 font-bold">•</span>
                     <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">

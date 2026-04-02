@@ -135,7 +135,7 @@ const MockCard = ({ item }) => {
         </div>
 
         <p className="text-muted text-sm line-clamp-2">
-          {item.description || "Tavsif mavjud emas."}
+          {item.description || intl.formatMessage({ id: "Tavsif berilmagan" })}
         </p>
       </div>
 

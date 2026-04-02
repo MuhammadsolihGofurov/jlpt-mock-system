@@ -35,12 +35,12 @@ function Login({ info }) {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading(
-      intl.formatMessage({ id: "checking_credentials" }) || "Tekshirilmoqda...",
+      intl.formatMessage({ id: "Tekshirilmoqda..." }),
     );
     try {
       await dispatch(loginUser(data)).unwrap();
       toast.update(toastId, {
-        render: "Xush kelibsiz!",
+        render: intl.formatMessage({ id: "Xush kelibsiz!" }),
         type: "success",
         isLoading: false,
         autoClose: 2000,

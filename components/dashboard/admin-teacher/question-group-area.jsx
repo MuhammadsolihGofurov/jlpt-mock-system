@@ -46,7 +46,7 @@ const GroupAndQuestionArea = ({ section }) => {
         <div>
           <h2 className="text-2xl font-black text-heading">{section.name}</h2>
           <p className="text-muted text-sm font-medium">
-            {intl.formatMessage({ id: "Vaqt" })}: {section.duration} daqiqa
+            {intl.formatMessage({ id: "Vaqt" })}: {section.duration} m
           </p>
         </div>
         <button

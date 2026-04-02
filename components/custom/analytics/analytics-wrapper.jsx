@@ -65,7 +65,7 @@ const AnalyticsContainer = () => {
 
   if (!user || !role) return null;
 
-  if (isLoading) return <AnalyticsSkeleton />;
+  // if (isLoading) return <AnalyticsSkeleton />;
 
   if (error)
     return (

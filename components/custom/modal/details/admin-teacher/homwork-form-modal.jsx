@@ -26,16 +26,16 @@ const HomeworkFormModal = ({ homework = null }) => {
   const { page = 1, search } = router.query;
 
   // 1. Ma'lumotlarni yuklab olish (Mocklar, Quizlar, Guruhlar)
-  const { data: mocksData } = useSWR(
-    ["mock-tests/", router.locale],
-    (url, loc) =>
-      fetcher(
-        `${url}?page=all`,
-        { headers: { "Accept-Language": loc } },
-        {},
-        true,
-      ),
-  );
+  // const { data: mocksData } = useSWR(
+  //   ["mock-tests/", router.locale],
+  //   (url, loc) =>
+  //     fetcher(
+  //       `${url}?page=all`,
+  //       { headers: { "Accept-Language": loc } },
+  //       {},
+  //       true,
+  //     ),
+  // );
   const { data: quizzesData } = useSWR(
     ["quizzes/", router.locale],
     (url, loc) =>
@@ -55,11 +55,11 @@ const HomeworkFormModal = ({ homework = null }) => {
     ),
   );
 
-  const mockOptions =
-    mocksData?.map((m) => ({
-      value: m.id,
-      label: `${m.title} (${m.level})`,
-    })) || [];
+  // const mockOptions =
+  //   mocksData?.map((m) => ({
+  //     value: m.id,
+  //     label: `${m.title} (${m.level})`,
+  //   })) || [];
   const quizOptions =
     quizzesData?.map((q) => ({ value: q.id, label: q.title })) || [];
   const groupOptions =
@@ -76,7 +76,7 @@ const HomeworkFormModal = ({ homework = null }) => {
       title: "",
       description: "",
       deadline: "",
-      mock_test_ids: [],
+      // mock_test_ids: [],
       quiz_ids: [],
       assigned_group_ids: [],
       assigned_user_ids: [],
@@ -90,7 +90,7 @@ const HomeworkFormModal = ({ homework = null }) => {
         title: homework.title,
         description: homework.description,
         deadline: homework.deadline?.slice(0, 16),
-        mock_test_ids: homework.mock_tests?.map((m) => m.id) || [],
+        // mock_test_ids: homework.mock_tests?.map((m) => m.id) || [],
         quiz_ids: homework.quizzes?.map((q) => q.id) || [],
         assigned_group_ids: homework.assigned_groups?.map((g) => g.id) || [],
         show_results_immediately: homework.show_results_immediately,
@@ -131,7 +131,7 @@ const HomeworkFormModal = ({ homework = null }) => {
         </div>
         <div>
           <h2 className="text-2xl font-black text-heading">
-            {isEdit ? "Vazifani tahrirlash" : "Yangi vazifa"}
+            {intl.formatMessage({ id: isEdit ? "Vazifani tahrirlash" : "Yangi vazifa" })}
           </h2>
           <p className="text-muted text-sm font-medium">
             {intl.formatMessage({
@@ -176,7 +176,7 @@ const HomeworkFormModal = ({ homework = null }) => {
 
         {/* Resources Selection */}
         <div className="grid grid-cols-1 gap-6 p-6 bg-slate-50 rounded-[2rem] border border-slate-100">
-          <Controller
+          {/* <Controller
             name="mock_test_ids"
             control={control}
             render={({ field }) => (
@@ -188,7 +188,7 @@ const HomeworkFormModal = ({ homework = null }) => {
                 placeholder="Mock tanlang"
               />
             )}
-          />
+          /> */}
 
           <Controller
             name="quiz_ids"
@@ -226,7 +226,7 @@ const HomeworkFormModal = ({ homework = null }) => {
           label="Tavsif (Optional)"
           name="description"
           register={register}
-          placeholder="Topshiriq yuzasidan qo'shimcha ko'rsatmalar..."
+          placeholder={intl.formatMessage({ id: "Topshiriq yuzasidan qo'shimcha ko'rsatmalar..." })}
         />
 
         {/* Footer */}
@@ -244,7 +244,7 @@ const HomeworkFormModal = ({ homework = null }) => {
             className="bg-primary text-white font-black px-8 py-3.5 rounded-2xl shadow-xl shadow-orange-200 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
           >
             <Save size={20} />
-            {isSubmitting ? "Saqlanmoqda..." : "Saqlash"}
+            {intl.formatMessage({ id: isSubmitting ? "Saqlanmoqda..." : "Saqlash" })}
           </button>
         </div>
       </form>

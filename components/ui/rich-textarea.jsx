@@ -1,6 +1,7 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
+import { useIntl } from "react-intl";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -11,6 +12,7 @@ const RichTextarea = ({ label, value, onChange, error, placeholder }) => {
         "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff",
         "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285e0"
     ];
+    const intl = useIntl();
 
     const modules = {
         toolbar: [
@@ -41,7 +43,7 @@ const RichTextarea = ({ label, value, onChange, error, placeholder }) => {
         <div className="flex flex-col gap-2">
             {label && (
                 <label className="text-sm font-black text-slate-700 uppercase tracking-wider ml-1">
-                    {label}
+                    {intl.formatMessage({ id: label })}
                 </label>
             )}
             <div className={`rich-editor-wrapper ${error ? "border-red-500" : "border-slate-100"}`}>
@@ -51,7 +53,7 @@ const RichTextarea = ({ label, value, onChange, error, placeholder }) => {
                     onChange={onChange}
                     modules={modules}
                     formats={formats}
-                    placeholder={placeholder}
+                    placeholder={intl.formatMessage({ id: placeholder })}
                     className="bg-white rounded-[1.5rem] overflow-hidden border border-slate-200"
                 />
             </div>

@@ -114,7 +114,7 @@ const SectionList = ({ mockId, activeSection, sections, onSelect }) => {
                     }
                   />
                   <span className="text-[10px] font-bold">
-                    {section.duration || 0} daqiqa
+                    {section.duration || 0} m
                   </span>
                 </div>
                 <div className="flex items-center gap-2">

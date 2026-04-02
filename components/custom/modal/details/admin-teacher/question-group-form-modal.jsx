@@ -122,7 +122,7 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0 }) => {
             {isEdit ? "Mondai tahrirlash" : "Yangi Mondai qo'shish"}
           </h2>
           <p className="text-muted text-sm font-medium">
-            {section?.name} bo'limi uchun savollar guruhini shakllantiring
+            {section?.name} {intl.formatMessage({ id: "bo'limi uchun savollar guruhini shakllantiring" })}
           </p>
         </div>
       </div>
@@ -201,7 +201,7 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0 }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="space-y-2">
             <label className="text-sm font-black text-heading ml-1 flex items-center gap-2">
-              <ImageIcon size={16} /> Rasm (Optional)
+              <ImageIcon size={16} /> {intl.formatMessage({ id: "Rasm (Optional)" })}
             </label>
             <input
               type="file"
@@ -250,7 +250,7 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0 }) => {
               className="bg-primary hover:bg-primary-dark text-white font-black px-8 py-3.5 rounded-2xl shadow-xl shadow-orange-200 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
             >
               <Save size={18} />
-              {isSubmitting ? "Saqlanmoqda..." : "Saqlash"}
+              {intl.formatMessage({ id: isSubmitting ? "Saqlanmoqda..." : "Saqlash" })}
             </button>
           </div>
         </div>

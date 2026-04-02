@@ -122,7 +122,7 @@ const HomeworkCard = ({ item, mutate }) => {
           {item.title}
         </h3>
         <p className="text-muted text-sm line-clamp-2 mb-4">
-          {item.description || "Tavsif mavjud emas."}
+          {item.description || intl.formatMessage({ id: "Tavsif berilmagan" })}
         </p>
 
         <div className="space-y-2 mb-6">
@@ -130,15 +130,15 @@ const HomeworkCard = ({ item, mutate }) => {
             <Users size={14} className="text-slate-400" />
             <span className="truncate">
               {item.assigned_groups?.map((g) => g.name).join(", ") ||
-                "Guruh biriktirilmagan"}
+                intl.formatMessage({ id: "Guruh biriktirilmagan" })}
             </span>
           </div>
           <div className="flex gap-2">
             <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded font-bold">
-              {item.quizzes?.length || 0} Quizzes
+              {item.quizzes?.length || 0} {intl.formatMessage({ id: "Quizzes" })}
             </span>
             <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded font-bold">
-              {item.mock_tests?.length || 0} Mocks
+              {item.mock_tests?.length || 0} {intl.formatMessage({ id: "Mocks" })}
             </span>
           </div>
         </div>

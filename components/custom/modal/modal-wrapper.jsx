@@ -27,7 +27,7 @@ const ModalWrapper = ({ children, onClose, size = "big" }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        onClick={onClose}
+        // onClick={onClose}
         className="fixed inset-0"
       />
 
