@@ -128,12 +128,12 @@ const QuizFormModal = ({ quiz = null }) => {
       title: "",
       description: "",
       is_active: true,
-      default_question_duration: 60,
+      default_question_duration: 20,
       questions: [
         {
           text: "",
           question_type: "QUIZ",
-          duration: 60,
+          duration: 10,
           points: 1,
           options: [
             { text: "", is_correct: false },
@@ -297,7 +297,7 @@ const QuizFormModal = ({ quiz = null }) => {
                 appendQ({
                   text: "",
                   question_type: "QUIZ",
-                  duration: 60,
+                  duration: 10,
                   points: 1,
                   options: [
                     { text: "", is_correct: false },
@@ -348,7 +348,7 @@ const QuizFormModal = ({ quiz = null }) => {
                     )}
                   />
                   <Input
-                    label="Vaqt"
+                    label="Vaqt (soniya)"
                     name={`questions.${qIndex}.duration`}
                     type="number"
                     register={register}
