@@ -110,11 +110,10 @@ const MockCard = ({ item }) => {
       {/* Main Content */}
       <div className="mb-4">
         <div
-          className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 duration-300 ${
-            isPublished
-              ? "bg-green-50 text-green-600"
-              : "bg-orange-50 text-orange-600"
-          }`}
+          className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 duration-300 ${isPublished
+            ? "bg-green-50 text-green-600"
+            : "bg-orange-50 text-orange-600"
+            }`}
         >
           <Layers size={24} />
         </div>
@@ -129,9 +128,9 @@ const MockCard = ({ item }) => {
       <div className="space-y-3 flex-1">
         <div className="flex items-center gap-2 text-slate-500 font-bold text-xs uppercase tracking-wider">
           <Award size={14} className="text-orange-400" />
-          <span>{item.level} Level</span>
+          <span>{item.level} {intl.formatMessage({ id: "Level" })}</span>
           <span className="mx-1">•</span>
-          <span>{item.total_score} Ball</span>
+          <span>{item.total_score} {intl.formatMessage({ id: "Ball" })}</span>
         </div>
 
         <p className="text-muted text-sm line-clamp-2">
@@ -153,23 +152,21 @@ const MockCard = ({ item }) => {
         )}
         <div className="flex items-center gap-3">
           <div
-            className={`px-3 py-1 rounded-lg text-[9px] font-black tracking-widest uppercase ${
-              isPublished
-                ? "bg-green-100 text-green-600"
-                : "bg-slate-100 text-slate-500"
-            }`}
+            className={`px-3 py-1 rounded-lg text-[9px] font-black tracking-widest uppercase ${isPublished
+              ? "bg-green-100 text-green-600"
+              : "bg-slate-100 text-slate-500"
+              }`}
           >
-            {item.status}
+            {intl.formatMessage({ id: item.status })}
           </div>
 
           <button
             onClick={handleTogglePublish}
             title={isPublished ? "Nashrdan olish" : "Nashr qilish"}
-            className={`p-3 rounded-2xl transition-all active:scale-90 ${
-              isPublished
-                ? "bg-slate-900 text-white hover:bg-slate-800"
-                : "bg-primary text-white hover:bg-primary-dark shadow-lg shadow-orange-100"
-            }`}
+            className={`p-3 rounded-2xl transition-all active:scale-90 ${isPublished
+              ? "bg-slate-900 text-white hover:bg-slate-800"
+              : "bg-primary text-white hover:bg-primary-dark shadow-lg shadow-orange-100"
+              }`}
           >
             {isPublished ? <RotateCcw size={18} /> : <Send size={18} />}
           </button>

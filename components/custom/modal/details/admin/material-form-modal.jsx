@@ -142,7 +142,7 @@ const MaterialFormModal = ({ material = null }) => {
             name="name"
             register={register}
             error={errors.name}
-            placeholder="N5 Vocabulary List"
+            placeholder={intl.formatMessage({ id: "Material nomini kiriting" })}
           />
 
           <Controller

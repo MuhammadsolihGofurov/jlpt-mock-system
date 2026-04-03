@@ -53,7 +53,7 @@ const HomeworkCard = ({ item, mutate }) => {
       "small",
     );
   };
-
+  
   const formatDate = (dateStr) => {
     if (!dateStr) return { full: "---", time: "--:--" };
     const date = new Date(dateStr);
@@ -155,7 +155,7 @@ const HomeworkCard = ({ item, mutate }) => {
           </Link>
         )}
 
-        {(canManage || item?.show_results_immediately) && (
+        {(
           <Link href={getResultsLink()}>
             <button className="w-full bg-slate-50 hover:bg-slate-100 text-heading font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm active:scale-95">
               <BarChart3 size={16} />

@@ -62,14 +62,14 @@ const MockManagePage = () => {
                 <span className="font-black text-slate-800 uppercase text-sm tracking-widest">
                   {intl.formatMessage({ id: "Bo'limlar" })}
                 </span>
-                <button
+                {/* <button
                   onClick={() =>
                     openModal("SECTION_FORM", { mockId, section_count: mock?.sections?.length }, "middle")
                   }
                   className="p-2 bg-primary text-white rounded-xl shadow-lg shadow-orange-100 hover:scale-105 transition-all"
                 >
                   <Plus size={18} />
-                </button>
+                </button> */}
               </div>
               <div className="flex-1 overflow-y-auto p-4">
                 <SectionList

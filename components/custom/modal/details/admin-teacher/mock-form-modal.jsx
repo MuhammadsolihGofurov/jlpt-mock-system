@@ -104,8 +104,8 @@ const MockFormModal = ({ mock = null }) => {
             name="title"
             register={register}
             error={errors.title}
-            placeholder="JLPT N5 Mock Exam 2025"
-            rules={{ required: intl.formatMessage({ id: "Nom majburiy" }) }}
+            placeholder={intl.formatMessage({ id: "Masalan, N5 amaliy test to'plami" })}
+          rules={{ required: intl.formatMessage({ id: "Nom majburiy" }) }}
           />
 
           <Controller
@@ -134,7 +134,7 @@ const MockFormModal = ({ mock = null }) => {
           name="description"
           register={register}
           error={errors.description}
-          placeholder="Amaliy test to'plami haqida..."
+          placeholder={intl.formatMessage({id:"Imtihon haqida qisqacha ma'lumot"})}
         />
 
         <div className={`grid ${!isEdit ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-6`}>
@@ -174,7 +174,7 @@ const MockFormModal = ({ mock = null }) => {
           </span>
           <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase ${isEdit && mock.status === 'PUBLISHED' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-primary'
             }`}>
-            {isEdit ? mock.status : "DRAFT"}
+            {isEdit ? mock.status : intl.formatMessage({id:"DRAFT"})}
           </span>
         </div>
 

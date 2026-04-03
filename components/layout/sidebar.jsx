@@ -122,7 +122,7 @@ const Sidebar = () => {
       {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[60] md:hidden transition-opacity"
+          className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[60] xl:hidden transition-opacity"
           onClick={() => dispatch(closeSidebar())}
         />
       )}
@@ -131,7 +131,7 @@ const Sidebar = () => {
         className={`
           fixed left-0 top-0 h-screen w-[260px] bg-white border-r border-gray-100 z-[70] 
           transition-all duration-300 ease-in-out flex flex-col
-          ${isSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"} md:translate-x-0
+          ${isSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"} xl:translate-x-0
         `}
       >
         {/* Logo Section */}

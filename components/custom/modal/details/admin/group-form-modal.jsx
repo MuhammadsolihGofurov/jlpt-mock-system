@@ -121,7 +121,7 @@ const GroupFormModal = ({ group = null }) => {
             name="name"
             register={register}
             error={errors.name}
-            placeholder="N5 Prep 2024"
+            placeholder={intl.formatMessage({ id: "JLPT N5 tayyorlov guruhi" })}
           />
 
           <Input
@@ -175,7 +175,7 @@ const GroupFormModal = ({ group = null }) => {
           name="description"
           register={register}
           error={errors.description}
-          placeholder="JLPT N5 preparation class..."
+          placeholder={intl.formatMessage({id:"JLPT N5 tayyorlov guruhi uchun mo'ljallangan tavsif..."})}
         />
 
         {/* Action Buttons */}

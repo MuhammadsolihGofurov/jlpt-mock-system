@@ -97,8 +97,8 @@ const Layout = ({ children }) => {
         <>
           <Sidebar />
           <MobileHeader />
-          <section className="md:ml-[260px] bg-cream">
-            <div className="mx-auto min-h-screen px-5 pb-[130px] md:pb-6 pt-3 md:pt-10 flex flex-col gap-7 sm:gap-10">
+          <section className="xl:ml-[260px] bg-cream">
+            <div className="mx-auto min-h-screen px-5 pb-[130px] xl:pb-6 pt-3 xl:pt-10 flex flex-col gap-7 sm:gap-10">
               {children}
             </div>
           </section>

@@ -107,7 +107,7 @@ export const UserCard = ({ item }) => {
                   : "bg-blue-50 text-blue-600 border-blue-100"
                 }`}
             >
-              {item.role}
+              {intl.formatMessage({id:item.role})}
             </span>
           </div>
           <div className="flex flex-col">

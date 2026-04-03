@@ -9,7 +9,7 @@ const MobileHeader = () => {
   const { user } = useSelector(state => state.auth);
 
   return (
-    <header className="md:hidden sticky top-0 z-[50] flex items-center justify-between px-5 py-3 bg-white/80 backdrop-blur-xl border-b border-gray-100/50">
+    <header className="xl:hidden sticky top-0 z-[50] flex items-center justify-between px-5 py-3 bg-white/80 backdrop-blur-xl border-b border-gray-100/50">
       {/* Chap tomonda Menu va Logo */}
       <div className="flex items-center gap-4">
         <button

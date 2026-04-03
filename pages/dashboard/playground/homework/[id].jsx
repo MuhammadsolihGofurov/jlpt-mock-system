@@ -25,6 +25,7 @@ import { HomeworkPlayground } from "@/components/custom/playground";
 const HomeworkPlaygroundPage = () => {
   const router = useRouter();
   const { id: homeworkId } = router.query;
+  const intl = useIntl();
 
   const [activeItemData, setActiveItemData] = useState(null);
   const [loadingItemId, setLoadingItemId] = useState(null);
@@ -55,12 +56,12 @@ const HomeworkPlaygroundPage = () => {
   };
 
   const handleFinishItem = async (finalPayload) => {
-    const toastId = toast.loading("Natijalar saqlanmoqda...");
+    const toastId = toast.loading(intl.formatMessage({ id: "Natijalar saqlanmoqda..." }));
     try {
       await authAxios.post("/submissions/submit-homework/", finalPayload);
 
       toast.update(toastId, {
-        render: "Natija saqlandi!",
+        render: intl.formatMessage({ id: "Natijalar muvaffaqiyatli saqlandi!" }),
         type: "success",
         isLoading: false,
         autoClose: 2000,
@@ -111,11 +112,11 @@ const HomeworkPlaygroundPage = () => {
       <div className="min-h-screen bg-[#FDFDFF] pb-10 font-sans">
         <nav className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center">
           <button onClick={() => router.back()} className="flex items-center gap-2 text-slate-400 hover:text-slate-900 transition-all font-bold group">
-            <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Ortga qaytish
+            <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> {intl.formatMessage({ id: "Orqaga" })}
           </button>
           <div className="flex items-center gap-2">
             <ShieldCheck className="text-emerald-500" size={16} />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Homework System</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{intl.formatMessage({ id: "Homework System" })}</span>
           </div>
         </nav>
 
@@ -130,12 +131,12 @@ const HomeworkPlaygroundPage = () => {
             <div className="flex flex-wrap gap-4">
               <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm min-w-[180px]">
                 <Award className="text-emerald-500 mb-2" size={20} />
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Jarayon</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{intl.formatMessage({ id: "Jarayon" })}</p>
                 <p className="text-2xl font-black text-slate-900">{totalFinishedItems} / {totalItemsCount}</p>
               </div>
               <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm min-w-[180px]">
                 <BookOpen className="text-blue-500 mb-2" size={20} />
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Elementlar</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{intl.formatMessage({ id: "Elementlar" })}</p>
                 <p className="text-2xl font-black text-slate-900">{totalItemsCount} ta</p>
               </div>
             </div>
@@ -146,8 +147,8 @@ const HomeworkPlaygroundPage = () => {
                 <RotateCcw size={20} />
               </div>
               <div>
-                <h4 className="font-bold text-blue-900">Cheksiz urinishlar</h4>
-                <p className="text-sm text-blue-700/80 mt-1">Ushbu vazifadagi mashqlarni o'zlashtirish darajangizni oshirish uchun istalgancha qayta ishlashingiz mumkin. Har bir urinish natijasi qayd etiladi.</p>
+                <h4 className="font-bold text-blue-900">{intl.formatMessage({ id: "Cheksiz urinishlar" })}</h4>
+                <p className="text-sm text-blue-700/80 mt-1">{intl.formatMessage({ id: "Ushbu vazifadagi mashqlarni o'zlashtirish darajangizni oshirish uchun istalgancha qayta ishlashingiz mumkin. Har bir urinish natijasi qayd etiladi." })}</p>
               </div>
             </div>
           </div>
@@ -156,7 +157,7 @@ const HomeworkPlaygroundPage = () => {
           <div className="lg:col-span-5">
             <div className="bg-white rounded-[3.5rem] p-8 md:p-10 border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
               <h3 className="text-2xl font-black mb-8 flex items-center justify-between">
-                Topshiriqlar ro'yxati
+                {intl.formatMessage({ id: "Topshiriqlar ro'yxati" })}
                 <span className="bg-slate-50 text-slate-400 p-2 rounded-xl"><FileText size={20} /></span>
               </h3>
 
@@ -178,7 +179,7 @@ const HomeworkPlaygroundPage = () => {
                             {item.level ? 'Mock Test' : 'Quiz'}
                           </span>
                           {item.status === "Completed" && (
-                            <span className="text-[9px] font-black uppercase text-emerald-500">Bajarilgan</span>
+                            <span className="text-[9px] font-black uppercase text-emerald-500">{intl.formatMessage({ id: "Bajarilgan" })}</span>
                           )}
                         </div>
                       </div>
@@ -193,7 +194,7 @@ const HomeworkPlaygroundPage = () => {
 
               <div className="mt-8 pt-8 border-t border-slate-50 flex items-center gap-3 text-slate-400">
                 <Info size={16} />
-                <p className="text-xs font-medium">Bajarilgan topshiriqlarni ham qayta ishlash mumkin</p>
+                <p className="text-xs font-medium">{intl.formatMessage({ id: "Bajarilgan topshiriqlarni ham qayta ishlash mumkin" })}</p>
               </div>
             </div>
           </div>

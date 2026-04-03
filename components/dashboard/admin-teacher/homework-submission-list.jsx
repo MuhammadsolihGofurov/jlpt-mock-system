@@ -273,6 +273,7 @@ const HomeworkSubmissionList = () => {
 // Kichik natija tugmasi (Modalni ochadi)
 const MiniScoreBtn = ({ data, icon, color, label }) => {
     const { openModal } = useModal();
+    const intl = useIntl();
     if (!data) return null;
 
     const colorMap = {
@@ -289,7 +290,7 @@ const MiniScoreBtn = ({ data, icon, color, label }) => {
             title={label || data.section_name}
         >
             {icon}
-            {label && <span className="text-[10px] font-black uppercase pr-1">{label}</span>}
+            {label && <span className="text-[10px] font-black uppercase pr-1">{intl.formatMessage({ id: label })}</span>}
             {!label && <span className="text-[11px] font-black">{data.score}</span>}
         </button>
     );

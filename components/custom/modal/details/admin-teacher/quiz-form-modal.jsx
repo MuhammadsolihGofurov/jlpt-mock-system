@@ -133,7 +133,7 @@ const QuizFormModal = ({ quiz = null }) => {
         {
           text: "",
           question_type: "QUIZ",
-          duration: 10,
+          // duration: 10,
           points: 1,
           options: [
             { text: "", is_correct: false },
@@ -257,7 +257,7 @@ const QuizFormModal = ({ quiz = null }) => {
               name="title"
               register={register}
               error={errors.title}
-              placeholder="N5 Kanji Practice"
+              placeholder={intl.formatMessage({id: "Quiz nomini kiriting..." })}
             />
           </div>
           <Input
@@ -297,7 +297,7 @@ const QuizFormModal = ({ quiz = null }) => {
                 appendQ({
                   text: "",
                   question_type: "QUIZ",
-                  duration: 10,
+                  // duration: 10,
                   points: 1,
                   options: [
                     { text: "", is_correct: false },
@@ -335,7 +335,7 @@ const QuizFormModal = ({ quiz = null }) => {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <Controller
                     name={`questions.${qIndex}.question_type`}
                     control={control}
@@ -347,12 +347,12 @@ const QuizFormModal = ({ quiz = null }) => {
                       />
                     )}
                   />
-                  <Input
+                  {/* <Input
                     label="Vaqt (soniya)"
                     name={`questions.${qIndex}.duration`}
                     type="number"
                     register={register}
-                  />
+                  /> */}
                   <Input
                     label="Ball"
                     name={`questions.${qIndex}.points`}

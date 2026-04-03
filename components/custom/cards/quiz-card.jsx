@@ -8,6 +8,7 @@ import {
   User,
   CheckCircle,
   XCircle,
+  Shuffle,
 } from "lucide-react";
 import { authAxios } from "@/utils/axios";
 import { useModal } from "@/context/modal-context";
@@ -44,14 +45,29 @@ const QuizCard = ({ item, mutate }) => {
     );
   };
 
+  const handleShuffle = () => {
+    openModal(
+      "CONFIRM_MODAL",
+      {
+        title: "Quizni aralashtirish",
+        body: `Ushbu quizni aralashtirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.`,
+        confirmText: "Ha",
+        variant: "danger",
+        onConfirm: async () => await authAxios.post(`quizzes/${item.id}/shuffle-options/`),
+        mutateKey: [`quizzes/`, router.locale],
+      },
+      "small",
+    );
+  };
+
   return (
     <div className="group bg-white border border-slate-100 p-6 rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:shadow-orange-100/50 transition-all duration-500 flex flex-col h-full relative overflow-hidden">
       {/* Status Badge & Actions */}
       <div className="flex items-center justify-between mb-5">
         <div
           className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${item.is_active
-              ? "bg-emerald-50 text-emerald-600"
-              : "bg-red-50 text-red-600"
+            ? "bg-emerald-50 text-emerald-600"
+            : "bg-red-50 text-red-600"
             }`}
         >
           {item.is_active ? (
@@ -67,6 +83,12 @@ const QuizCard = ({ item, mutate }) => {
 
         {canManage && (
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <button
+              onClick={handleShuffle}
+              className="p-2 bg-slate-50 text-slate-600 rounded-xl hover:bg-blue-500 hover:text-white transition-all"
+            >
+              <Shuffle size={14} />
+            </button>
             <button
               onClick={() => openModal("QUIZ_FORM", { quiz: item }, "video")}
               className="p-2 bg-slate-50 text-slate-600 rounded-xl hover:bg-blue-500 hover:text-white transition-all"

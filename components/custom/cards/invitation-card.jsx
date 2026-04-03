@@ -148,11 +148,11 @@ const InvitationCard = ({ item }) => {
             </span>
             <span
               className={`text-[11px] font-black tracking-wide px-2.5 py-1 rounded-lg ${item.role === "TEACHER"
-                  ? "bg-blue-50 text-blue-600 border border-blue-100"
-                  : "bg-primary/5 text-primary border border-primary/10"
+                ? "bg-blue-50 text-blue-600 border border-blue-100"
+                : "bg-primary/5 text-primary border border-primary/10"
                 }`}
             >
-              {item.role}
+              {intl.formatMessage({id:item.role})}
             </span>
           </div>
           <div className="flex flex-col">
@@ -167,7 +167,7 @@ const InvitationCard = ({ item }) => {
               ) : (
                 <CheckCircle2 size={12} />
               )}
-              {item.status}
+              {intl.formatMessage({ id: item.status })}
             </div>
           </div>
         </div>
