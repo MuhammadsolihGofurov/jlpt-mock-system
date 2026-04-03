@@ -794,5 +794,21 @@
     "PDF Yuklash": "Download PDF",
     "Quizni ko'rish": "View Quiz",
     "Quizni aralashtirish": "Shuffle Quiz",
-    "Ushbu quizni aralashtirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.": "Do you want to shuffle this quiz? This action cannot be undone."
+    "Ushbu quizni aralashtirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.": "Do you want to shuffle this quiz? This action cannot be undone.",
+    "Quiz nomini kiriting...": "Enter quiz name...",
+    "JLPT N5 tayyorlov guruhi": "JLPT N5 preparation group",
+    "JLPT N5 tayyorlov guruhi uchun mo'ljallangan tavsif...": "Description intended for the JLPT N5 preparation group...",
+    "APPROVED": "Approved",
+    "PENDING": "Pending",
+    "REJECTED": "Rejected",
+    "CENTER_ADMIN": "Center Administrator",
+    "TEACHER": "Teacher",
+    "STUDENT": "Student",
+    "Material nomini kiriting": "Enter material name",
+    "Tanlang": "Select",
+    "Other": "Other",
+    "Masalan, N5 amaliy test to'plami": "For example, N5 practice test collection",
+    "Imtihon haqida qisqacha ma'lumot": "Brief information about the exam",
+    "DRAFT": "Draft",
+    "PUBLISHED": "Published"
 }

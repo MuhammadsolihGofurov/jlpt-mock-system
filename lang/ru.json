@@ -794,5 +794,21 @@
   "PDF Yuklash": "Скачать PDF",
   "Quizni ko'rish": "Посмотреть квиз",
   "Quizni aralashtirish": "Перемешать квиз",
-  "Ushbu quizni aralashtirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.": "Вы хотите перемешать этот квиз? Это действие нельзя отменить."
+  "Ushbu quizni aralashtirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.": "Вы хотите перемешать этот квиз? Это действие нельзя отменить.",
+  "Quiz nomini kiriting...": "Введите название квиза...",
+  "JLPT N5 tayyorlov guruhi": "Группа подготовки к JLPT N5",
+  "JLPT N5 tayyorlov guruhi uchun mo'ljallangan tavsif...": "Описание, предназначенное для группы подготовки к JLPT N5...",
+  "APPROVED": "Одобрено",
+  "PENDING": "В ожидании",
+  "REJECTED": "Отклонено",
+  "CENTER_ADMIN": "Администратор центра",
+  "TEACHER": "Учитель",
+  "STUDENT": "Студент",
+  "Material nomini kiriting": "Введите название материала",
+  "Tanlang": "Выберите",
+  "Other": "Другое",
+  "Masalan, N5 amaliy test to'plami": "Например, сборник практических тестов N5",
+  "Imtihon haqida qisqacha ma'lumot": "Краткая информация об экзамене",
+  "DRAFT": "Черновик",
+  "PUBLISHED": "Опубликовано"
 }

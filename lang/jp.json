@@ -794,5 +794,21 @@
   "PDF Yuklash": "PDFをダウンロード",
   "Quizni ko'rish": "クイズを見る",
   "Quizni aralashtirish": "クイズをシャッフル",
-  "Ushbu quizni aralashtirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.": "このクイズをシャッフルしますか？この操作は取り消せません。"
+  "Ushbu quizni aralashtirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.": "このクイズをシャッフルしますか？この操作は取り消せません。",
+  "Quiz nomini kiriting...": "クイズ名を入力してください...",
+  "JLPT N5 tayyorlov guruhi": "JLPT N5対策コース",
+  "JLPT N5 tayyorlov guruhi uchun mo'ljallangan tavsif...": "JLPT N5対策コース向けの説明...",
+  "APPROVED": "承認済み",
+  "PENDING": "保留中",
+  "REJECTED": "却下",
+  "CENTER_ADMIN": "センター管理者",
+  "TEACHER": "教師",
+  "STUDENT": "学生",
+  "Material nomini kiriting": "教材名を入力してください",
+  "Tanlang": "選択してください",
+  "Other": "その他",
+  "Masalan, N5 amaliy test to'plami": "例：N5模擬試験集",
+  "Imtihon haqida qisqacha ma'lumot": "試験概要",
+  "DRAFT": "下書き",
+  "PUBLISHED": "公開済み"
 }
