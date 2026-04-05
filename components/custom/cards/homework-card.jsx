@@ -53,10 +53,32 @@ const HomeworkCard = ({ item, mutate }) => {
       "small",
     );
   };
-  
+
   const formatDate = (dateStr) => {
     if (!dateStr) return { full: "---", time: "--:--" };
-    const date = new Date(dateStr);
+
+    let date;
+
+    // YYYY-MM-DD yoki YYYY-MM-DD HH:mm:ss ni to‘g‘ri parse qilish
+    const clean = dateStr.replace("T", " ").replace("Z", "");
+
+    // Agar faqat sana bo‘lsa
+    if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
+      const [y, m, d] = clean.split("-");
+      date = new Date(y, m - 1, d);
+    } else {
+      // Sana + vaqt bo‘lsa
+      const [datePart, timePart = "00:00:00"] = clean.split(" ");
+      const [y, m, d] = datePart.split("-");
+      const [h, min] = timePart.split(":");
+
+      date = new Date(y, m - 1, d, h || 0, min || 0);
+    }
+
+    if (isNaN(date.getTime())) {
+      return { full: "Invalid", time: "--:--" };
+    }
+
     return {
       full: date.toLocaleDateString("uz-UZ", {
         day: "2-digit",
@@ -66,6 +88,7 @@ const HomeworkCard = ({ item, mutate }) => {
       time: date.toLocaleTimeString("uz-UZ", {
         hour: "2-digit",
         minute: "2-digit",
+        hour12: false,
       }),
     };
   };

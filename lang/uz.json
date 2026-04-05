@@ -292,9 +292,9 @@
   "Imtihonlar": "Imtihonlar",
   "Vazifalar": "Vazifalar",
   "Assignments": "Topshiriqlar",
-  "homework_title": "Uyga vazifalar",
-  "homework_desc": "Ushbu sahifada uyga vazifalar uchun materiallarni ko'rishingiz mumkin.",
-  "homework_key": "uyga vazifalar",
+  "homework_title": "Topshiriqlar",
+  "homework_desc": "Ushbu sahifada topshiriqlar uchun materiallarni ko'rishingiz mumkin.",
+  "homework_key": "topshiriqlar",
   "Imtihon qo'shish": "Imtihon qo'shish",
   "Imtihonlarni saralash": "Imtihonlarni saralash",
   "Holat bo'yicha kerakli imtihonlarni toping": "Holat bo'yicha kerakli imtihonlarni toping",
@@ -333,7 +333,7 @@
   "Yangi Quiz": "Yangi Quiz",
   "Savollar va variantlarni bir joyda boshqaring": "Savollar va variantlarni bir joyda boshqaring",
   "Quiz nomi": "Quiz nomi",
-  "Standart vaqt (minut)": "Standart vaqt (minut)",
+  "Standart vaqt (minut)": "Standart vaqt (sekunda)",
   "Savollar ro'yxati": "Savollar ro'yxati",
   "Savol qo'shish": "Savol qo'shish",
   "Noaktiv": "Noaktiv",
@@ -811,5 +811,8 @@
   "Masalan, N5 amaliy test to'plami": "Masalan, N5 amaliy test to'plami",
   "Imtihon haqida qisqacha ma'lumot": "Imtihon haqida qisqacha ma'lumot",
   "DRAFT": "Qoralama",
-  "PUBLISHED": "Nashr etilgan"
+  "PUBLISHED": "Nashr etilgan",
+  "Javobingizni tanlang...": "Javobingizni tanlang...",
+  "NATIJANI KO'RISH": "NATIJANI KO'RISH",
+  "KEYINGI SAVOL": "KEYINGI SAVOL"
 }

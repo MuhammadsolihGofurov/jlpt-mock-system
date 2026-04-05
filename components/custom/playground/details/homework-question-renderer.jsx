@@ -1,53 +1,84 @@
 import React from "react";
-import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, Triangle, Square, Circle, Pentagon } from "lucide-react";
+import { useIntl } from "react-intl";
 
-const HomeworkQuestionRenderer = ({ question, index, onSelect, result, isChecking }) => {
+// Kahoot uslubidagi ikonka va ranglar
+const VARIANT_THEMES = [
+    { icon: <Triangle className="fill-white" size={24} />, color: "rose", bg: "bg-rose-500/30", border: "border-rose-400", glow: "shadow-rose-500/20" },
+    { icon: <Pentagon className="fill-white" size={24} />, color: "blue", bg: "bg-blue-500/30", border: "border-blue-400", glow: "shadow-blue-500/20" },
+    { icon: <Circle className="fill-white" size={24} />, color: "amber", bg: "bg-amber-500/30", border: "border-amber-400", glow: "shadow-amber-500/20" },
+    { icon: <Square className="fill-white" size={24} />, color: "emerald", bg: "bg-emerald-500/30", border: "border-emerald-400", glow: "shadow-emerald-500/20" },
+];
+
+const HomeworkQuestionRenderer = ({ question, index, onSelect, result, isChecking, isTimeOut }) => {
     if (!question) return null;
+    const intl = useIntl();
 
     return (
-        <div className="bg-white p-6 md:p-8 rounded-[2rem] border-2 border-slate-100 shadow-xl">
-            <div className="mb-6 text-center">
-                <span className="text-primary font-black text-sm uppercase tracking-widest">
-                    Question {index + 1}
-                </span>
-                <h2 className="text-xl md:text-2xl font-bold mt-2 text-slate-800"
-                    dangerouslySetInnerHTML={{ __html: question.text }} />
+        <div className="w-full h-full flex flex-col">
+            {/* SAVOL QISMI */}
+            <div className="mb-8 text-center">
+                <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                    <span className="text-[12px] font-black tracking-[0.2em] uppercase uppercase text-white/80">{intl.formatMessage({ id: "Savol" })} {index + 1}</span>
+                </div>
+                <h2
+                    className="text-2xl md:text-4xl font-black text-white leading-tight drop-shadow-xl"
+                    dangerouslySetInnerHTML={{ __html: question.text }}
+                />
             </div>
 
-            <div className="grid gap-3">
+            {/* VARIANTLAR - KAHOOT STYLE 2x2 GRID */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 pb-4">
                 {question.options.map((option, idx) => {
-                    const isSelected = result?.optionIndex === idx;
-                    const isCorrect = result?.correctOption === idx;
+                    const theme = VARIANT_THEMES[idx % 4];
+                    const isSelected = result?.idx === idx;
+                    const isCorrect = result?.correctIdx === idx;
                     const isWrong = isSelected && !result?.isCorrect;
+                    const isDisabled = !!result || isChecking || isTimeOut;
 
-                    let buttonClass = "border-slate-100 bg-slate-50 hover:border-primary/30";
-                    if (result) {
-                        if (isCorrect) buttonClass = "border-emerald-500 bg-emerald-50 text-emerald-700";
-                        else if (isWrong) buttonClass = "border-red-500 bg-red-50 text-red-700";
-                        else buttonClass = "opacity-50 border-slate-100";
-                    }
+                    // Dinamik klasslarni aniqlash
+                    let stateStyles = `${theme.bg} ${theme.border} hover:bg-white/20`;
+                    if (isCorrect) stateStyles = "bg-emerald-500 border-emerald-300 shadow-[0_0_30px_rgba(16,185,129,0.4)] scale-[1.02] z-10";
+                    if (isWrong) stateStyles = "bg-rose-600 border-rose-300 opacity-100 shadow-[0_0_30px_rgba(225,29,72,0.4)]";
+                    if (isDisabled && !isCorrect && !isWrong) stateStyles = "bg-black/40 border-white/10 opacity-40 grayscale-[0.5]";
 
                     return (
                         <button
                             key={idx}
-                            disabled={!!result || isChecking}
+                            disabled={isDisabled}
                             onClick={() => onSelect(question.id, idx)}
-                            className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-between group ${buttonClass}`}
+                            className={`
+                relative group flex items-center p-5 md:p-7 rounded-[2rem] border-2 backdrop-blur-xl
+                transition-all duration-300 text-left
+                ${stateStyles}
+                ${!isDisabled && "hover:-translate-y-1 active:scale-95"}
+              `}
                         >
-                            <span className="font-bold">{option.text}</span>
-                            {result && isCorrect && <CheckCircle2 size={20} className="text-emerald-500" />}
-                            {result && isWrong && <XCircle size={20} className="text-red-500" />}
-                            {isSelected && isChecking && <Loader2 size={20} className="animate-spin text-primary" />}
+                            {/* SHAKL/IKONKA */}
+                            <div className={`
+                w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mr-4 transition-transform
+                ${isCorrect || isWrong ? 'bg-white/20 scale-110' : 'bg-white/10 border border-white/20'}
+                group-hover:rotate-12
+              `}>
+                                {theme.icon}
+                            </div>
+
+                            {/* VARIANT MATNI */}
+                            <span className={`flex-1 font-bold text-lg md:text-xl drop-shadow-sm ${isCorrect || isWrong ? 'text-white' : 'text-white/90'}`}>
+                                {option.text}
+                            </span>
+
+                            {/* JAVOB HOLATI */}
+                            <div className="absolute top-4 right-4">
+                                {isCorrect && <CheckCircle2 className="text-white animate-bounce" size={32} />}
+                                {isWrong && <XCircle className="text-white animate-shake" size={32} />}
+                                {isSelected && isChecking && <Loader2 className="animate-spin text-white" size={28} />}
+                            </div>
                         </button>
                     );
                 })}
             </div>
-
-            {result?.feedback && (
-                <div className="mt-4 p-4 bg-blue-50 rounded-xl text-sm text-blue-700 italic">
-                    {result.feedback}
-                </div>
-            )}
         </div>
     );
 };

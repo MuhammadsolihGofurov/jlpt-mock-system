@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Timer, ChevronRight, ChevronLeft, Send, CheckCircle2, XCircle } from "lucide-react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { ChevronLeft, ChevronRight, Trophy, Clock } from "lucide-react";
 import HomeworkQuestionRenderer from "./details/homework-question-renderer";
 import { authAxios } from "@/utils/axios";
 import { toast } from "react-toastify";
@@ -10,48 +10,89 @@ const HomeworkPlayground = ({ data, onFinish, onBack }) => {
     const questions = itemData?.questions || [];
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState({});
+    const intl = useIntl();
     const [isChecking, setIsChecking] = useState(false);
     const [timeLeft, setTimeLeft] = useState(itemData?.default_question_duration || 30);
-    const intl = useIntl();
+
+    const normalAudio = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/timeout-1.mp3") : null);
+    const urgentAudio = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/timeout-2.mp3") : null);
+
+    const stopAllSounds = () => {
+        if (normalAudio.current) {
+            normalAudio.current.pause();
+            normalAudio.current.currentTime = 0;
+        }
+        if (urgentAudio.current) {
+            urgentAudio.current.pause();
+            urgentAudio.current.currentTime = 0;
+        }
+    };
+
+    const randomBg = useMemo(() => {
+        const bgNumber = Math.floor(Math.random() * 3) + 1;
+        return `/images/background-${bgNumber}.jpg`;
+    }, []);
 
     const currentQuestion = questions[currentIndex];
     const totalQuestions = questions.length;
-    const progress = ((currentIndex + 1) / totalQuestions) * 100;
+    const currentResult = answers[currentQuestion?.id];
 
-    const handleNext = useCallback(() => {
-        if (currentIndex < totalQuestions - 1) {
-            setCurrentIndex(prev => prev + 1);
-            setTimeLeft(itemData?.default_question_duration || 30);
-        }
-    }, [currentIndex, totalQuestions, itemData]);
+    const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    };
 
     useEffect(() => {
-        if (timeLeft <= 0) {
-            handleNext();
+        if (currentResult || timeLeft <= 0) {
+            stopAllSounds();
             return;
         }
-        const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+
+        if (timeLeft > 5) {
+            if (urgentAudio.current) {
+                urgentAudio.current.pause();
+                urgentAudio.current.currentTime = 0;
+            }
+            normalAudio.current.loop = true;
+            normalAudio.current.play().catch(() => { });
+        } else if (timeLeft <= 5 && timeLeft > 0) {
+            if (normalAudio.current) {
+                normalAudio.current.pause();
+                normalAudio.current.currentTime = 0;
+            }
+            urgentAudio.current.loop = true;
+            urgentAudio.current.play().catch(() => { });
+        }
+
+        const timer = setInterval(() => {
+            setTimeLeft(prev => prev - 1);
+        }, 1000);
+
         return () => clearInterval(timer);
-    }, [timeLeft, handleNext]);
+    }, [timeLeft, currentResult]);
+
+    useEffect(() => {
+        return () => stopAllSounds();
+    }, [currentIndex]);
 
     const handleSelectOption = async (questionId, optionIndex) => {
-        if (answers[questionId] || isChecking) return;
-
+        if (answers[questionId] || isChecking || timeLeft === 0) return;
         setIsChecking(true);
+        stopAllSounds();
+
         try {
             const res = await authAxios.post("/submissions/check-single-question/", {
                 submission_id: data.submission_id,
                 question_id: questionId,
                 selected_index: optionIndex
             });
-
             setAnswers(prev => ({
                 ...prev,
                 [questionId]: {
                     idx: optionIndex,
                     isCorrect: res.data.is_correct,
                     correctIdx: res.data.correct_option_index,
-                    feedback: res.data.feedback
                 }
             }));
         } catch (error) {
@@ -61,129 +102,98 @@ const HomeworkPlayground = ({ data, onFinish, onBack }) => {
         }
     };
 
-    const handleFinalSubmit = () => {
-        const cleanAnswersMap = {};
-        Object.keys(answers).forEach(qId => {
-            cleanAnswersMap[qId] = answers[qId].idx;
-        });
-        onFinish({
-            submission_id: data.submission_id,
-            answers: cleanAnswersMap
-        });
-    };
+    const handleNext = useCallback(() => {
+        if (currentIndex < totalQuestions - 1) {
+            stopAllSounds();
+            setCurrentIndex(prev => prev + 1);
+            setTimeLeft(itemData?.default_question_duration || 30);
+            // Savol o'zgarganda sahifani tepaga qaytarish (mobil uchun)
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, [currentIndex, totalQuestions, itemData]);
 
-    if (!itemData || questions.length === 0) return null;
-
-    const currentResult = answers[currentQuestion?.id];
+    const isUrgent = timeLeft <= 5 && timeLeft > 0;
 
     return (
-        <div className="fixed inset-0 bg-white flex flex-col z-[100] font-sans h-screen overflow-hidden text-slate-900">
-            {/* CLEAN HEADER */}
-            <header className="h-16 border-b border-slate-100 px-6 flex items-center relative">
-                {/* Back & Title */}
-                <div className="flex items-center gap-3 z-10">
-                    <button onClick={onBack} className="p-2 hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-200">
-                        <ChevronLeft size={20} className="text-slate-600" />
+        // FIXED olib tashlandi, MIN-H-SCREEN qo'shildi
+        <div className="relative min-h-screen flex flex-col z-[100] bg-black text-white pb-10">
+            {/* BACKGROUND - FIXED bo'lib turishi kerak, kontent ustidan o'tishi uchun */}
+            <div
+                className="fixed inset-0 bg-cover bg-center transition-transform duration-[10s] scale-110 animate-slow-zoom z-0"
+                style={{ backgroundImage: `url(${randomBg})` }}
+            />
+            <div className="fixed inset-0 bg-gradient-to-tr from-black/80 via-black/40 to-black/60 backdrop-saturate-[1.2] z-1" />
+
+            {/* UI CONTENT CONTAINER */}
+            <div className="relative z-10 flex flex-col max-w-4xl mx-auto w-full px-4">
+                <header className="h-20 flex items-center justify-between sticky top-0 z-30">
+                    <button onClick={() => { stopAllSounds(); onBack(); }} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-xl border border-white/20">
+                        <ChevronLeft size={20} />
                     </button>
-                    <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none">{intl.formatMessage({ id: "Lesson" })}</span>
-                        <span className="text-xs font-bold text-slate-800 line-clamp-1">{itemData.title}</span>
-                    </div>
-                </div>
 
-                {/* CENTRAL TIMER - MODERNISED */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full border-2 transition-all duration-300 ${timeLeft < 10
-                        ? 'bg-rose-50 border-rose-200 text-rose-600 animate-pulse'
-                        : 'bg-slate-50 border-slate-200 text-slate-700'
-                        }`}>
-                        <Timer size={16} className={timeLeft < 10 ? 'animate-spin-slow' : ''} />
-                        <span className="font-mono text-lg font-black tracking-tight">{timeLeft < 10 ? `0${timeLeft}` : timeLeft}s</span>
+                    <div className={`px-6 py-2 rounded-full backdrop-blur-2xl border-2 transition-all duration-300 ${isUrgent ? 'border-rose-500 bg-rose-500/20 scale-105' : 'border-white/20 bg-white/5'}`}>
+                        <div className="flex items-center gap-2">
+                            <Clock size={18} className={isUrgent ? 'animate-pulse text-rose-400' : 'text-white/60'} />
+                            <span className="font-mono text-xl font-black min-w-[50px] text-center">
+                                {formatTime(timeLeft)}
+                            </span>
+                        </div>
                     </div>
-                </div>
 
-                {/* PROGRESS INFO */}
-                <div className="ml-auto flex items-center gap-4 z-10">
-                    <div className="hidden md:flex flex-col items-end">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{intl.formatMessage({ id: "Progress" })}</span>
-                        <span className="text-xs font-bold">{currentIndex + 1} / {totalQuestions}</span>
+                    <div className="flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full border border-white/10">
+                        <Trophy size={16} className="text-yellow-400" />
+                        <span className="font-bold text-xs">{currentIndex + 1}/{totalQuestions}</span>
                     </div>
-                    <div className="w-12 h-12 relative flex items-center justify-center">
-                        <svg className="w-full h-full transform -rotate-90">
-                            <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-slate-100" />
-                            <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="3" fill="transparent" strokeDasharray={125.6} strokeDashoffset={125.6 - (125.6 * progress) / 100} className="text-slate-900 transition-all duration-500" strokeLinecap="round" />
-                        </svg>
-                        <span className="absolute text-[9px] font-black">{Math.round(progress)}%</span>
-                    </div>
-                </div>
-            </header>
+                </header>
 
-            {/* MAIN CONTENT */}
-            <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
-                <div className="w-full max-w-2xl">
-
-                    {/* QUESTION RENDERER */}
-                    <div className="mb-6">
+                <main className="flex flex-col py-4 gap-6">
+                    {/* Savol kartasi balandligi cheklanmagan */}
+                    <div className="bg-black/30 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-5 md:p-8 shadow-2xl">
                         <HomeworkQuestionRenderer
                             question={currentQuestion}
                             index={currentIndex}
                             onSelect={handleSelectOption}
                             result={currentResult}
                             isChecking={isChecking}
-                            showLetters={true} // Component ichida harflarni chiqarish uchun
+                            isTimeOut={timeLeft === 0}
                         />
                     </div>
 
-                    {/* INTERACTIVE FEEDBACK & NAVIGATION - INLINE */}
-                    <div className="min-h-[80px]">
-                        {currentResult && (
-                            <div className={`p-4 rounded-2xl flex items-center justify-between border-2 transition-all animate-in zoom-in-95 duration-300 ${currentResult.isCorrect
-                                ? 'bg-emerald-50 border-emerald-100 text-emerald-800'
-                                : 'bg-rose-50 border-rose-100 text-rose-800'
-                                }`}>
-                                <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-xl ${currentResult.isCorrect ? 'bg-emerald-500' : 'bg-rose-500'} text-white shadow-lg`}>
-                                        {currentResult.isCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-black uppercase tracking-tight">
-                                            {currentResult.isCorrect ? "Barakalla!" : "Diqqatli bo'ling!"}
-                                        </span>
-                                        {!currentResult.isCorrect && (
-                                            <span className="text-xs font-bold opacity-80">
-                                                {intl.formatMessage({ id: "To'g'ri javob" })}: {String.fromCharCode(65 + currentResult.correctIdx)}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {currentIndex === totalQuestions - 1 ? (
-                                    <button
-                                        onClick={handleFinalSubmit}
-                                        className="px-8 py-3 bg-slate-900 text-white rounded-xl text-sm font-black hover:bg-black transition-all shadow-xl active:scale-95 flex items-center gap-2"
-                                    >
-                                        {intl.formatMessage({ id: "Yakunlash" })} <Send size={16} />
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={handleNext}
-                                        className={`px-8 py-3 rounded-xl text-sm font-black text-white transition-all shadow-xl active:scale-95 flex items-center gap-2 ${currentResult.isCorrect ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'
-                                            }`}
-                                    >
-                                        {intl.formatMessage({ id: "Keyingisi" })} <ChevronRight size={18} />
-                                    </button>
-                                )}
+                    {/* ACTION BUTTONS */}
+                    <div className="pb-8">
+                        {(currentResult || timeLeft === 0) ? (
+                            <button
+                                onClick={() => {
+                                    stopAllSounds();
+                                    if (currentIndex === totalQuestions - 1) {
+                                        onFinish({ submission_id: data.submission_id });
+                                    } else {
+                                        handleNext();
+                                    }
+                                }}
+                                className="w-full py-5 rounded-2xl bg-white text-black font-black text-lg shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-2"
+                            >
+                                {intl.formatMessage({ id: currentIndex === totalQuestions - 1 ? "NATIJANI KO'RISH" : "KEYINGI SAVOL" })}
+                                <ChevronRight size={20} />
+                            </button>
+                        ) : (
+                            <div className="text-center text-white/40 text-sm font-medium italic animate-pulse py-4">
+                                {intl.formatMessage({ id: "Javobingizni tanlang..." })}
                             </div>
                         )}
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
 
-            {/* STYLING NOTE: A,B,C,D harflari HomeworkQuestionRenderer ichida 
-                har bir option buttonining ichiga: 
-                <span className="w-8 h-8 rounded-lg border flex items-center justify-center font-bold mr-3">A</span>
-                ko'rinishida qo'shilishi kerak. 
-            */}
+            <style jsx>{`
+                @keyframes slow-zoom {
+                    0% { transform: scale(1); }
+                    100% { transform: scale(1.1); }
+                }
+                .animate-slow-zoom {
+                    animation: slow-zoom 20s linear infinite alternate;
+                }
+            `}</style>
         </div>
     );
 };

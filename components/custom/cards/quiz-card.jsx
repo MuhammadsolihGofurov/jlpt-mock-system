@@ -134,7 +134,7 @@ const QuizCard = ({ item, mutate }) => {
               {intl.formatMessage({ id: "Vaqt (savol)" })}
             </span>
             <span className="text-sm font-black text-heading">
-              {item.default_question_duration} m
+              {item.default_question_duration} s
             </span>
           </div>
         </div>
