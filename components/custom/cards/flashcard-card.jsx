@@ -38,7 +38,7 @@ const FlashcardDeckCard = ({ deck }) => {
     }
 
     const handleDownload = async (id, title) => {
-        const toastId = toast.loading("Fayl tayyorlanmoqda, iltimos kuting...");
+        const toastId = toast.loading(intl.formatMessage({ id: "Fayl tayyorlanmoqda, iltimos kuting..." }));
 
         try {
             // 2. API dan ma'lumotlarni olish
@@ -62,7 +62,7 @@ const FlashcardDeckCard = ({ deck }) => {
             await generateFlashcardPdf(cards, title);
 
             toast.update(toastId, {
-                render: "Fayl muvaffaqiyatli yuklab olindi! 🎉",
+                render: intl.formatMessage({ id: "Fayl muvaffaqiyatli yuklab olindi! 🎉" }),
                 type: "success",
                 isLoading: false,
                 autoClose: 3000,
@@ -72,7 +72,7 @@ const FlashcardDeckCard = ({ deck }) => {
             handleApiError(err);
 
             toast.update(toastId, {
-                render: err || "Faylni yuklashda xatolik yuz berdi.",
+                render: err || intl.formatMessage({ id: "Faylni tayyorlashda xatolik yuz berdi!" }),
                 type: "error",
                 isLoading: false,
                 autoClose: 3000,

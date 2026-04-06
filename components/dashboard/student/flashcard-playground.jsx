@@ -19,6 +19,7 @@ import { handleApiError } from "@/utils/handle-error";
 import fetcher from "@/utils/fetcher";
 import { useSelector } from "react-redux";
 import { parsePdfToCards } from "@/utils/flashcard-import-export";
+import { useModal } from "@/context/modal-context";
 
 // --- SORTABLE CARD ROW COMPONENT ---
 const SortableCardRow = ({ id, index, register, remove, db_id }) => {
@@ -48,7 +49,7 @@ const SortableCardRow = ({ id, index, register, remove, db_id }) => {
                         <textarea
                             {...register(`cards.${index}.term`)}
                             rows={1}
-                            placeholder="Masalan: 走る"
+                            placeholder="走る"
                             className="w-full bg-transparent border-b border-slate-200 py-1 text-base font-bold outline-none focus:border-orange-500 transition-all resize-none overflow-hidden"
                             onInput={(e) => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
                         />
@@ -76,10 +77,10 @@ const SortableCardRow = ({ id, index, register, remove, db_id }) => {
                 </div>
 
                 <div className="p-4 flex items-center gap-4 bg-slate-50/30 border-l border-slate-50">
-                    <div className="relative group/lock cursor-not-allowed">
+                    <div className="relative group/lock cursor-not-allowed md:block hidden">
                         <div className="w-20 h-20 rounded-2xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center text-slate-400 opacity-60">
                             <ImageIcon size={22} />
-                            <span className="text-[7px] font-black mt-1 uppercase tracking-tighter text-center">Rasm (PRO)</span>
+                            <span className="text-[7px] font-black mt-1 uppercase tracking-tighter text-center">(PRO)</span>
                         </div>
                     </div>
 
@@ -96,6 +97,7 @@ const SortableCardRow = ({ id, index, register, remove, db_id }) => {
 const FlashcardPlayground = ({ flashcard_data, cards }) => {
     const router = useRouter();
     const intl = useIntl();
+    const { openModal } = useModal();
     const isEditMode = !!flashcard_data?.id;
     const { user } = useSelector(state => state.auth);
     const userRole = user?.role;
@@ -166,28 +168,44 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
     };
 
     // --- DELETE CARD LOGIC ---
-    const handleDelete = async (index) => {
+    const handleDelete = (index) => {
         const cardToDelete = fields[index];
         const realId = cardToDelete.db_id;
 
+        // Agar karta bazada mavjud bo'lsa (Edit rejimida)
         if (isEditMode && realId) {
-            if (!confirm("Ushbu kartani o'chirib tashlamoqchimisiz?")) return;
-            try {
-                const toastId = toast.loading("O'chirilmoqda...");
-                await authAxios.delete(`flashcards/${realId}/`);
-                toast.update(toastId, { render: "O'chirildi", type: "success", isLoading: false, autoClose: 1500 });
-                remove(index);
-            } catch (err) {
-                handleApiError(err);
-            }
+            openModal(
+                "CONFIRM_MODAL",
+                {
+                    title: "Flash kart o'chirish",
+                    body: "Ushbu flash kartni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
+                    confirmText: "Ha, o'chirilsin",
+                    variant: "danger",
+                    // Agar SWR ishlatayotgan bo'lsangiz mutateKey ni qoldiring, 
+                    // aks holda onConfirm ichida remove(index) yetarli bo'ladi.
+                    mutateKey: [`flashcard-sets/`, router.locale],
+                    onConfirm: async () => {
+                        try {
+                            await authAxios.delete(`flashcards/${realId}/`);
+                            remove(index); // Muvaffaqiyatli o'chgach, formadan ham olib tashlaymiz
+                            toast.success("O'chirildi");
+                        } catch (err) {
+                            handleApiError(err);
+                            throw err; // Modal xatolikni ko'rishi uchun
+                        }
+                    },
+                },
+                "small",
+            );
         } else {
+            // Agar karta hali bazaga saqlanmagan bo'lsa, shunchaki ro'yxatdan o'chiramiz
             remove(index);
         }
     };
 
     // --- MAIN SUBMIT LOGIC ---
     const onSubmit = async (formData) => {
-        const toastId = toast.loading("Saqlanmoqda...");
+        const toastId = toast.loading(intl.formatMessage({ id: "Saqlanmoqda..." }));
         try {
             const setId = flashcard_data?.id;
             const setPayload = {
@@ -195,7 +213,7 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                 description: formData.description,
             };
 
-            if(formData.visibility){
+            if (formData.visibility) {
                 setPayload.visibility = formData.visibility;
             }
 
@@ -263,7 +281,7 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
             toast.update(toastId, { render: intl.formatMessage({ id: "Muvaffaqiyatli yuklandi!" }), type: "success", isLoading: false, autoClose: 2000 });
         } catch (err) {
             console.error("PDF Error:", err);
-            toast.update(toastId, { render: "Xatolik: PDF formatini o'qib bo'lmadi", type: "error", isLoading: false, autoClose: 3000 });
+            toast.update(toastId, { render: intl.formatMessage({ id: "Xatolik: PDF formatini o'qib bo'lmadi" }), type: "error", isLoading: false, autoClose: 3000 });
         }
     };
 
@@ -271,7 +289,7 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
         <div className="min-h-screen pb-24 font-sans text-slate-900 bg-slate-50/30">
             {/* STICKY HEADER */}
             <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/60 py-5">
-                <div className="max-w-[1200px] mx-auto px-8 flex justify-between items-center">
+                <div className="max-w-[1200px] mx-auto px-8 flex justify-between md:flex-row flex-col gap-3 sm:items-center">
                     <div className="flex items-center gap-5">
                         <button onClick={() => router.back()} className="p-2.5 hover:bg-slate-100 rounded-xl transition-all text-slate-500">
                             <ArrowLeft size={22} />
@@ -284,7 +302,7 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                         {/* PDF YUKLASH TUGMASI */}
                         <label className="cursor-pointer bg-orange-50 hover:bg-orange-100 text-orange-600 px-5 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 active:scale-95 border border-orange-200">
                             <FileUp size={18} />
-                            <span>{intl.formatMessage({ id: "PDF yuklash" })}</span>
+                            <span>{intl.formatMessage({ id: "PDF Yuklash" })}</span>
                             <input type="file" accept=".pdf" className="hidden" onChange={handlePdfUpload} />
                         </label>
 

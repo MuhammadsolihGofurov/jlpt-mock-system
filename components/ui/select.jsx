@@ -145,7 +145,7 @@ export const Select = ({
           )}
 
           {/* Options Ro'yxati */}
-          <div className="max-h-[200px] overflow-y-auto custom-scrollbar">
+          <div className="max-h-[120px] overflow-y-auto custom-scrollbar">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((opt) => {
                 const isSelected = isMulti
