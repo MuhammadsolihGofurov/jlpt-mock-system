@@ -26,13 +26,13 @@ function FlashcardsPage({ info }) {
                 description={intl.formatMessage({ id: "flashcards_desc" })}
                 keywords={intl.formatMessage({ id: "flashcards_key" })}
             />
-            <AuthGuard roles={["STUDENT"]}>
+            <AuthGuard roles={["STUDENT", "TEACHER", "CENTER_ADMIN", "OWNER"]}>
                 <PageHeader
                     title="flashcards_title"
                     description="flashcards_desc"
                     badge="Faol"
                     buttonLabel="Flash kart qo'shish"
-                    roles={["STUDENT"]}
+                    roles={["STUDENT", "TEACHER", "CENTER_ADMIN", "OWNER"]}
                     onButtonClick={() => router.push("/dashboard/flashcards/create")}
                     extraActions={
                         <>

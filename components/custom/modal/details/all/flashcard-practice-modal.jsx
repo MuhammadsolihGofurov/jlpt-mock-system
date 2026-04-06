@@ -4,10 +4,12 @@ import { useModal } from "@/context/modal-context";
 import { useForm, Controller } from "react-hook-form";
 import { Select } from "@/components/ui";
 import { useRouter } from "next/router";
+import { useIntl } from "react-intl";
 
 const FlashcardPracticeModal = ({ id }) => {
     const { closeModal } = useModal();
     const router = useRouter();
+    const intl = useIntl();
     const { control, handleSubmit, watch } = useForm({
         defaultValues: {
             source: "ALL",
@@ -28,13 +30,13 @@ const FlashcardPracticeModal = ({ id }) => {
                 <Brain size={40} />
             </div>
             <h2 className="text-2xl font-black text-slate-800 text-center mb-2 leading-tight">
-                Mashqni sozlash
+                {intl.formatMessage({ id: "Mashqni sozlash" })}
             </h2>
             <p className="text-slate-500 text-center font-medium mb-8 px-4 leading-relaxed">
-                O'zingizga mos keladigan rejimni tanlang va bilimingizni sinab ko'ring.
+                {intl.formatMessage({ id: "Quyidagi sozlamalar orqali kartalarni qanday ko'rsatishni tanlang. Keyin mashqni boshlash uchun 'Boshlash' tugmasini bosing." })}
             </p>
 
-            <div className="space-y-4 mb-8 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 w-full">
                 <Controller
                     name="source"
                     control={control}
@@ -57,9 +59,12 @@ const FlashcardPracticeModal = ({ id }) => {
                             label="Savol turi"
                             options={[
                                 { value: "SELECT", label: "Savol turini tanlang..." },
-                                { value: "MIXED", label: "Aralash (Mixed)" },
+                                // { value: "MIXED", label: "Aralash (Mixed)" },
                                 { value: "TERM", label: "Termin ko'rsatiladi" },
                                 { value: "DEFINITION", label: "Ta'rif ko'rsatiladi" },
+                                { value: "FURIGANA", label: "Furigana ko'rsatiladi" },
+                                { value: "DEFINITION_FURIGANA", label: "Ta'rif va Furigana ko'rsatiladi" },
+                                { value: "FURIGANA_DEFINITION", label: "Furigana va Ta'rif ko'rsatiladi" }
                             ]}
                             {...field}
                         />
@@ -72,7 +77,7 @@ const FlashcardPracticeModal = ({ id }) => {
                 disabled={selectedMode === "SELECT"}
                 className="w-2/4 py-4 bg-orange-500 text-white rounded-2xl font-black shadow-lg disabled:opacity-50 active:scale-95 transition-all"
             >
-                Boshlash
+                {intl.formatMessage({ id: "Boshlash" })}
             </button>
         </div>
     );

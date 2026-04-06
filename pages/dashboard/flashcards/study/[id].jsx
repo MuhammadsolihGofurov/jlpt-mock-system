@@ -26,7 +26,7 @@ function FlashcardSetsPage({ info }) {
     return (
         <>
             <Seo title={intl.formatMessage({ id: "Study Mode" })} />
-            <AuthGuard roles={["STUDENT"]}>
+            <AuthGuard roles={["STUDENT", "TEACHER", "CENTER_ADMIN", "OWNER"]}>
                 <div className="min-h-screen bg-[#f8fafc] py-12 px-6">
                     <div className="max-w-6xl mx-auto">
 

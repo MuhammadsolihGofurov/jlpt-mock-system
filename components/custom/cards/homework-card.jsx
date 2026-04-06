@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import Link from "next/link";
 import { useIntl } from "react-intl";
+import { isDeadlineOver } from "@/utils/funcs";
 
 const HomeworkCard = ({ item, mutate }) => {
   const { openModal } = useModal();
@@ -53,6 +54,8 @@ const HomeworkCard = ({ item, mutate }) => {
       "small",
     );
   };
+
+  const isExpired = isDeadlineOver(item.deadline);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return { full: "---", time: "--:--" };
@@ -170,11 +173,18 @@ const HomeworkCard = ({ item, mutate }) => {
       <div className="flex flex-col gap-2">
         {isStudent && (
           <Link
-            href={`/dashboard/playground/homework/${item?.id}`}
-            className="w-full bg-primary text-white font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm active:scale-95"
+            // Agar vaqt o'tgan bo'lsa Link bosilmasligi uchun pointer-events-none qo'shamiz
+            href={isExpired ? "#" : `/dashboard/playground/homework/${item?.id}`}
+            className={`w-full font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm active:scale-95 
+            ${isExpired
+                ? "bg-slate-200 text-slate-400 cursor-not-allowed pointer-events-none"
+                : "bg-primary text-white hover:bg-primary/90"
+              }`}
           >
             <PlayCircle size={18} />
-            {intl.formatMessage({ id: "Vazifani boshlash" })}
+            {intl.formatMessage({
+              id: isExpired ? "Vaqt tugagan" : "Vazifani boshlash"
+            })}
           </Link>
         )}
 

@@ -101,7 +101,7 @@ const FlashcardStudy = ({ cards, mode, onModeChange }) => {
                                             <span className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
                                             <span className="text-slate-300 font-black text-[10px] uppercase tracking-[0.3em]">{intl.formatMessage({ id: "Termin" })}</span>
                                         </div>
-                                        <h2 className="text-4xl md:text-5xl font-black text-slate-800 leading-tight select-none">
+                                        <h2 className="text-5xl md:text-7xl font-black text-slate-800 leading-tight select-none">
                                             {card.term}
                                         </h2>
                                         {card.image_link && <img src={card.image_link} className="mt-8 max-h-40 rounded-3xl object-contain shadow-lg" alt="" />}
@@ -116,7 +116,7 @@ const FlashcardStudy = ({ cards, mode, onModeChange }) => {
                                             <span className="text-orange-400/50 font-black text-[10px] uppercase tracking-[0.3em]">{intl.formatMessage({ id: "Ta'rif" })}</span>
                                         </div>
                                         <h2 className="text-2xl md:text-3xl font-medium text-white leading-relaxed select-none">
-                                            {card.definition}
+                                            {card.furigana} <br/> {card.definition}
                                         </h2>
                                         <p className="absolute bottom-10 text-slate-500 text-[10px] font-bold uppercase tracking-widest">{intl.formatMessage({ id: "Orqaga qaytish uchun bosing" })}</p>
                                     </div>

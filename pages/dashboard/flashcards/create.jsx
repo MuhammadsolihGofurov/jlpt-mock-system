@@ -22,7 +22,7 @@ function FlashCardsCreatePage({ info }) {
                 description={intl.formatMessage({ id: "flashcards_desc" })}
                 keywords={intl.formatMessage({ id: "flashcards_key" })}
             />
-            <AuthGuard roles={["STUDENT"]}>
+            <AuthGuard roles={["STUDENT", "TEACHER", "CENTER_ADMIN", "OWNER"]}>
                 <FlashcardPlayground />
             </AuthGuard>
         </>

@@ -17,7 +17,7 @@ function FlashcardPracticePage({ info }) {
                 description={intl.formatMessage({ id: "flashcards_desc" })}
                 keywords={intl.formatMessage({ id: "flashcards_key" })}
             />
-            <AuthGuard roles={["STUDENT"]}>
+            <AuthGuard roles={["STUDENT", "TEACHER", "CENTER_ADMIN", "OWNER"]}>
                 <div className="container mx-auto py-12 px-6">
                     {setId ? (
                         <FlashcardPractice setId={setId} />

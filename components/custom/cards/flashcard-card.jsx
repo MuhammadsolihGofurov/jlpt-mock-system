@@ -1,18 +1,21 @@
 import React from "react";
-import { Layers, ChevronRight, Edit2, Trash2, BookOpen, Brain } from "lucide-react";
+import { Layers, Edit2, Trash2, BookOpen, Brain, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import { ActionDropdown } from "@/components/ui";
 import { useRouter } from "next/router";
 import { useModal } from "@/context/modal-context";
 import { authAxios } from "@/utils/axios";
 import { DropdownItem } from "@/components/ui/action-dropdown";
-import { formatDateTime } from "@/utils/funcs";
+import { formatDate, formatDateTime } from "@/utils/funcs";
 import { useIntl } from "react-intl";
+import { useSelector } from "react-redux";
 
 const FlashcardDeckCard = ({ deck }) => {
     const router = useRouter();
     const { openModal } = useModal();
     const intl = useIntl();
+    const { user } = useSelector(state => state.auth);
+    const userRole = user?.role;
 
     const handleDelete = (id) => {
         openModal(
@@ -34,6 +37,17 @@ const FlashcardDeckCard = ({ deck }) => {
     const handlePractice = () => {
         openModal("PRACTICE_MODAL", { id: deck?.id }, "middle");
     }
+
+    // Markazlar ro'yxatini shakllantirish
+    const centers = deck.visible_centers || [];
+    const hasCenters = centers.length > 0;
+    const allCentersNames = centers.map(c => c.name).join(", ");
+
+    // Guruh ro'yxatini shakllantirish
+    const groups = deck.assigned_groups || [];
+    const hasGroups = groups.length > 0;
+    const allGroupsNames = groups.map(g => g.name).join(", ");
+
     return (
         <motion.div
             whileHover={{ y: -5 }}
@@ -70,20 +84,56 @@ const FlashcardDeckCard = ({ deck }) => {
                 <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed min-h-[40px]">
                     {deck.description || intl.formatMessage({ id: "Tavsif berilmagan" })}
                 </p>
-                <div className="flex items-center gap-2 pt-2">
+
+                <div className="flex flex-wrap items-center gap-2 pt-2">
+                    {/* Kartalar soni */}
                     <span className="px-3 py-1 bg-slate-100 rounded-full text-[10px] font-black text-slate-500 uppercase tracking-widest">
                         {deck.cards_count} {intl.formatMessage({ id: deck.cards_count === 1 ? "kart" : "kartlar" })}
                     </span>
+
+                    {/* Markazlar Nomlari bilan */}
+                    {hasCenters && (userRole === "OWNER") && (
+                        <>
+                            <span className="text-[10px] text-slate-300 font-bold">•</span>
+                            <div
+                                title={allCentersNames}
+                                className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 rounded-full text-[10px] font-black text-blue-600 uppercase tracking-widest border border-blue-100"
+                            >
+                                <Globe size={10} className="shrink-0" />
+                                <span className="max-w-[150px] truncate">
+                                    {centers[0].name}
+                                    {centers.length > 1 && ` +${centers.length - 1}`}
+                                </span>
+                            </div>
+                        </>
+                    )}
+
+                    {/* Guruhlar Nomlari bilan */}
+                    {hasGroups && (userRole === "CENTER_ADMIN" || userRole === "TEACHER") && (
+                        <>
+                            <span className="text-[10px] text-slate-300 font-bold">•</span>
+                            <div
+                                title={allGroupsNames}
+                                className="flex items-center gap-1.5 px-3 py-1 bg-green-50 rounded-full text-[10px] font-black text-green-600 uppercase tracking-widest border border-green-100"
+                            >
+                                <Globe size={10} className="shrink-0" />
+                                <span className="max-w-[150px] truncate">
+                                    {groups[0].name}
+                                    {groups.length > 1 && ` +${groups.length - 1}`}
+                                </span>
+                            </div>
+                        </>
+                    )}
+
                     <span className="text-[10px] text-slate-300 font-bold">•</span>
                     <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                        {formatDateTime(deck.created_at)}
+                        {formatDate(deck.created_at)?.full} {formatDate(deck.created_at)?.time}
                     </span>
                 </div>
             </div>
 
             {/* 3. Action Buttons Section */}
             <div className="grid grid-cols-2 gap-3 pt-5 border-t border-slate-50" onClick={e => e.stopPropagation()}>
-                {/* Study Button */}
                 <button
                     onClick={() => router.push(`/dashboard/flashcards/study/${deck.id}`)}
                     className="flex items-center justify-center gap-2 py-3 bg-orange-50 text-orange-600 rounded-2xl font-bold text-xs hover:bg-orange-500 hover:text-white transition-all active:scale-95"
@@ -91,7 +141,6 @@ const FlashcardDeckCard = ({ deck }) => {
                     <BookOpen size={16} /> {intl.formatMessage({ id: "Yodlash" })}
                 </button>
 
-                {/* Practice Button */}
                 <button
                     onClick={handlePractice}
                     className="flex items-center justify-center gap-2 py-3 bg-[#1e293b] text-white rounded-2xl font-bold text-xs hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-100"

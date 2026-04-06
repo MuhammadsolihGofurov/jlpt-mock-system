@@ -121,7 +121,29 @@ export const formatDate = (dateStr) => {
 		full: "---",
 		time: "--:--"
 	};
-	const date = new Date(dateStr);
+
+	let date;
+
+	const clean = dateStr.replace("T", " ").replace("Z", "");
+
+	if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
+		const [y, m, d] = clean.split("-");
+		date = new Date(y, m - 1, d);
+	} else {
+		const [datePart, timePart = "00:00:00"] = clean.split(" ");
+		const [y, m, d] = datePart.split("-");
+		const [h, min] = timePart.split(":");
+
+		date = new Date(y, m - 1, d, h || 0, min || 0);
+	}
+
+	if (isNaN(date.getTime())) {
+		return {
+			full: "Invalid",
+			time: "--:--"
+		};
+	}
+
 	return {
 		full: date.toLocaleDateString("uz-UZ", {
 			day: "2-digit",
@@ -131,6 +153,19 @@ export const formatDate = (dateStr) => {
 		time: date.toLocaleTimeString("uz-UZ", {
 			hour: "2-digit",
 			minute: "2-digit",
+			hour12: false,
 		}),
 	};
+};
+
+
+export const isDeadlineOver = (deadline) => {
+	if (!deadline) return false;
+
+	const now = new Date();
+	const deadlineDate = new Date(deadline);
+
+	if (isNaN(deadlineDate.getTime())) return false;
+
+	return now > deadlineDate;
 };

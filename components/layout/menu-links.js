@@ -92,7 +92,7 @@ export const menus = [{
     label: "flashcards_title",
     href: "/dashboard/flashcards",
     icon: FileQuestion,
-    roles: ["STUDENT"],
+    roles: ["STUDENT", "OWNER", "CENTER_ADMIN", "TEACHER"],
     is_mobile: true,
   },
   {
