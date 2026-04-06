@@ -5,7 +5,8 @@ import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-
 import { CSS } from "@dnd-kit/utilities";
 import {
     GripVertical, Trash2, Plus, Save, ArrowLeft,
-    Image as ImageIcon, Layers, Lock, Globe, Users, ShieldCheck
+    Image as ImageIcon, Layers, Lock, Globe, Users, ShieldCheck,
+    FileUp
 } from "lucide-react";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
@@ -17,6 +18,7 @@ import { useIntl } from "react-intl";
 import { handleApiError } from "@/utils/handle-error";
 import fetcher from "@/utils/fetcher";
 import { useSelector } from "react-redux";
+import { parsePdfToCards } from "@/utils/flashcard-import-export";
 
 // --- SORTABLE CARD ROW COMPONENT ---
 const SortableCardRow = ({ id, index, register, remove, db_id }) => {
@@ -191,8 +193,11 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
             const setPayload = {
                 title: formData.title,
                 description: formData.description,
-                visibility: formData.visibility,
             };
+
+            if(formData.visibility){
+                setPayload.visibility = formData.visibility;
+            }
 
             if (formData.visibility === "GROUPS") {
                 setPayload.assigned_group_ids = formData.assigned_group_ids;
@@ -238,6 +243,30 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
         }
     };
 
+    // handle upload
+    const handlePdfUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const toastId = toast.loading(intl.formatMessage({ id: "PDF tahlil qilinmoqda..." }));
+        try {
+            const parsedCards = await parsePdfToCards(file);
+            const fileName = file.name.replace(/\.[^/.]+$/, ""); // .pdf ni olib tashlash
+
+
+            reset({
+                ...watch(),
+                title: fileName,
+                cards: parsedCards.length > 0 ? parsedCards : [{ term: "", definition: "", furigana: "", order: 1 }]
+            });
+
+            toast.update(toastId, { render: intl.formatMessage({ id: "Muvaffaqiyatli yuklandi!" }), type: "success", isLoading: false, autoClose: 2000 });
+        } catch (err) {
+            console.error("PDF Error:", err);
+            toast.update(toastId, { render: "Xatolik: PDF formatini o'qib bo'lmadi", type: "error", isLoading: false, autoClose: 3000 });
+        }
+    };
+
     return (
         <div className="min-h-screen pb-24 font-sans text-slate-900 bg-slate-50/30">
             {/* STICKY HEADER */}
@@ -251,13 +280,22 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                             {intl.formatMessage({ id: isEditMode ? "To'plamni tahrirlash" : "Yangi to'plam" })}
                         </h1>
                     </div>
-                    <button
-                        onClick={handleSubmit(onSubmit)}
-                        disabled={isSubmitting}
-                        className="bg-[#1e293b] hover:bg-black text-white px-8 py-3 rounded-2xl font-bold shadow-lg transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50"
-                    >
-                        <Save size={18} /> {intl.formatMessage({ id: isSubmitting ? "Saqlanmoqda..." : "Saqlash" })}
-                    </button>
+                    <div className="flex items-center gap-3">
+                        {/* PDF YUKLASH TUGMASI */}
+                        <label className="cursor-pointer bg-orange-50 hover:bg-orange-100 text-orange-600 px-5 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 active:scale-95 border border-orange-200">
+                            <FileUp size={18} />
+                            <span>{intl.formatMessage({ id: "PDF yuklash" })}</span>
+                            <input type="file" accept=".pdf" className="hidden" onChange={handlePdfUpload} />
+                        </label>
+
+                        <button
+                            onClick={handleSubmit(onSubmit)}
+                            disabled={isSubmitting}
+                            className="bg-[#1e293b] hover:bg-black text-white px-8 py-3 rounded-2xl font-bold shadow-lg transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50"
+                        >
+                            <Save size={18} /> {intl.formatMessage({ id: isSubmitting ? "Saqlanmoqda..." : "Saqlash" })}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -332,6 +370,7 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                             <Input label="Tavsif (Ixtiyoriy)" placeholder={intl.formatMessage({ id: "Ushbu to'plam haqida qisqacha..." })} register={register} name="description" />
                         </div>
                     </div>
+
                 </section>
 
                 {/* FLASHCARDS LIST SECTION */}

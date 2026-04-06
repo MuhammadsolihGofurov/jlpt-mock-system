@@ -1,5 +1,5 @@
 import React from "react";
-import { Layers, Edit2, Trash2, BookOpen, Brain, Globe } from "lucide-react";
+import { Layers, Edit2, Trash2, BookOpen, Brain, Globe, Download } from "lucide-react";
 import { motion } from "framer-motion";
 import { ActionDropdown } from "@/components/ui";
 import { useRouter } from "next/router";
@@ -9,6 +9,9 @@ import { DropdownItem } from "@/components/ui/action-dropdown";
 import { formatDate, formatDateTime } from "@/utils/funcs";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { generateFlashcardDocx, generateFlashcardPdf } from "@/utils/flashcard-import-export";
+import { handleApiError } from "@/utils/handle-error";
 
 const FlashcardDeckCard = ({ deck }) => {
     const router = useRouter();
@@ -34,6 +37,50 @@ const FlashcardDeckCard = ({ deck }) => {
         );
     }
 
+    const handleDownload = async (id, title) => {
+        const toastId = toast.loading("Fayl tayyorlanmoqda, iltimos kuting...");
+
+        try {
+            // 2. API dan ma'lumotlarni olish
+            // Eslatma: setId o'rniga siz ko'rsatgan UUID ishlatildi
+            const response = await authAxios.get(
+                `/flashcard-sets/${id}/study/?mode=SEQUENTIAL`
+            );
+
+            const cards = response.data?.cards;
+
+            if (!cards || cards.length === 0) {
+                toast.update(toastId, {
+                    render: "Kardlar topilmadi!",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 3000,
+                });
+                return;
+            }
+
+            await generateFlashcardPdf(cards, title);
+
+            toast.update(toastId, {
+                render: "Fayl muvaffaqiyatli yuklab olindi! 🎉",
+                type: "success",
+                isLoading: false,
+                autoClose: 3000,
+            });
+
+        } catch (err) {
+            handleApiError(err);
+
+            toast.update(toastId, {
+                render: err || "Faylni yuklashda xatolik yuz berdi.",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+            });
+
+        }
+    };
+
     const handlePractice = () => {
         openModal("PRACTICE_MODAL", { id: deck?.id }, "middle");
     }
@@ -48,6 +95,9 @@ const FlashcardDeckCard = ({ deck }) => {
     const hasGroups = groups.length > 0;
     const allGroupsNames = groups.map(g => g.name).join(", ");
 
+    // owner
+    const isOwner = deck.owner_user_id === user?.id;
+
     return (
         <motion.div
             whileHover={{ y: -5 }}
@@ -61,18 +111,28 @@ const FlashcardDeckCard = ({ deck }) => {
                 </div>
                 <ActionDropdown>
                     <DropdownItem
-                        icon={Edit2}
-                        label="Tahrirlash"
+                        icon={Download}
+                        label="Yuklab olish"
                         variant="blue"
-                        onClick={() => router.push(`/dashboard/flashcards/edit/${deck.id}`)}
+                        onClick={() => handleDownload(deck.id, deck.title)}
                     />
-                    <div className="h-[1px] bg-gray-100 mx-2 my-1" />
-                    <DropdownItem
-                        icon={Trash2}
-                        label="O'chirish"
-                        variant="danger"
-                        onClick={() => handleDelete(deck?.id)}
-                    />
+                    {isOwner && (
+                        <>
+                            <DropdownItem
+                                icon={Edit2}
+                                label="Tahrirlash"
+                                variant="blue"
+                                onClick={() => router.push(`/dashboard/flashcards/edit/${deck.id}`)}
+                            />
+                            <div className="h-[1px] bg-gray-100 mx-2 my-1" />
+                            <DropdownItem
+                                icon={Trash2}
+                                label="O'chirish"
+                                variant="danger"
+                                onClick={() => handleDelete(deck?.id)}
+                            />
+                        </>
+                    )}
                 </ActionDropdown>
             </div>
 
