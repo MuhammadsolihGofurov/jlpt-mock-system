@@ -847,5 +847,11 @@
   "Termin ko'rsatiladi": "用語を表示",
   "Ta'rif ko'rsatiladi": "意味を表示",
   "Qaysi kartalar?": "対象のカードは？",
-  "Faqat xatolar": "間違いのみ"
+  "Faqat xatolar": "間違いのみ",
+  "Ko'rinish doirasi": "表示範囲",
+  "Global (Hamma markazlar)": "グローバル（やすべてのセンター）",
+  "Faqat tanlanganlar uchun": "選択されたセンターのみ",
+  "Faqat o'zim uchun": "自分のみ",
+  "Butun markaz uchun": "センター全体",
+  "Tanlanganlar uchun": "選択されたユーザーのみ"
 }

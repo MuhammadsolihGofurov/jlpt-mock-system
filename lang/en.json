@@ -847,5 +847,11 @@
     "Termin ko'rsatiladi": "Show Term",
     "Ta'rif ko'rsatiladi": "Show Definition",
     "Qaysi kartalar?": "Which cards?",
-    "Faqat xatolar": "Errors only"
+    "Faqat xatolar": "Errors only",
+    "Ko'rinish doirasi": "Visibility scope",
+    "Global (Hamma markazlar)": "Global (All centers)",
+    "Faqat tanlanganlar uchun": "Only for selected centers",
+    "Faqat o'zim uchun": "Only for myself",
+    "Butun markaz uchun": "For the entire center",
+    "Tanlanganlar uchun": "For selected ones"
 }

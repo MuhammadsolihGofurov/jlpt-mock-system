@@ -117,11 +117,11 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
 
     // 2. Visibility variantlari (Role-based)
     const visibilityOptionsBased = [
-        { value: "PUBLIC", label: "Global (Hamma markazlar)", roles: ["OWNER"] },
-        { value: "PRIVATE", label: "Faqat tanlanganlar uchun", roles: ["OWNER"] },
-        { value: "PRIVATE", label: "Faqat o'zim uchun", roles: ["CENTER_ADMIN", "STUDENT"] },
-        { value: "CENTER", label: "Butun markaz uchun", roles: ["CENTER_ADMIN", "TEACHER"] },
-        { value: "GROUPS", label: "Tanlanganlar uchun", roles: ["CENTER_ADMIN", "TEACHER"] },
+        { value: "PUBLIC", label: intl.formatMessage({ id: "Global (Hamma markazlar)" }), roles: ["OWNER"] },
+        { value: "PRIVATE", label: intl.formatMessage({ id: "Faqat tanlanganlar uchun" }), roles: ["OWNER"] },
+        { value: "PRIVATE", label: intl.formatMessage({ id: "Faqat o'zim uchun" }), roles: ["CENTER_ADMIN", "STUDENT"] },
+        { value: "CENTER", label: intl.formatMessage({ id: "Butun markaz uchun" }), roles: ["CENTER_ADMIN", "TEACHER"] },
+        { value: "GROUPS", label: intl.formatMessage({ id: "Tanlanganlar uchun" }), roles: ["CENTER_ADMIN", "TEACHER"] },
     ];
 
     const visibilityOptions = visibilityOptionsBased.filter(option => option.roles.includes(userRole));

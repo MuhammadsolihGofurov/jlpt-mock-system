@@ -847,5 +847,11 @@
   "Termin ko'rsatiladi": "Показывать термин",
   "Ta'rif ko'rsatiladi": "Показывать определение",
   "Qaysi kartalar?": "Какие карточки?",
-  "Faqat xatolar": "Только ошибки"
+  "Faqat xatolar": "Только ошибки",
+  "Ko'rinish doirasi": "Область видимости",
+  "Global (Hamma markazlar)": "Глобальный (Все центры)",
+  "Faqat tanlanganlar uchun": "Только для выбранных центров",
+  "Faqat o'zim uchun": "Только для себя",
+  "Butun markaz uchun": "Для всего центра",
+  "Tanlanganlar uchun": "Для выбранных"
 }
