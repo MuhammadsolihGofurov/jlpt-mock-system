@@ -59,47 +59,67 @@ const SubmissionLists = () => {
   }
 
   const exportToExcel = () => {
-    const tableData = data.results.map((sub, index) => ({
-      "№": index + 1,
-      "Talaba": sub.student_display,
-      "Vocabulary": Object.values(sub.results?.sections || {}).find(s => s.section_type === "VOCAB")?.score || 0,
-      "Reading": Object.values(sub.results?.sections || {}).find(s => s.section_type === "GRAMMAR_READING")?.score || 0,
-      "Listening": Object.values(sub.results?.sections || {}).find(s => s.section_type === "LISTENING")?.score || 0,
-      "Jami": Math.round(sub.score),
-      "Holat": sub.results?.jlpt_result?.passed ? "O'tdi" : "Yiqildi",
-      "Sana": formatDate(sub.completed_at)
-    }));
+    const tableData = data.results.map((sub, index) => {
+      const isDisqualified = sub.results?.disqualified || sub.disqualified;
+
+      let statusText = sub.results?.jlpt_result?.passed ? "O'tdi" : "Yiqildi";
+      if (isDisqualified) statusText = intl.formatMessage({ id: "Disqualified" });
+
+      return {
+        "№": index + 1,
+        "Talaba": sub.student_display,
+        "Vocabulary": Object.values(sub.results?.sections || {}).find(s => s.section_type === "VOCAB")?.score || 0,
+        "Reading": Object.values(sub.results?.sections || {}).find(s => s.section_type === "GRAMMAR_READING")?.score || 0,
+        "Listening": Object.values(sub.results?.sections || {}).find(s => s.section_type === "LISTENING")?.score || 0,
+        "Jami": isDisqualified ? 0 : Math.round(sub.score),
+        "Holat": statusText,
+        "Sana": formatDate(sub.completed_at)
+      };
+    });
 
     const worksheet = XLSX.utils.json_to_sheet(tableData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Natijalar");
-    XLSX.writeFile(workbook, `Imtihon_Natijalari_${examId}.xlsx`);
+    XLSX.writeFile(workbook, `Imtihon_Natijalari_${examId}.xlsx`)
   };
 
   const exportToPDF = () => {
     const doc = new jsPDF();
-
-    // Sarlavha qo'shish
     doc.setFontSize(16);
     doc.text("Imtihon Natijalari", 14, 15);
 
-    const tableRows = data.results.map((sub, index) => [
-      (page - 1) * 8 + (index + 1),
-      sub.student_display,
-      Object.values(sub.results?.sections || {}).find(s => s.section_type === "VOCAB")?.score || 0,
-      Object.values(sub.results?.sections || {}).find(s => s.section_type === "GRAMMAR_READING")?.score || 0,
-      Object.values(sub.results?.sections || {}).find(s => s.section_type === "LISTENING")?.score || 0,
-      Math.round(sub.score),
-      sub.results?.jlpt_result?.passed ? "Pass" : "Fail",
-    ]);
+    const tableRows = data.results.map((sub, index) => {
+      const isDisqualified = sub.results?.disqualified || sub.disqualified;
 
-    // DIQQAT: doc.autoTable o'rniga to'g'ridan-to'g'ri autoTable chaqiriladi
+      let statusLabel = sub.results?.jlpt_result?.passed ? "Pass" : "Fail";
+      if (isDisqualified) statusLabel = intl.formatMessage({ id: "Disqualified" });
+
+      return [
+        (page - 1) * 8 + (index + 1),
+        sub.student_display,
+        Object.values(sub.results?.sections || {}).find(s => s.section_type === "VOCAB")?.score || 0,
+        Object.values(sub.results?.sections || {}).find(s => s.section_type === "GRAMMAR_READING")?.score || 0,
+        Object.values(sub.results?.sections || {}).find(s => s.section_type === "LISTENING")?.score || 0,
+        isDisqualified ? "0 (DQ)" : Math.round(sub.score),
+        statusLabel,
+      ];
+    });
+
     autoTable(doc, {
       head: [['№', 'Talaba', 'Vocab', 'Reading', 'Listening', 'Jami', 'Holat']],
       body: tableRows,
       startY: 25,
       styles: { font: "helvetica", fontSize: 10 },
       headStyles: { fillColor: [71, 85, 105] },
+      // Diskvalifikatsiya qatorlarini qizil qilish uchun:
+      didParseCell: function (data) {
+        if (data.section === 'body' && data.column.index === 6) {
+          if (data.cell.raw === 'DISQUALIFIED') {
+            data.cell.styles.textColor = [255, 0, 0]; // Qizil rang
+            data.cell.styles.fontStyle = 'bold';
+          }
+        }
+      }
     });
 
     doc.save(`Natijalar_${examId}_page_${page}.pdf`);
@@ -185,6 +205,9 @@ const SubmissionLists = () => {
                   (s) => s.section_type === "LISTENING",
                 );
 
+                const isDisqualified = sub.results?.disqualified || sub.disqualified;
+                const disqualificationReason = sub.results?.disqualification_reason || sub.disqualification_reason;
+
                 return (
                   <tr
                     key={sub.id}
@@ -232,19 +255,26 @@ const SubmissionLists = () => {
                     </td>
 
                     <td className="px-6 py-5 text-center">
-                      <div
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${isPassed
-                          ? "bg-green-50 text-green-600"
-                          : "bg-red-50 text-red-600"
-                          }`}
-                      >
-                        {isPassed ? (
-                          <CheckCircle2 size={12} />
-                        ) : (
-                          <XCircle size={12} />
-                        )}
-                        {isPassed ? "Pass" : "Fail"}
-                      </div>
+                      {isDisqualified ? (
+                        <div className="inline-flex flex-col items-center gap-1">
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-black text-white">
+                            <XCircle size={12} />
+                            {intl.formatMessage({ id: "Disqualified" })}
+                          </div>
+                          {/* Incident vaqtini ko'rsatish (ixtiyoriy) */}
+                          <span className="text-[8px] text-red-500 font-bold uppercase">
+                            {sub?.results?.integrity_incident?.events?.map(e => e.type).join(", ")}
+                          </span>
+                        </div>
+                      ) : (
+                        <div
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${isPassed ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"
+                            }`}
+                        >
+                          {isPassed ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
+                          {isPassed ? "Pass" : "Fail"}
+                        </div>
+                      )}
                     </td>
 
                     <td className="px-6 py-5 font-bold text-slate-400 text-[11px] whitespace-nowrap">

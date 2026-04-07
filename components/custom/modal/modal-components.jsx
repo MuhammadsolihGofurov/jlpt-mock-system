@@ -25,6 +25,7 @@ import ContactRequestStatusModal from "./details/owner/contact-request-modal";
 import SubscriptionFormModal from "./details/owner/subscription-modal";
 import ServiceDetailModal from "./details/service-modal";
 import FlashcardPracticeModal from "./details/all/flashcard-practice-modal";
+import CategoryFormModal from "./details/admin/category-form-modal";
 
 export const ModalComponents = {
   centerForm: CenterFormModal,
@@ -53,5 +54,6 @@ export const ModalComponents = {
   NOTIFY_MODAL: NotificationDetailModal,
   CONTACT_FORM: ContactRequestStatusModal,
   SERVICE_MODAL: ServiceDetailModal,
-  PRACTICE_MODAL: FlashcardPracticeModal
+  PRACTICE_MODAL: FlashcardPracticeModal,
+  CATEGORY_MODAL: CategoryFormModal
 };

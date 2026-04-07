@@ -4,12 +4,17 @@ import { AuthGuard } from "@/components/guard";
 import { PageHeader } from "@/components/layout";
 import { useModal } from "@/context/modal-context";
 import { MaterialLists, UserLists } from "@/components/dashboard/admin";
-import { Filter, Search } from "lucide-react";
+import { ChevronLeft, FileText, Filter, GraduationCap, Search } from "lucide-react";
 import { SearchInput } from "@/components/ui";
 import GroupLists from "@/components/dashboard/admin/group-lists";
+import { AssignmentTabs } from "@/components/dashboard/admin-teacher";
+import useSWR from "swr";
+import fetcher from "@/utils/fetcher";
+import { useRouter } from "next/router";
 
 function MaterialsPage({ info }) {
   const intl = useIntl();
+  const router = useRouter();
   const { openModal } = useModal();
 
   return (
@@ -39,6 +44,11 @@ function MaterialsPage({ info }) {
             </>
           }
         />
+        <div className="">
+          <button onClick={() => { router.push("/dashboard/materials/folders") }} className="pl-4 pr-5 py-3 flex items-center justify-center rounded-full bg-gray/10 backdrop-blur-xl gap-1 border border-gray/20 text-sm text-black">
+            <ChevronLeft size={14} /> {intl.formatMessage({ id: "Orqaga" })}
+          </button>
+        </div>
         <MaterialLists />
       </AuthGuard>
     </>

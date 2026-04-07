@@ -1,5 +1,5 @@
 import { useForm, Controller } from "react-hook-form";
-import { FileText, Save, Globe, Lock, FileUp } from "lucide-react";
+import { FileText, Save, Globe, Lock, FileUp, Plus } from "lucide-react";
 import { Input, Select } from "@/components/ui";
 import { useModal } from "@/context/modal-context";
 import { useIntl } from "react-intl";
@@ -12,28 +12,46 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 const MaterialFormModal = ({ material = null }) => {
-  const { closeModal } = useModal();
+  const { closeModal, openModal } = useModal();
   const isEdit = !!material;
   const router = useRouter();
   const intl = useIntl();
+  const { category } = router.query;
 
   // 1. Guruhlar ro'yxatini olish (materialni biriktirish uchun)
   const { data: groupsData } = useSWR(
     ["groups/", router.locale],
     (url, locale) =>
       fetcher(
-        `${url}?page_size=100`,
+        `${url}?page=all`,
         { headers: { "Accept-Language": locale } },
         {},
         true,
       ),
   );
 
+  // const { data: categoriesData } = useSWR(
+  //   ["material-categories/", router.locale],
+  //   (url, locale) =>
+  //     fetcher(
+  //       `${url}?page=all`,
+  //       { headers: { "Accept-Language": locale } },
+  //       {},
+  //       true,
+  //     ),
+  // );
+
   const groupOptions =
-    groupsData?.results?.map((g) => ({
+    groupsData?.map((g) => ({
       value: g.id,
       label: g.name,
     })) || [];
+
+  // const categoryOptions =
+  //   categoriesData?.map((g) => ({
+  //     value: g.id,
+  //     label: g.name,
+  //   })) || [];
 
   const fileTypeOptions = [
     { value: "PDF", label: "PDF Document" },
@@ -65,6 +83,7 @@ const MaterialFormModal = ({ material = null }) => {
         file_type: material.file_type,
         is_public: material.is_public,
         group_ids: material.groups?.map((g) => g.id) || [],
+        // category_id: material?.category?.id
       });
     }
   }, [material, reset]);
@@ -79,6 +98,7 @@ const MaterialFormModal = ({ material = null }) => {
       formData.append("name", data.name);
       formData.append("file_type", data.file_type);
       formData.append("is_public", data.is_public);
+      formData.append("category_id", category);
 
       // Agar yangi fayl tanlangan bo'lsa
       if (data.file && data.file[0]) {
@@ -160,6 +180,42 @@ const MaterialFormModal = ({ material = null }) => {
               />
             )}
           />
+          {/* <div className="md:col-span-2 space-y-2">
+            <div className="flex items-end gap-3">
+              <div className="flex-1">
+                <Controller
+                  name="category_id"
+                  control={control}
+                  rules={{ required: intl.formatMessage({ id: "Kategoriyani belgilang" }) }}
+                  render={({ field }) => (
+                    <Select
+                      label="Kategoriya"
+                      options={categoryOptions}
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={errors.category_id?.message}
+                      placeholder={intl.formatMessage({ id: "Kategoriyani tanlang" })}
+                    />
+                  )}
+                />
+              </div>
+
+              Yangi kategoriya qo'shish tugmasi
+              <button
+                type="button"
+                onClick={() => openModal("CATEGORY_MODAL", {}, "middle")}
+                className="mb-[2px] p-3.5 bg-gray-50 text-primary hover:bg-orange-50 border-2 border-dashed border-gray-200 hover:border-primary rounded-2xl transition-all group flex items-center gap-2"
+                title={intl.formatMessage({ id: "Yangi kategoriize qo'shish" })}
+              >
+                <div className="bg-orange-100 p-1 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
+                  <Plus size={18} />
+                </div>
+                <span className="text-sm font-bold pr-1">
+                  {intl.formatMessage({ id: "Qo'shish" })}
+                </span>
+              </button>
+            </div>
+          </div> */}
         </div>
 
         {/* File Upload Input */}

@@ -115,9 +115,25 @@ const FlashcardStudy = ({ cards, mode, onModeChange }) => {
                                         <div className="absolute top-10">
                                             <span className="text-orange-400/50 font-black text-[10px] uppercase tracking-[0.3em]">{intl.formatMessage({ id: "Ta'rif" })}</span>
                                         </div>
-                                        <h2 className="text-2xl md:text-3xl font-medium text-white leading-relaxed select-none">
-                                            {card.furigana} <br/> {card.definition}
-                                        </h2>
+                                        <div className="flex flex-col h-full justify-center items-center p-6 text-center select-none">
+                                            <span className="text-base md:text-lg font-medium text-orange-200/80 tracking-widest uppercase mb-2">
+                                                {card.furigana}
+                                            </span>
+
+                                            <h2 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight drop-shadow-md">
+                                                {card.definition}
+                                            </h2>
+
+                                            <div className="w-16 h-1 bg-white/30 rounded-full mb-6" />
+
+                                            {
+                                                card?.example_gap && <div className="bg-black/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10 max-w-md">
+                                                    <p className="text-lg md:text-xl font-medium text-orange-50 italic leading-relaxed">
+                                                        "{card.example_gap}"
+                                                    </p>
+                                                </div>
+                                            }
+                                        </div>
                                         <p className="absolute bottom-10 text-slate-500 text-[10px] font-bold uppercase tracking-widest">{intl.formatMessage({ id: "Orqaga qaytish uchun bosing" })}</p>
                                     </div>
 

@@ -11,17 +11,18 @@ import { MaterialCard } from "@/components/custom/cards";
 const MaterialLists = () => {
   const router = useRouter();
   const { modalClosed } = useModal();
-  const { page = 1, search, file_type, is_public } = router.query;
+  const { page = 1, search, file_type, is_public, category } = router.query;
 
   const { data, isLoading, mutate } = useSWR(
-    [`materials/`, router.locale, page, search, file_type, is_public],
-    (url, locale, p, q, file, pub) => {
+    [`materials/`, router.locale, page, search, file_type, is_public, category],
+    (url, locale, p, q, file, pub, cId) => {
       const queryParams = new URLSearchParams({
         page: p,
         page_size: 8,
         ...(file_type && { file_type: file }),
         ...(is_public && { is_public: pub }),
         ...(q && { search: q }),
+        ...(cId && { category: cId }),
       });
       return fetcher(
         `${url}?${queryParams}`,

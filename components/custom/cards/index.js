@@ -38,3 +38,8 @@ export {
     default as FlashcardDeckCard
 }
 from "./flashcard-card";
+
+export {
+    default as FolderCard
+}
+from './folder-card'

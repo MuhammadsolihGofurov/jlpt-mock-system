@@ -21,6 +21,7 @@ import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import Link from "next/link";
 import { useIntl } from "react-intl";
+import { formatDate } from "@/utils/funcs";
 
 const ExamCard = ({ item, mutate }) => {
   const { openModal } = useModal();
@@ -38,7 +39,10 @@ const ExamCard = ({ item, mutate }) => {
   // Faqat Owner, Admin yoki o'sha imtihonni yaratgan Teacher tahrirlay oladi
   const canManage = isOwner || isAdmin || (isTeacher && isCreator);
 
-  const isOpen = item.status === "OPEN";
+  // Imtihon ochiq VA o'quvchi hali topshirib bo'lmagan bo'lsa
+  const isCompleted = item?.student_submission_status === "GRADED" || item?.student_submission_status === "DISQUALIFIED";
+
+  const isOpen = item.status === "OPEN" && !isCompleted;
   const isPublished = item.is_published;
 
   // 1. Status o'zgartirish (OPEN / CLOSED)
@@ -116,21 +120,21 @@ const ExamCard = ({ item, mutate }) => {
     return `/dashboard/results/exam-results/${item.id}`; // Admin/Teacher uchun
   };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return { full: "---", time: "--:--" };
-    const date = new Date(dateStr);
-    return {
-      full: date.toLocaleDateString("uz-UZ", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      }),
-      time: date.toLocaleTimeString("uz-UZ", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-  };
+  // const formatDate = (dateStr) => {
+  //   if (!dateStr) return { full: "---", time: "--:--" };
+  //   const date = new Date(dateStr);
+  //   return {
+  //     full: date.toLocaleDateString("uz-UZ", {
+  //       day: "2-digit",
+  //       month: "2-digit",
+  //       year: "numeric",
+  //     }),
+  //     time: date.toLocaleTimeString("uz-UZ", {
+  //       hour: "2-digit",
+  //       minute: "2-digit",
+  //     }),
+  //   };
+  // };
 
   const dateInfo = formatDate(item.estimated_start_time);
 
@@ -213,8 +217,8 @@ const ExamCard = ({ item, mutate }) => {
           <button
             onClick={handleToggleStatus}
             className={`flex items-center justify-center gap-2 py-3 rounded-2xl text-[11px] font-black uppercase tracking-tighter transition-all ${isOpen
-                ? "bg-red-50 text-red-600 hover:bg-red-100"
-                : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+              ? "bg-red-50 text-red-600 hover:bg-red-100"
+              : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
               }`}
           >
             {isOpen ? <Lock size={14} /> : <Unlock size={14} />}
@@ -224,8 +228,8 @@ const ExamCard = ({ item, mutate }) => {
           <button
             onClick={handleTogglePublish}
             className={`flex items-center justify-center gap-2 py-3 rounded-2xl text-[11px] font-black uppercase tracking-tighter transition-all ${isPublished
-                ? "bg-slate-900 text-white"
-                : "bg-orange-50 text-orange-600 hover:bg-orange-100"
+              ? "bg-slate-900 text-white"
+              : "bg-orange-50 text-orange-600 hover:bg-orange-100"
               }`}
           >
             {isPublished ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -246,10 +250,20 @@ const ExamCard = ({ item, mutate }) => {
             }
             className={`w-full ${isOpen ? "bg-primary" : "bg-slate-400"} text-white font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm group-active:scale-95`}
           >
-            {isOpen ? <PlayCircle size={18} /> : <LockKeyhole size={18} />}
-            {intl.formatMessage({
-              id: isOpen ? "Imtihonni boshlash" : "Imtihon ochiq emas",
-            })}
+            {isCompleted ? (
+        <LockKeyhole size={18} />
+      ) : isOpen ? (
+        <PlayCircle size={18} />
+      ) : (
+        <LockKeyhole size={18} />
+      )}
+
+      {/* Matnni holatga qarab o'zgartiramiz */}
+      {isCompleted
+        ? intl.formatMessage({ id: "Topshirib bo'lingan" })
+        : isOpen
+        ? intl.formatMessage({ id: "Imtihonni boshlash" })
+        : intl.formatMessage({ id: "Imtihon ochiq emas" })}
           </button>
         )}
         {(isPublished || canManage) && (

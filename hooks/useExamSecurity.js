@@ -1,6 +1,7 @@
 import {
   useEffect,
-  useCallback
+  useCallback,
+  useRef
 } from "react";
 import {
   useRouter
@@ -11,7 +12,6 @@ import {
 import {
   useIntl
 } from "react-intl";
-import axios from "axios"; // Yoki o'zingizning authAxios'ingiz
 import {
   authAxios
 } from "@/utils/axios";
@@ -20,25 +20,32 @@ export const useExamSecurity = (isActive, submissionId, onViolation) => {
   const router = useRouter();
   const intl = useIntl();
 
-  // API ga xabar yuborish funksiyasi
+  // Urinishlar sonini saqlash uchun (renderlar orasida saqlanib qoladi)
+  const violationCount = useRef(0);
+  const MAX_ATTEMPTS = 3;
+
   const reportViolation = useCallback(async (type) => {
     const payload = {
       submission_id: submissionId,
       incident: {
         events: [{
-          type: message,
+          type,
           at: new Date().toISOString(),
-        }, ],
+          attempt_number: violationCount.current
+        }],
       },
     };
 
-    try {
-      // API manzilingizni kiriting
-      await authAxios.post("/submissions/report-exam-integrity/", JSON.stringify(payload));
-      console.log(`Violation reported: ${type}`);
-    } catch (error) {
-      console.error("API Error reporting violation:", error);
+    if (violationCount.current >= MAX_ATTEMPTS) {
+      try {
+        await authAxios.post("/submissions/report-exam-integrity/", payload);
+        console.log(`Violation reported: ${type} (Attempt: ${violationCount.current})`);
+      } catch (error) {
+        console.error("API Error reporting violation:", error);
+      }
     }
+
+
   }, [submissionId]);
 
   useEffect(() => {
@@ -57,37 +64,61 @@ export const useExamSecurity = (isActive, submissionId, onViolation) => {
       once: true
     });
 
-    const handleViolation = (message, violationType) => {
-      // 1. API ga xabar berish
-      reportViolation(message);
+    const handleViolation = (messageId, violationType) => {
+      violationCount.current += 1; // Xatolar sonini oshirish
 
-      // 2. Foydalanuvchiga bildirishnoma
-      toast.error(intl.formatMessage({
-        id: message
-      }), {
+      // 1. API ga xabar berish
+      reportViolation(violationType);
+
+      // 2. Foydalanuvchiga ogohlantirish (nechanchi imkoniyat qolganini ko'rsatish)
+      const remaining = MAX_ATTEMPTS - violationCount.current;
+      const warningMessage = remaining > 0 ?
+        `${intl.formatMessage({ id: messageId })}. ${intl.formatMessage({id:"Qolgan urinishlar"})}: ${remaining}` :
+        intl.formatMessage({
+          id: "Sizda imkoniyat qolmadi!"
+        });
+
+      toast.error(warningMessage, {
         position: "top-center",
         autoClose: 3000,
       });
 
-      // 3. Callback funksiyani chaqirish (agar bo'lsa)
+      // 3. Callback
       if (onViolation) onViolation(violationType);
 
-      // 4. Imtihondan chiqarish (kechiktirilgan)
-      setTimeout(() => {
-        router.push("/blocked");
-      }, 2500);
+      // 4. 3 marta bo'lganda blocklash
+      if (violationCount.current >= MAX_ATTEMPTS) {
+        setTimeout(() => {
+          router.push("/blocked");
+        }, 1500);
+      }
     };
 
-    // 1. Klaviaturani bloklash
+    // 1. Klaviaturani bloklash (Alt+Tab, PrintScreen va boshqalar)
     const handleKeyDown = (e) => {
-      const forbiddenKeys = ["f12", "f5", "f11"];
-      const forbiddenCtrlKeys = ["r", "u", "s", "c", "v"];
       const key = e.key.toLowerCase();
 
-      if (forbiddenKeys.includes(key) || (e.ctrlKey && forbiddenCtrlKeys.includes(key))) {
+      // PrintScreen (Screenshot) ni aniqlash (ba'zi brauzerlarda ishlaydi)
+      if (key === "printscreen") {
         e.preventDefault();
-        const type = key === "f12" ? "devtools_attempt" : `forbidden_key_${key}`;
-        handleViolation("Xavfsizlik qoidasi: Taqiqlangan tugma bosildi!", type);
+        handleViolation("Screenshot olish taqiqlanadi!", "screenshot_attempt");
+        // Clipboardni tozalashga urinish
+        navigator.clipboard.writeText("");
+      }
+
+      const forbiddenKeys = ["f12", "f5", "f11"];
+      const forbiddenCtrlKeys = ["r", "u", "s", "c", "v", "p"]; // P - Print uchun
+
+      // Alt + Tab ni to'liq bloklab bo'lmaydi (OS darajasida), 
+      // lekin Alt bosilganda biz buni "Tab switch" sifatida ushlaymiz (visibilitychange orqali).
+      if (
+        forbiddenKeys.includes(key) ||
+        (e.ctrlKey && forbiddenCtrlKeys.includes(key)) ||
+        (e.altKey && key === "tab") || // Alt + Tab urinishi
+        (e.metaKey) // Windows yoki Mac Command tugmasi
+      ) {
+        e.preventDefault();
+        handleViolation("Taqiqlangan tugma kombinatsiyasi!", `key_${key}`);
       }
     };
 
@@ -98,27 +129,29 @@ export const useExamSecurity = (isActive, submissionId, onViolation) => {
       }
     };
 
-    // 3. Tab almashish
+    // 3. Tab almashish (Alt+Tab va boshqa oynaga o'tishni ushlaydi)
     const handleVisibilityChange = () => {
       if (document.hidden) {
         handleViolation("Boshqa oynaga o'tish taqiqlanadi!", "tab_switch");
       }
     };
 
-    // 4. Sichqoncha o'ng tugmasi
-    const handleContextMenu = (e) => {
+    // 4. Nusxa ko'chirishni taqiqlash (Ekran rasmini olishni qiyinlashtiradi)
+    const handleCopy = (e) => {
       e.preventDefault();
-      // Ixtiyoriy: O'ng tugmani ham report qilish mumkin
-      // reportViolation("context_menu_attempt"); 
+      handleViolation("Ma'lumot nusxalash taqiqlanadi!", "copy_attempt");
     };
 
-    // 5. Sahifadan chiqib ketishga urinish (beforeunload)
+    const handleContextMenu = (e) => e.preventDefault();
+
     const handleBeforeUnload = () => {
-      reportViolation("beforeunload");
+      reportViolation("page_refresh_attempt");
     };
 
+    // Eventlarni bog'lash
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("contextmenu", handleContextMenu);
+    window.addEventListener("copy", handleCopy);
     window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("fullscreenchange", handleFullScreenChange);
     document.addEventListener("visibilitychange", handleVisibilityChange);
@@ -126,6 +159,7 @@ export const useExamSecurity = (isActive, submissionId, onViolation) => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("contextmenu", handleContextMenu);
+      window.removeEventListener("copy", handleCopy);
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("fullscreenchange", handleFullScreenChange);
       document.removeEventListener("visibilitychange", handleVisibilityChange);

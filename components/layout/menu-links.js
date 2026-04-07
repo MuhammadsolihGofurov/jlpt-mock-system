@@ -70,7 +70,7 @@ export const menus = [{
   },
   {
     label: "materials_title",
-    href: "/dashboard/materials",
+    href: "/dashboard/materials/folders",
     icon: Files,
     roles: ["CENTER_ADMIN", "TEACHER", "STUDENT"],
   },
