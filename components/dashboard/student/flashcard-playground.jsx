@@ -74,6 +74,16 @@ const SortableCardRow = ({ id, index, register, remove, db_id }) => {
                             onInput={(e) => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
                         />
                     </div>
+                    <div className="relative lg:col-span-2">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 block ml-1">{intl.formatMessage({ id: "Misol uchun" })}</label>
+                        <textarea
+                            {...register(`cards.${index}.example_gap`)}
+                            rows={1}
+                            placeholder={intl.formatMessage({ id: "Masalan: Men bugun yugurdim" })}
+                            className="w-full bg-transparent border-b border-slate-200 py-1 text-base font-medium outline-none focus:border-blue-500 transition-all resize-none overflow-hidden text-slate-600"
+                            onInput={(e) => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
+                        />
+                    </div>
                 </div>
 
                 <div className="p-4 flex items-center gap-4 bg-slate-50/30 border-l border-slate-50">
@@ -134,7 +144,7 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
             visibility: "",
             assigned_group_ids: [],
             visible_center_ids: [],
-            cards: [{ term: "", definition: "", image_link: "", furigana: "", order: 1 }]
+            cards: [{ term: "", definition: "", image_link: "", furigana: "", example_gap: "", order: 1 }]
         }
     });
 
@@ -153,7 +163,7 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                 visible_center_ids: flashcard_data.visible_centers?.map(c => c.id) || [],
                 cards: cards?.length > 0
                     ? cards.sort((a, b) => a.order - b.order).map(c => ({ ...c, db_id: c.id }))
-                    : [{ term: "", definition: "", image_link: "", order: 1 }]
+                    : [{ term: "", definition: "", furigana: "", example_gap: "", image_link: "", order: 1 }]
             });
         }
     }, [flashcard_data, cards, reset]);
@@ -417,7 +427,7 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
 
                     <button
                         type="button"
-                        onClick={() => append({ term: "", definition: "", image_link: "", furigana: "", order: fields.length + 1 })}
+                        onClick={() => append({ term: "", definition: "", image_link: "", furigana: "", example_gap: "", order: fields.length + 1 })}
                         className="w-full py-6 border-2 border-dashed border-slate-200 rounded-[2.5rem] text-slate-400 font-bold text-lg hover:border-orange-400 hover:text-orange-500 hover:bg-white transition-all flex items-center justify-center gap-3 group"
                     >
                         <div className="bg-slate-100 group-hover:bg-orange-500 group-hover:text-white p-2 rounded-xl transition-all">
