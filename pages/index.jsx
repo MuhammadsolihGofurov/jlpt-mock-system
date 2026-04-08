@@ -24,7 +24,7 @@ const IndexPage = ({ info }) => {
             <Seo
                 title={info?.seo_title || "Mikan — JLPT va Yapon tili imtihonlariga tayyorlov platformasi"}
                 description={info?.meta_description || "Yapon tili darajangizni JLPT va IELTS mock testlari orqali innovatsion tahlil qiling. O'quv markazlari va talabalar uchun professional ekotizim."}
-                keywords={info?.keywords || "JLPT testlari, yapon tili imtihoni, JLPT N2 tayyorgarlik, IELTS mock test Uzbekistan, Mikan platformasi, yapon tili kurslari"}
+                keywords={info?.keywords || "JLPT testlari, yapon tili imtihoni, JLPT N2 tayyorgarlik, IELTS mock test Uzbekistan, Mikan platformasi, yapon tili kurslari, jltp imtihonlari, flash kartlar, jlptga tayyorlanish, mikan uz, mikan, yapon tili"}
             />
 
             {/* --- 1. MINIMAL NAV --- */}
