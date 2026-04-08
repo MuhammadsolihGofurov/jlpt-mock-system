@@ -9,6 +9,7 @@ import useSWR, { mutate } from "swr";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import fetcher from "@/utils/fetcher";
+import Script from "next/script";
 
 const WITHOUT_SIDEBAR = [
   "/login",
