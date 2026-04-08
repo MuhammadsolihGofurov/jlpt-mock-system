@@ -89,6 +89,9 @@ const Layout = ({ children }) => {
           content="/img/icons/favicon/browserconfig.xml"
         />
         <meta name="theme-color" content="#ffffff"></meta>
+
+
+        <meta name="google-site-verification" content="nkQkcYk98918n_BSnRwf4Qgz3EuBf-ZI0WI4ts6RS1w" />
       </Head>
 
       {hasSidebar || router.pathname === "/" ? (
