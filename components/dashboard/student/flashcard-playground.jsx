@@ -157,6 +157,8 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
     const { fields, append, remove, move } = useFieldArray({ control, name: "cards" });
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 10 } }));
     const currentVisibility = watch("visibility");
+    const currentCards = watch("cards");
+    const currentTitle = watch("title");
 
     // --- DRAFT LOGIC START ---
 
@@ -240,7 +242,7 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                 }
             }
         }
-    }, [isEditMode, reset]);
+    }, [isEditMode]);
 
     // --- DRAFT LOGIC END ---
 
@@ -354,6 +356,8 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
         } catch (err) {
             const msg = handleApiError(err);
             toast.update(toastId, { render: msg, type: "error", isLoading: false, autoClose: 3000 });
+        } finally {
+            toast.dismiss(toastId);
         }
     };
 
@@ -368,8 +372,8 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
 
             reset({
                 ...watch(),
-                title: fileName,
-                cards: parsedCards.length > 0 ? parsedCards : [{ term: "", definition: "", furigana: "", order: 1 }]
+                title: currentTitle ?? fileName,
+                cards: parsedCards.length > 0 ? [...currentCards, ...parsedCards] : [{ term: "", definition: "", furigana: "", order: 1 }]
             });
 
             toast.update(toastId, { render: intl.formatMessage({ id: "Muvaffaqiyatli yuklandi!" }), type: "success", isLoading: false, autoClose: 2000 });
