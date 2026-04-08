@@ -881,5 +881,8 @@
   "Jildni o'chirish": "Удалить папку",
   "Ushbu jildni o'chirib tashlamoqchimisiz?": "Вы уверены, что хотите удалить эту папку?",
   "Jildlar topilmadi": "Папки не найдены",
-  "Hozircha hech qanday jild yaratilmagan": "Папки пока не созданы"
+  "Hozircha hech qanday jild yaratilmagan": "Папки пока не созданы",
+  "Qoralama tiklandi": "Черновик восстановлен",
+  "Qoralamani tahrirlash": "Редактировать черновик",
+  "Agar tasdiqlasangiz, qoralamani tahrirlaysiz, aks holda yangi flash kart yasaysiz.": "Если вы подтвердите, вы будете редактировать черновик, в protivnom sluchae создадите новую флэш-карту."
 }

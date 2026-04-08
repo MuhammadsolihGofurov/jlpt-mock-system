@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
@@ -21,8 +21,10 @@ import { useSelector } from "react-redux";
 import { parsePdfToCards } from "@/utils/flashcard-import-export";
 import { useModal } from "@/context/modal-context";
 
+const DRAFT_STORAGE_KEY = "flashcard_playground_draft";
+
 // --- SORTABLE CARD ROW COMPONENT ---
-const SortableCardRow = ({ id, index, register, remove, db_id }) => {
+const SortableCardRow = React.memo(({ id, index, register, remove, db_id }) => {
     const intl = useIntl();
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
@@ -101,7 +103,7 @@ const SortableCardRow = ({ id, index, register, remove, db_id }) => {
             </div>
         </div>
     );
-};
+});
 
 // --- MAIN PLAYGROUND PAGE ---
 const FlashcardPlayground = ({ flashcard_data, cards }) => {
@@ -114,30 +116,34 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
 
     const { data: groupsData } = useSWR(
         userRole !== 'OWNER' && userRole !== "STUDENT" ? ["groups/", router.locale] : null,
-        (url, locale) => fetcher(`${url}?page=all`, { headers: { "Accept-Language": locale } }, {}, true)
+        (url, locale) => fetcher(`${url}?page=all`, { headers: { "Accept-Language": locale } }, {}, true), {
+        revalidateOnFocus: false,
+        revalidateIfStale: false
+    }
     );
 
     const { data: centerData } = useSWR(
         userRole == 'OWNER' ? ["owner-centers/", router.locale] : null,
-        (url, locale) => fetcher(`${url}?page=all`, { headers: { "Accept-Language": locale } }, {}, true)
+        (url, locale) => fetcher(`${url}?page=all`, { headers: { "Accept-Language": locale } }, {}, true), {
+        revalidateOnFocus: false,
+        revalidateIfStale: false
+    }
     );
 
     const groupOptions = groupsData?.map((g) => ({ value: g.id, label: g.name })) || [];
     const centerOptions = centerData?.map((c) => ({ value: c.id, label: c.center_name })) || [];
 
-    // 2. Visibility variantlari (Role-based)
     const visibilityOptionsBased = [
         { value: "PUBLIC", label: intl.formatMessage({ id: "Global (Hamma markazlar)" }), roles: ["OWNER"] },
         { value: "PRIVATE", label: intl.formatMessage({ id: "Faqat tanlanganlar uchun" }), roles: ["OWNER"] },
-        { value: "PRIVATE", label: intl.formatMessage({ id: "Faqat o'zim uchun" }), roles: ["CENTER_ADMIN", "STUDENT"] },
+        { value: "PRIVATE", label: intl.formatMessage({ id: "Faqat o'zim uchun" }), roles: ["CENTER_ADMIN", "STUDENT", "TEACHER"] },
         { value: "CENTER", label: intl.formatMessage({ id: "Butun markaz uchun" }), roles: ["CENTER_ADMIN", "TEACHER"] },
         { value: "GROUPS", label: intl.formatMessage({ id: "Tanlanganlar uchun" }), roles: ["CENTER_ADMIN", "TEACHER"] },
     ];
 
     const visibilityOptions = visibilityOptionsBased.filter(option => option.roles.includes(userRole));
 
-    // 3. React Hook Form Setup
-    const { register, control, handleSubmit, reset, watch, formState: { isSubmitting } } = useForm({
+    const { register, control, handleSubmit, reset, watch, getValues, formState: { isSubmitting } } = useForm({
         defaultValues: {
             title: "",
             description: "",
@@ -152,9 +158,94 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 10 } }));
     const currentVisibility = watch("visibility");
 
-    // 4. Ma'lumotlarni formaga yuklash (Edit Mode)
+    // --- DRAFT LOGIC START ---
+
+    // Qoralama saqlash funksiyasi
+    const saveDraft = useCallback(() => {
+        if (isEditMode || isSubmitting) return;
+
+        const currentValues = getValues();
+
+        // Faqat mazmunli ma'lumot bo'lsagina saqlash
+        const hasContent = currentValues.title ||
+            currentValues.cards.some(c => c.term?.trim() || c.definition?.trim());
+
+        if (hasContent) {
+            localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(currentValues));
+            console.log("Qoralama saqlandi:", new Date().toLocaleTimeString());
+        }
+    }, [isEditMode, isSubmitting, getValues]);
+
+    // 1. Sahifaga kirganda qoralama tekshirish (Faqat Create rejimida)
     useEffect(() => {
-        if (flashcard_data) {
+        if (isEditMode) return;
+
+        const handleAllEvents = () => {
+            saveDraft();
+        };
+
+        window.addEventListener("beforeunload", handleAllEvents);
+
+        window.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "hidden") {
+                handleAllEvents();
+            }
+        });
+
+        window.addEventListener("blur", handleAllEvents);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleAllEvents);
+            window.removeEventListener("blur", handleAllEvents);
+            window.removeEventListener("visibilitychange", handleAllEvents);
+        };
+    }, [saveDraft, isEditMode]);
+
+    // 3. Avtomatik interval (3 daqiqa)
+    useEffect(() => {
+        if (isEditMode) return;
+
+        const interval = setInterval(() => {
+            saveDraft();
+        }, 3 * 60 * 1000);
+
+        return () => clearInterval(interval);
+    }, [saveDraft, isEditMode]);
+
+    // 4. Kirganda tiklash (O'zgarmas qoladi)
+    useEffect(() => {
+        if (!isEditMode) {
+            const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+            if (savedDraft) {
+                try {
+                    const parsed = JSON.parse(savedDraft);
+                    openModal(
+                        "CONFIRM_MODAL",
+                        {
+                            title: "Qoralamani tahrirlash",
+                            body: "Agar tasdiqlasangiz, qoralamani tahrirlaysiz, aks holda yangi flash kart yasaysiz.",
+                            confirmText: "Ha",
+                            variant: "warning",
+                            onConfirm: async () => {
+                                reset(parsed);
+                                toast.info(intl.formatMessage({ id: "Qoralama tiklandi" }), { autoClose: 2000 });
+                            },
+                            onClose: () => { localStorage.removeItem(DRAFT_STORAGE_KEY) }
+                        },
+                        "small",
+                    );
+
+                } catch (e) {
+                    console.error("Draft parse error", e);
+                }
+            }
+        }
+    }, [isEditMode, reset]);
+
+    // --- DRAFT LOGIC END ---
+
+    useEffect(() => {
+        if (flashcard_data && !isSubmitting) {
             reset({
                 title: flashcard_data.title || "",
                 description: flashcard_data.description || "",
@@ -166,7 +257,7 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                     : [{ term: "", definition: "", furigana: "", example_gap: "", image_link: "", order: 1 }]
             });
         }
-    }, [flashcard_data, cards, reset]);
+    }, [flashcard_data?.id]);
 
     const handleDragEnd = (event) => {
         const { active, over } = event;
@@ -177,12 +268,10 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
         }
     };
 
-    // --- DELETE CARD LOGIC ---
     const handleDelete = (index) => {
         const cardToDelete = fields[index];
         const realId = cardToDelete.db_id;
 
-        // Agar karta bazada mavjud bo'lsa (Edit rejimida)
         if (isEditMode && realId) {
             openModal(
                 "CONFIRM_MODAL",
@@ -191,29 +280,25 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                     body: "Ushbu flash kartni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
                     confirmText: "Ha, o'chirilsin",
                     variant: "danger",
-                    // Agar SWR ishlatayotgan bo'lsangiz mutateKey ni qoldiring, 
-                    // aks holda onConfirm ichida remove(index) yetarli bo'ladi.
                     mutateKey: [`flashcard-sets/`, router.locale],
                     onConfirm: async () => {
                         try {
                             await authAxios.delete(`flashcards/${realId}/`);
-                            remove(index); // Muvaffaqiyatli o'chgach, formadan ham olib tashlaymiz
+                            remove(index);
                             toast.success("O'chirildi");
                         } catch (err) {
                             handleApiError(err);
-                            throw err; // Modal xatolikni ko'rishi uchun
+                            throw err;
                         }
                     },
                 },
                 "small",
             );
         } else {
-            // Agar karta hali bazaga saqlanmagan bo'lsa, shunchaki ro'yxatdan o'chiramiz
             remove(index);
         }
     };
 
-    // --- MAIN SUBMIT LOGIC ---
     const onSubmit = async (formData) => {
         const toastId = toast.loading(intl.formatMessage({ id: "Saqlanmoqda..." }));
         try {
@@ -234,7 +319,6 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                 setPayload.visible_center_ids = formData.visible_center_ids;
             }
 
-            // 1. Flashcard Set yaratish yoki yangilash
             let currentSetId = setId;
             if (isEditMode) {
                 await authAxios.put(`flashcard-sets/${setId}/`, setPayload);
@@ -243,7 +327,6 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                 currentSetId = res.data.id;
             }
 
-            // 2. Kartalarni ajratish (Update vs Create)
             const formattedCards = formData.cards.map((c, i) => ({
                 ...c,
                 order: i + 1,
@@ -263,6 +346,9 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
 
             if (requests.length > 0) await Promise.all(requests);
 
+            // Muvaffaqiyatli saqlangach qoralama o'chiriladi
+            localStorage.removeItem(DRAFT_STORAGE_KEY);
+
             toast.update(toastId, { render: "Muvaffaqiyatli saqlandi!", type: "success", isLoading: false, autoClose: 2000 });
             router.push("/dashboard/flashcards");
         } catch (err) {
@@ -271,7 +357,6 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
         }
     };
 
-    // handle upload
     const handlePdfUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -279,8 +364,7 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
         const toastId = toast.loading(intl.formatMessage({ id: "PDF tahlil qilinmoqda..." }));
         try {
             const parsedCards = await parsePdfToCards(file);
-            const fileName = file.name.replace(/\.[^/.]+$/, ""); // .pdf ni olib tashlash
-
+            const fileName = file.name.replace(/\.[^/.]+$/, "");
 
             reset({
                 ...watch(),
@@ -297,7 +381,6 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
 
     return (
         <div className="min-h-screen pb-24 font-sans text-slate-900 bg-slate-50/30">
-            {/* STICKY HEADER */}
             <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/60 py-5">
                 <div className="max-w-[1200px] mx-auto px-8 flex justify-between md:flex-row flex-col gap-3 sm:items-center">
                     <div className="flex items-center gap-5">
@@ -309,7 +392,6 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                         </h1>
                     </div>
                     <div className="flex items-center gap-3">
-                        {/* PDF YUKLASH TUGMASI */}
                         <label className="cursor-pointer bg-orange-50 hover:bg-orange-100 text-orange-600 px-5 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 active:scale-95 border border-orange-200">
                             <FileUp size={18} />
                             <span>{intl.formatMessage({ id: "PDF Yuklash" })}</span>
@@ -328,7 +410,6 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
             </div>
 
             <div className="max-w-[1200px] mx-auto px-8 mt-10 space-y-10">
-                {/* CONFIGURATION SECTION */}
                 <section className="bg-white rounded-[2.5rem] p-10 border border-slate-200/50 shadow-sm space-y-8">
                     <div className="flex items-center gap-3 text-orange-500">
                         <ShieldCheck size={24} />
@@ -401,7 +482,6 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
 
                 </section>
 
-                {/* FLASHCARDS LIST SECTION */}
                 <section className="space-y-4">
                     <div className="flex items-center justify-between px-4 mb-4">
                         <div className="flex items-center gap-2 text-slate-400 font-bold uppercase text-xs tracking-widest">

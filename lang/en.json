@@ -881,5 +881,8 @@
     "Jildni o'chirish": "Delete folder",
     "Ushbu jildni o'chirib tashlamoqchimisiz?": "Are you sure you want to delete this folder?",
     "Jildlar topilmadi": "Folders not found",
-    "Hozircha hech qanday jild yaratilmagan": "No folders have been created yet"
+    "Hozircha hech qanday jild yaratilmagan": "No folders have been created yet",
+    "Qoralama tiklandi": "Draft restored",
+    "Qoralamani tahrirlash": "Edit draft",
+    "Agar tasdiqlasangiz, qoralamani tahrirlaysiz, aks holda yangi flash kart yasaysiz.": "If you confirm, you will edit the draft; otherwise, you will create a new flashcard."
 }

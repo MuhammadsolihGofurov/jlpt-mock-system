@@ -12,6 +12,7 @@ const ConfirmModal = ({
   body,
   onConfirm,
   confirmText,
+  onClose = () => { },
   cancelText = "Bekor qilish",
   variant = "danger",
   local = "unclear",
@@ -87,7 +88,7 @@ const ConfirmModal = ({
       <div className="flex flex-col-reverse sm:flex-row items-center gap-3">
         <button
           type="button"
-          onClick={() => closeModal("CONFIRM_MODAL")}
+          onClick={() => { closeModal("CONFIRM_MODAL"); onClose() }}
           className="w-full py-4 rounded-2xl font-bold text-muted hover:bg-gray-100 transition-all active:scale-95"
         >
           {intl.formatMessage({ id: cancelText })}

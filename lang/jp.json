@@ -881,5 +881,8 @@
   "Jildni o'chirish": "フォルダを削除",
   "Ushbu jildni o'chirib tashlamoqchimisiz?": "このフォルダを削除してもよろしいですか？",
   "Jildlar topilmadi": "フォルダが見つかりません",
-  "Hozircha hech qanday jild yaratilmagan": "フォルダはまだ作成されていません"
+  "Hozircha hech qanday jild yaratilmagan": "フォルダはまだ作成されていません",
+  "Qoralama tiklandi": "下書きが復元されました",
+  "Qoralamani tahrirlash": "下書きを編集",
+  "Agar tasdiqlasangiz, qoralamani tahrirlaysiz, aks holda yangi flash kart yasaysiz.": "確認すると下書きを編集します。そうしない場合は、新しいフラッシュカードを作成します。"
 }
