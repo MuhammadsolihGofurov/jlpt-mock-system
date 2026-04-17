@@ -11,7 +11,7 @@ import { ListeningOverlay } from "./details/exam-listening-overlay";
 import { useIntl } from "react-intl";
 import { ListeningModeSelector } from "./details/listening-mode-selector";
 
-const ExamPlayground = ({ examData }) => {
+const ExamPlayground = ({ examData, currentExamType, examType }) => {
   const router = useRouter();
   const intl = useIntl();
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
@@ -53,9 +53,9 @@ const ExamPlayground = ({ examData }) => {
     (q) => answers.hasOwnProperty(q.id) && answers[q.id] !== undefined,
   );
 
-  useExamSecurity(true, examData?.submission_id, (type) => {
-    console.log("Qoidabuzarlik turi:", type);
-  });
+  // useExamSecurity(true, examData?.submission_id, (type) => {
+  //   console.log("Qoidabuzarlik turi:", type);
+  // });
 
   const handleSelectOption = (questionId, optionIndex) => {
     setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }));
@@ -101,9 +101,9 @@ const ExamPlayground = ({ examData }) => {
         answers: answers,
       };
 
-      await authAxios.post("/submissions/submit-exam/", payload);
+      await authAxios.post(currentExamType?.submit_exam, payload);
       toast.success(intl.formatMessage({ id: "Imtihon yakunlandi!" }));
-      router.push("/dashboard/assignments/exam");
+      router.push(examType === "jlpt" ? "/dashboard/assignments/exam-jlpt" : "/dashboard/assignments/exam-jft");
     } catch (error) {
       console.error("Submission error:", error);
       toast.error(intl.formatMessage({ id: "Topshirishda xatolik yuz berdi." }));

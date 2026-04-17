@@ -80,25 +80,54 @@ export const QuestionRenderer = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {q.options.map((option, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => onSelect(q.id, idx)}
-                  className={`p-5 text-left rounded-2xl border-2 transition-all flex items-center gap-4 group/opt
-                    ${selectedAnswers[q.id] === idx
-                      ? "border-primary bg-orange-50 ring-4 ring-orange-100"
-                      : "border-slate-100 hover:border-slate-200 bg-white"
-                    }`}
-                >
-                  <span className={`w-10 h-10 rounded-xl flex items-center justify-center border-2 font-black transition-colors
-                    ${selectedAnswers[q.id] === idx ? "bg-primary border-primary text-white" : "border-slate-200 text-slate-400 group-hover/opt:border-primary"}`}>
-                    {idx + 1}
-                  </span>
-                  <span className={`flex-1 font-bold ${selectedAnswers[q.id] === idx ? "text-primary" : "text-slate-600"}`}>
-                    {option.text}
-                  </span>
-                </button>
-              ))}
+              {q.options.map((option, idx) => {
+                const isSelected = selectedAnswers[q.id] === idx;
+
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => onSelect(q.id, idx)}
+                    className={`p-5 text-left rounded-2xl border-2 transition-all flex items-center gap-4 group/opt min-h-[100px]
+          ${isSelected
+                        ? "border-primary bg-orange-50 ring-4 ring-orange-100"
+                        : "border-slate-100 hover:border-slate-200 bg-white hover:shadow-md"
+                      }`}
+                  >
+                    {/* Raqam belgisi */}
+                    <span
+                      className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border-2 font-black text-lg transition-all
+            ${isSelected
+                          ? "bg-primary border-primary text-white"
+                          : "border-slate-200 text-slate-400 group-hover/opt:border-primary group-hover/opt:text-primary"
+                        }`}
+                    >
+                      {idx + 1}
+                    </span>
+
+                    {/* Variant tarkibi: Matn yoki Rasm */}
+                    <div className="flex-1 min-w-0">
+                      {option.image ? (
+                        // Agar rasm bo'lsa
+                        <div className="flex justify-center">
+                          <img
+                            src={option.image}
+                            alt={`Variant ${idx + 1}`}
+                            className="max-h-52 max-w-full rounded-xl object-contain border border-slate-100"
+                          />
+                        </div>
+                      ) : (
+                        // Agar oddiy matn bo'lsa
+                        <span
+                          className={`block font-medium leading-relaxed break-words
+                          ${isSelected ? "text-primary" : "text-slate-700"}`}
+                        >
+                          {option.text}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         ))}

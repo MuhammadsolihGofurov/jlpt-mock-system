@@ -9,8 +9,9 @@ import { useModal } from "@/context/modal-context";
 import Pagination from "@/components/ui/pagination";
 import { EmptyMessage } from "@/components/custom/message";
 import { FlashcardDeckCard } from "@/components/custom/cards";
+import { FlashcardDecksSkeleton } from "@/components/skeleton";
 
-const FlashcardList = () => {
+const FlashcardList = ({ customLoading }) => {
     const router = useRouter();
     const intl = useIntl();
     const { openModal, modalClosed } = useModal();
@@ -33,20 +34,14 @@ const FlashcardList = () => {
         router.push(`/dashboard/flashcards/practise/${id}`);
     };
 
-    if (isLoading) {
-        return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 opacity-50">
-                {[...Array(6)].map((_, i) => (
-                    <div key={i} className="h-64 bg-slate-100 rounded-[2rem] animate-pulse" />
-                ))}
-            </div>
-        );
+    if (isLoading || customLoading) {
+        return <FlashcardDecksSkeleton />;
     }
 
     return (
         <div className="flex flex-col min-h-full space-y-8">
             {/* Grid List */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
                 {data?.results?.map((deck) => (
                     <FlashcardDeckCard
                         key={deck.id}

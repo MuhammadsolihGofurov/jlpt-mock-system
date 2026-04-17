@@ -17,6 +17,16 @@ body {
   }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #ffedd5 25%, #fed7aa 50%, #ffedd5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
 
 /* React Toastify Custom Styling */
 :root {

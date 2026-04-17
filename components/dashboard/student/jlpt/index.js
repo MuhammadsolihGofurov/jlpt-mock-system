@@ -1,0 +1,1 @@
+export { default as MyResultExam } from './my-exam-result'

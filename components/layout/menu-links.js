@@ -83,7 +83,7 @@ export const menus = [{
   },
   {
     label: "Assignments",
-    href: "/dashboard/assignments/exam",
+    href: "/dashboard/assignments/exam-jlpt",
     icon: File,
     roles: ["TEACHER", "CENTER_ADMIN", "STUDENT"],
     is_mobile: true,

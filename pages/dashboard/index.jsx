@@ -1,10 +1,10 @@
 import { useIntl } from "react-intl";
 import Seo from "@/components/seo/seo";
-import { AuthGuard } from "@/components/guard";
+import { AuthGuard, withAuthGuard } from "@/components/guard";
 import { AnalyticsContainer } from "@/components/custom/analytics";
 import { PageHeader } from "@/components/layout";
 
-function Dashboard({ info }) {
+function Dashboard({ customLoading }) {
   const intl = useIntl();
 
   return (
@@ -14,14 +14,13 @@ function Dashboard({ info }) {
         description={intl.formatMessage({ id: "dash_desc" })}
         keywords={intl.formatMessage({ id: "dash_key" })}
       />
-      <AuthGuard roles={["OWNER", "CENTER_ADMIN", "TEACHER", "STUDENT"]}>
-        <PageHeader
-          title={"Xush kelibsiz!"}
-          description={"dash_desc"}
-          badge="Faol"
-        />
-        <AnalyticsContainer />
-      </AuthGuard>
+      <PageHeader
+        title={"Xush kelibsiz!"}
+        description={"dash_desc"}
+        badge="Faol"
+        customLoading={customLoading}
+      />
+      <AnalyticsContainer customLoading={customLoading} />
     </>
   );
 }
@@ -49,4 +48,4 @@ export async function getServerSideProps() {
   }
 }
 
-export default Dashboard;
+export default withAuthGuard(Dashboard, ["OWNER", "CENTER_ADMIN", "TEACHER", "STUDENT"]);

@@ -17,7 +17,7 @@ from "./material-card";
 export {
     default as MockCard
 }
-from "./mock-card";
+from "./jlpt-mock-card";
 export {
     default as ExamCard
 }
@@ -42,4 +42,5 @@ from "./flashcard-card";
 export {
     default as FolderCard
 }
-from './folder-card'
+from './folder-card';
+export { default as JftCard } from './jft-mock-card'

@@ -1,6 +1,6 @@
 import { useIntl } from "react-intl";
 import Seo from "@/components/seo/seo";
-import { AuthGuard } from "@/components/guard";
+import { AuthGuard, withAuthGuard } from "@/components/guard";
 import { PageHeader } from "@/components/layout";
 import { FileText, Filter, GraduationCap, Search } from "lucide-react";
 import { useModal } from "@/context/modal-context";
@@ -13,7 +13,7 @@ import { FlashcardList } from "@/components/dashboard/student";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 
-function FlashcardsPage({ info }) {
+function FlashcardsPage({ customLoading }) {
     const intl = useIntl();
     const router = useRouter();
 
@@ -26,22 +26,21 @@ function FlashcardsPage({ info }) {
                 description={intl.formatMessage({ id: "flashcards_desc" })}
                 keywords={intl.formatMessage({ id: "flashcards_key" })}
             />
-            <AuthGuard roles={["STUDENT", "TEACHER", "CENTER_ADMIN", "OWNER"]}>
-                <PageHeader
-                    title="flashcards_title"
-                    description="flashcards_desc"
-                    badge="Faol"
-                    buttonLabel="Flash kart qo'shish"
-                    roles={["STUDENT", "TEACHER", "CENTER_ADMIN", "OWNER"]}
-                    onButtonClick={() => router.push("/dashboard/flashcards/create")}
-                    extraActions={
-                        <>
-                            <SearchInput />
-                        </>
-                    }
-                />
-                <FlashcardList />
-            </AuthGuard>
+            <PageHeader
+                title="flashcards_title"
+                description="flashcards_desc"
+                badge="Faol"
+                buttonLabel="Flash kart qo'shish"
+                roles={["STUDENT", "TEACHER", "CENTER_ADMIN", "OWNER"]}
+                onButtonClick={() => router.push("/dashboard/flashcards/create")}
+                extraActions={
+                    <>
+                        <SearchInput />
+                    </>
+                }
+                customLoading={customLoading}
+            />
+            <FlashcardList customLoading={customLoading} />
         </>
     );
 }
@@ -69,4 +68,4 @@ export async function getServerSideProps() {
     }
 }
 
-export default FlashcardsPage;
+export default withAuthGuard(FlashcardsPage, ["STUDENT", "TEACHER", "CENTER_ADMIN", "OWNER"]);

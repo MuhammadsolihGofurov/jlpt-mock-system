@@ -1,6 +1,6 @@
 import { useIntl } from "react-intl";
 import Seo from "@/components/seo/seo";
-import { AuthGuard } from "@/components/guard";
+import { AuthGuard, withAuthGuard } from "@/components/guard";
 import { PageHeader } from "@/components/layout";
 import { useModal } from "@/context/modal-context";
 import { MaterialFolderLists, MaterialLists, UserLists } from "@/components/dashboard/admin";
@@ -11,8 +11,9 @@ import { AssignmentTabs } from "@/components/dashboard/admin-teacher";
 import useSWR from "swr";
 import fetcher from "@/utils/fetcher";
 import { useRouter } from "next/router";
+import { MaterialsSkeleton } from "@/components/skeleton";
 
-function FoldersPage({ info }) {
+function FoldersPage({ customLoading }) {
     const intl = useIntl();
     const router = useRouter();
     const { openModal } = useModal();
@@ -24,17 +25,16 @@ function FoldersPage({ info }) {
                 description={intl.formatMessage({ id: "folders_description" })}
                 keywords={intl.formatMessage({ id: "materials_key" })}
             />
-            <AuthGuard roles={["CENTER_ADMIN", "TEACHER", "STUDENT"]}>
-                <PageHeader
-                    title="Jildlar"
-                    description="folders_description"
-                    badge="Faol"
-                    buttonLabel="Kategoriya qo'shish"
-                    roles={["CENTER_ADMIN", "TEACHER"]}
-                    onButtonClick={() => openModal("CATEGORY_MODAL", {}, "middle")}
-                />
-                <MaterialFolderLists />
-            </AuthGuard>
+            <PageHeader
+                title="Jildlar"
+                description="folders_description"
+                badge="Faol"
+                buttonLabel="Kategoriya qo'shish"
+                roles={["CENTER_ADMIN", "TEACHER"]}
+                onButtonClick={() => openModal("CATEGORY_MODAL", {}, "middle")}
+                customLoading={customLoading}
+            />
+            <MaterialFolderLists customLoading={customLoading}/>
         </>
     );
 }
@@ -62,4 +62,4 @@ export async function getServerSideProps() {
     }
 }
 
-export default FoldersPage;
+export default withAuthGuard(FoldersPage, ["CENTER_ADMIN", "TEACHER", "STUDENT"]);

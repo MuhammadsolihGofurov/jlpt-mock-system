@@ -10,7 +10,7 @@ import { mutate } from "swr";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 
-const SectionFormModal = ({ mockId, section = null, section_count = 0, }) => {
+const SectionFormModal = ({ mockId, section = null, section_count = 0, currentMockType }) => {
   const { closeModal } = useModal();
   const isEdit = !!section;
   const router = useRouter();
@@ -26,7 +26,7 @@ const SectionFormModal = ({ mockId, section = null, section_count = 0, }) => {
   } = useForm({
     defaultValues: {
       name: "",
-      section_type: "VOCAB",
+      section_type: "",
       duration: 20,
       order: section_count + 1,
       total_score: 60,
@@ -54,7 +54,7 @@ const SectionFormModal = ({ mockId, section = null, section_count = 0, }) => {
 
     try {
       const method = isEdit ? "patch" : "post";
-      const url = isEdit ? `/test-sections/${section.id}/` : `/test-sections/`;
+      const url = isEdit ? `${currentMockType?.section}${section.id}/` : `${currentMockType?.section}`;
 
       const payload = isEdit ? data : { ...data, mock_test: mockId };
 
@@ -115,12 +115,7 @@ const SectionFormModal = ({ mockId, section = null, section_count = 0, }) => {
             render={({ field }) => (
               <Select
                 label="Bo'lim turi"
-                options={[
-                  { value: "VOCAB", label: "Vocabulary" },
-                  //   { value: "GRAMMAR", label: "Grammar" },
-                  { value: "GRAMMAR_READING", label: "Reading" },
-                  { value: "LISTENING", label: "Listening" },
-                ]}
+                options={currentMockType?.section_types}
                 value={field.value}
                 onChange={field.onChange}
                 error={errors.section_type?.message}
@@ -129,20 +124,22 @@ const SectionFormModal = ({ mockId, section = null, section_count = 0, }) => {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="relative">
-            <Input
-              label="Vaqt (daqiqa)"
-              name="duration"
-              type="number"
-              register={register}
-              error={errors.duration}
-              placeholder="20"
-            />
-            <div className="absolute right-4 top-[38px] text-slate-300">
-              <Clock size={18} />
+        <div className={`grid grid-cols-1  gap-5 ${!currentMockType?.total_duration ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+          {
+            !currentMockType.total_duration && <div className="relative">
+              <Input
+                label="Vaqt (daqiqa)"
+                name="duration"
+                type="number"
+                register={register}
+                error={errors.duration}
+                placeholder="20"
+              />
+              <div className="absolute right-4 top-[38px] text-slate-300">
+                <Clock size={18} />
+              </div>
             </div>
-          </div>
+          }
 
           <div className="relative">
             <Input

@@ -7,8 +7,9 @@ import Pagination from "@/components/ui/pagination";
 import { EmptyMessage } from "@/components/custom/message";
 import SearchInput from "@/components/ui/search-input";
 import { MaterialCard } from "@/components/custom/cards";
+import { MaterialListsSkeleton } from "@/components/skeleton";
 
-const MaterialLists = () => {
+const MaterialLists = ({ customLoading }) => {
   const router = useRouter();
   const { modalClosed } = useModal();
   const { page = 1, search, file_type, is_public, category } = router.query;
@@ -39,23 +40,14 @@ const MaterialLists = () => {
     }
   }, [modalClosed, mutate]);
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-pulse">
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className="h-60 bg-white/60 border border-slate-100 rounded-[2rem]"
-          />
-        ))}
-      </div>
-    );
+  if (isLoading || customLoading) {
+    return <MaterialListsSkeleton />;
   }
 
   return (
     <div className="flex flex-col space-y-6 pb-10">
       {data?.results?.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {data.results.map((material) => (
             <MaterialCard key={material.id} item={material} />
           ))}

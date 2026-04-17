@@ -16,8 +16,11 @@ import useSWR, { mutate } from "swr";
 import fetcher from "@/utils/fetcher";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { examTypes } from "@/types/exam-types";
 
-const ExamFormModal = ({ exam = null }) => {
+
+
+const ExamFormModal = ({ exam = null, currentExamType, exam_type }) => {
   const { closeModal } = useModal();
   const isEdit = !!exam;
   const router = useRouter();
@@ -26,7 +29,7 @@ const ExamFormModal = ({ exam = null }) => {
 
   // 1. Mock testlar ro'yxatini olish (Imtihon shabloni uchun)
   const { data: mocksData } = useSWR(
-    ["mock-tests/", router.locale],
+    [currentExamType?.mock_lists, router.locale],
     (url, locale) =>
       fetcher(
         `${url}?page=all&status=PUBLISHED`,
@@ -84,30 +87,36 @@ const ExamFormModal = ({ exam = null }) => {
       reset({
         title: exam.title,
         description: exam.description,
-        mock_test: exam.mock_test,
-        estimated_start_time: exam.estimated_start_time?.slice(0, 16), // datetime-local formatiga moslash
+        mock_test: exam.mock_test || exam.jft_mock_test,
+        estimated_start_time: exam.estimated_start_time?.slice(0, 16),
         assigned_group_ids: exam.assigned_groups?.map((g) => g.id) || [],
         status: exam.status,
         is_published: exam.is_published,
       });
     }
-  }, [exam, reset]);
+  }, [exam]);
 
   const onSubmit = async (formData) => {
     const toastId = toast.loading(intl.formatMessage({ id: "Saqlanmoqda..." }));
+    const { title, description, mock_test, estimated_start_time, assigned_group_ids, status: formStatus, is_published } = formData;
 
     try {
       const method = isEdit ? "patch" : "post";
-      const url = isEdit ? `exam-assignments/${exam.id}/` : "exam-assignments/";
+      const url = isEdit ? `${currentExamType?.assignment}${exam.id}/` : currentExamType?.assignment;
 
       // API kutilganidek doim CLOSED va false yuborish (siz so'ragandek)
       const finalData = {
-        ...formData,
-        estimated_start_time: formData.estimated_start_time
-          ? new Date(formData.estimated_start_time).toISOString()
+        title,
+        description,
+        estimated_start_time: estimated_start_time
+          ? new Date(estimated_start_time).toISOString()
           : null,
-        status: isEdit ? formData.status : "CLOSED",
-        is_published: isEdit ? formData.is_published : false,
+        status: isEdit ? formStatus : "CLOSED",
+        is_published: isEdit ? is_published : false,
+        assigned_group_ids,
+        ...(exam_type === "jlpt"
+          ? { mock_test: mock_test }
+          : { jft_mock_test: mock_test })
       };
 
       await authAxios[method](url, finalData);
@@ -122,7 +131,7 @@ const ExamFormModal = ({ exam = null }) => {
       });
 
       closeModal("EXAM_FORM", { refresh: true });
-      mutate([`exam-assignments/`, router.locale, page, search, status]);
+      mutate([currentExamType?.assignment, router.locale, page, search, status]);
     } catch (err) {
       toast.dismiss(toastId);
       handleApiError(err, setError);

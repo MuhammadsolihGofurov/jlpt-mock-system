@@ -3,8 +3,8 @@ import ExamFormModal from "./details/admin-teacher/exam-form-modal";
 import HomeworkFormModal from "./details/admin-teacher/homwork-form-modal";
 import MockFilterModal from "./details/admin-teacher/mock-filter-modal";
 import MockFormModal from "./details/admin-teacher/mock-form-modal";
-import QuestionFormModal from "./details/admin-teacher/question-form-modal";
-import QuestionGroupFormModal from "./details/admin-teacher/question-group-form-modal";
+import QuestionFormModal from "./details/admin-teacher/jlpt/question-form-modal";
+import QuestionGroupFormModal from "./details/admin-teacher/jlpt/question-group-form-modal";
 import QuizFilterModal from "./details/admin-teacher/quiz-filter-modal";
 import QuizFormModal from "./details/admin-teacher/quiz-form-modal";
 import ResultViewModal from "./details/admin-teacher/result-view-modal";
@@ -26,6 +26,10 @@ import SubscriptionFormModal from "./details/owner/subscription-modal";
 import ServiceDetailModal from "./details/service-modal";
 import FlashcardPracticeModal from "./details/all/flashcard-practice-modal";
 import CategoryFormModal from "./details/admin/category-form-modal";
+import JFTMockFormModal from "./details/admin-teacher/jft/jft-form-modal";
+import JFTQuestionGroupFormModal from "./details/admin-teacher/jft/jft-question-group-modal";
+import { JFTQuestionFormModal } from "./details/admin-teacher/jft";
+import CheckedConfirmModal from "./details/checked-confirm-modal";
 
 export const ModalComponents = {
   centerForm: CenterFormModal,
@@ -55,5 +59,9 @@ export const ModalComponents = {
   CONTACT_FORM: ContactRequestStatusModal,
   SERVICE_MODAL: ServiceDetailModal,
   PRACTICE_MODAL: FlashcardPracticeModal,
-  CATEGORY_MODAL: CategoryFormModal
+  CATEGORY_MODAL: CategoryFormModal,
+  JFT_MOCK_FORM: JFTMockFormModal,
+  JFT_QUESTION_GROUP: JFTQuestionGroupFormModal,
+  JFT_QUESTION_FORM: JFTQuestionFormModal,
+  CHECKED_CONFIRM_MODAL: CheckedConfirmModal
 };

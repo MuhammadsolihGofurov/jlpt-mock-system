@@ -23,7 +23,7 @@ import Link from "next/link";
 import { useIntl } from "react-intl";
 import { formatDate } from "@/utils/funcs";
 
-const ExamCard = ({ item, mutate }) => {
+const ExamCard = ({ item, currentExamType, exam_type }) => {
   const { openModal } = useModal();
   const router = useRouter();
   const intl = useIntl();
@@ -58,12 +58,12 @@ const ExamCard = ({ item, mutate }) => {
         confirmText: isOpen ? "Ha, yopilsin" : "Ha, ochilsin",
         variant: isOpen ? "danger" : "primary",
         onConfirm: async () => {
-          return await authAxios.patch(`exam-assignments/${item.id}/`, {
+          return await authAxios.patch(`${currentExamType?.assignment}${item.id}/`, {
             status: newStatus,
             assigned_group_ids: item?.assigned_groups?.map((item) => item.id),
           });
         },
-        mutateKey: ["exam-assignments/", router.locale, page, search, status],
+        mutateKey: [currentExamType?.assignment, router.locale, page, search, status],
       },
       "small",
     );
@@ -83,12 +83,12 @@ const ExamCard = ({ item, mutate }) => {
         confirmText: isPublished ? "Ha, yashirilsin" : "Ha, e'lon qilinsin",
         variant: isPublished ? "warning" : "danger",
         onConfirm: async () => {
-          return await authAxios.patch(`exam-assignments/${item.id}/`, {
+          return await authAxios.patch(`${currentExamType?.assignment}${item.id}/`, {
             is_published: !isPublished,
             assigned_group_ids: item?.assigned_groups?.map((item) => item.id),
           });
         },
-        mutateKey: [`exam-assignments/`, router.locale, page, search, status],
+        mutateKey: [`${currentExamType?.assignment}`, router.locale, page, search, status],
       },
       "small",
     );
@@ -104,9 +104,9 @@ const ExamCard = ({ item, mutate }) => {
         confirmText: "Ha, o'chirilsin",
         variant: "danger",
         onConfirm: async () => {
-          return await authAxios.delete(`exam-assignments/${item.id}/`);
+          return await authAxios.delete(`${currentExamType?.assignment}${item.id}/`);
         },
-        mutateKey: [`exam-assignments/`, router.locale, page, search, status],
+        mutateKey: [`${currentExamType?.assignment}`, router.locale, page, search, status],
       },
       "small",
     );
@@ -115,26 +115,10 @@ const ExamCard = ({ item, mutate }) => {
   // Natijalar linkini rolga qarab aniqlash
   const getResultsLink = () => {
     if (isStudent) {
-      return `/dashboard/results/my-exam-results/${item.id}`; // Student uchun
+      return `/dashboard/results/my-exam/${exam_type}/${item.id}`; // Student uchun
     }
-    return `/dashboard/results/exam-results/${item.id}`; // Admin/Teacher uchun
+    return `/dashboard/results/exam/${exam_type}/${item.id}`; // Admin/Teacher uchun
   };
-
-  // const formatDate = (dateStr) => {
-  //   if (!dateStr) return { full: "---", time: "--:--" };
-  //   const date = new Date(dateStr);
-  //   return {
-  //     full: date.toLocaleDateString("uz-UZ", {
-  //       day: "2-digit",
-  //       month: "2-digit",
-  //       year: "numeric",
-  //     }),
-  //     time: date.toLocaleTimeString("uz-UZ", {
-  //       hour: "2-digit",
-  //       minute: "2-digit",
-  //     }),
-  //   };
-  // };
 
   const dateInfo = formatDate(item.estimated_start_time);
 
@@ -246,24 +230,24 @@ const ExamCard = ({ item, mutate }) => {
           <button
             disabled={!isOpen}
             onClick={() =>
-              router.push(`/dashboard/playground/exam/${item?.id}`)
+              router.push(`/dashboard/playground/exam/${exam_type}/${item?.id}`)
             }
             className={`w-full ${isOpen ? "bg-primary" : "bg-slate-400"} text-white font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm group-active:scale-95`}
           >
             {isCompleted ? (
-        <LockKeyhole size={18} />
-      ) : isOpen ? (
-        <PlayCircle size={18} />
-      ) : (
-        <LockKeyhole size={18} />
-      )}
+              <LockKeyhole size={18} />
+            ) : isOpen ? (
+              <PlayCircle size={18} />
+            ) : (
+              <LockKeyhole size={18} />
+            )}
 
-      {/* Matnni holatga qarab o'zgartiramiz */}
-      {isCompleted
-        ? intl.formatMessage({ id: "Topshirib bo'lingan" })
-        : isOpen
-        ? intl.formatMessage({ id: "Imtihonni boshlash" })
-        : intl.formatMessage({ id: "Imtihon ochiq emas" })}
+            {/* Matnni holatga qarab o'zgartiramiz */}
+            {isCompleted
+              ? intl.formatMessage({ id: "Topshirib bo'lingan" })
+              : isOpen
+                ? intl.formatMessage({ id: "Imtihonni boshlash" })
+                : intl.formatMessage({ id: "Imtihon ochiq emas" })}
           </button>
         )}
         {(isPublished || canManage) && (

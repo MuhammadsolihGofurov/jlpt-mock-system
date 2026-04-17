@@ -8,8 +8,9 @@ import { EmptyMessage } from "@/components/custom/message";
 import ExamCard from "@/components/custom/cards/exam-card"; // Yuqorida yasalgan card
 import { Plus, Search, Filter } from "lucide-react";
 import { useSelector } from "react-redux";
+import { ExamListSkeleton } from "@/components/skeleton";
 
-const ExamLists = () => {
+const ExamLists = ({ path, currentExamType, exam_type, customLoading }) => {
   const router = useRouter();
   const { modalClosed, openModal } = useModal();
   const { user } = useSelector((state) => state.auth);
@@ -18,7 +19,7 @@ const ExamLists = () => {
   const { page = 1, search, status } = router.query;
 
   const { data, isLoading, mutate } = useSWR(
-    [`exam-assignments/`, router.locale, page, search, status],
+    [`${path}`, router.locale, page, search, status],
     (url, locale, p, q, st) => {
       const queryParams = new URLSearchParams({
         page: p,
@@ -42,26 +43,17 @@ const ExamLists = () => {
   //   }
   // }, [modalClosed, mutate]);
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-pulse">
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className="h-80 bg-white/60 border border-slate-100 rounded-[2.5rem]"
-          />
-        ))}
-      </div>
-    );
+  if (isLoading || customLoading) {
+    return <ExamListSkeleton />;
   }
 
   return (
     <div className="flex flex-col space-y-6 pb-10">
       {/* List Content */}
       {data?.results?.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {data.results.map((exam) => (
-            <ExamCard key={exam.id} item={exam} mutate={mutate} />
+            <ExamCard key={exam.id} item={exam} mutate={mutate} currentExamType={currentExamType} exam_type={exam_type} />
           ))}
         </div>
       ) : (

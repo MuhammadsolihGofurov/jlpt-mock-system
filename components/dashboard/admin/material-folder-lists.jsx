@@ -6,8 +6,9 @@ import { useModal } from "@/context/modal-context";
 import Pagination from "@/components/ui/pagination";
 import { EmptyMessage } from "@/components/custom/message";
 import { FolderCard } from "@/components/custom/cards";
+import { MaterialsSkeleton } from "@/components/skeleton";
 
-const MaterialFolderLists = () => {
+const MaterialFolderLists = ({ customLoading }) => {
     const router = useRouter();
     const { modalClosed } = useModal();
     // const { page = 1 } = router.query;
@@ -34,17 +35,8 @@ const MaterialFolderLists = () => {
         }
     }, [modalClosed, mutate]);
 
-    if (isLoading) {
-        return (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 animate-pulse">
-                {[...Array(12)].map((_, i) => (
-                    <div key={i} className="space-y-2">
-                        <div className="w-10 h-2 bg-slate-100 rounded-t-lg ml-1" />
-                        <div className="h-32 bg-slate-50 border-2 border-slate-100 rounded-xl rounded-tl-none" />
-                    </div>
-                ))}
-            </div>
-        );
+    if (customLoading || isLoading) {
+        return <MaterialsSkeleton />;
     }
 
     return (

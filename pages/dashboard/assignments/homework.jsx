@@ -1,6 +1,6 @@
 import { useIntl } from "react-intl";
 import Seo from "@/components/seo/seo";
-import { AuthGuard } from "@/components/guard";
+import { AuthGuard, withAuthGuard } from "@/components/guard";
 import { PageHeader } from "@/components/layout";
 import { FileText, Filter, GraduationCap, Search } from "lucide-react";
 import { useModal } from "@/context/modal-context";
@@ -9,8 +9,9 @@ import {
   HomeworkLists,
 } from "@/components/dashboard/admin-teacher";
 import { SearchInput } from "@/components/ui";
+import { examTabs } from "@/types/tabs";
 
-function HomeworkAssignmentsPage({ info }) {
+function HomeworkAssignmentsPage({ customLoading }) {
   const intl = useIntl();
   const { openModal } = useModal();
 
@@ -21,38 +22,25 @@ function HomeworkAssignmentsPage({ info }) {
         description={intl.formatMessage({ id: "homework_desc" })}
         keywords={intl.formatMessage({ id: "homework_key" })}
       />
-      <AuthGuard roles={["CENTER_ADMIN", "TEACHER", "STUDENT"]}>
-        <PageHeader
-          title="homework_title"
-          description="homework_desc"
-          badge="Faol"
-          buttonLabel="Uyga vazifa qo'shish"
-          roles={["CENTER_ADMIN", "TEACHER"]}
-          onButtonClick={() => openModal("HOMEWORK_FORM", {}, "middle")}
-          extraActions={
-            <>
-              <SearchInput />
-            </>
-          }
-        />
-        <AssignmentTabs
-          tabs={[
-            {
-              id: "exam",
-              label: "Imtihonlar",
-              path: "/dashboard/assignments/exam",
-              icon: <GraduationCap size={20} />,
-            },
-            {
-              id: "homework",
-              label: "Vazifalar",
-              path: "/dashboard/assignments/homework",
-              icon: <FileText size={20} />,
-            },
-          ]}
-        />
-        <HomeworkLists />
-      </AuthGuard>
+      <PageHeader
+        title="homework_title"
+        description="homework_desc"
+        badge="Faol"
+        buttonLabel="Uyga vazifa qo'shish"
+        roles={["CENTER_ADMIN", "TEACHER"]}
+        onButtonClick={() => openModal("HOMEWORK_FORM", {}, "middle")}
+        extraActions={
+          <>
+            <SearchInput />
+          </>
+        }
+        customLoading={customLoading}
+      />
+      <AssignmentTabs
+        tabs={examTabs}
+        customLoading={customLoading}
+      />
+      <HomeworkLists customLoading={customLoading} />
     </>
   );
 }
@@ -80,4 +68,4 @@ export async function getServerSideProps() {
   }
 }
 
-export default HomeworkAssignmentsPage;
+export default withAuthGuard(HomeworkAssignmentsPage, ["CENTER_ADMIN", "TEACHER", "STUDENT"]);

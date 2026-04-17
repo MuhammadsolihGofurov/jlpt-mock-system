@@ -76,7 +76,7 @@ const ExamFilterModal = () => {
                 options={[
                   { value: "", label: "Barchasi" },
                   { value: "OPEN", label: "Ochiq (Aktiv)" },
-                  { value: "CLOSED", label: "Yopiq (Yakunlangan)" },
+                  { value: "CLOSED", label: "Yopiq" },
                 ]}
                 value={field.value}
                 onChange={field.onChange}

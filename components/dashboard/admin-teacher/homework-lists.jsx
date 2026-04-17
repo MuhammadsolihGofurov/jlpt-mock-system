@@ -8,8 +8,9 @@ import { EmptyMessage } from "@/components/custom/message";
 import HomeworkCard from "@/components/custom/cards/homework-card";
 import { Plus } from "lucide-react";
 import { useSelector } from "react-redux";
+import { ExamListSkeleton } from "@/components/skeleton";
 
-const HomeworkLists = () => {
+const HomeworkLists = ({ customLoading }) => {
   const router = useRouter();
   const { openModal } = useModal();
   const { user } = useSelector((state) => state.auth);
@@ -34,17 +35,8 @@ const HomeworkLists = () => {
 
   const canCreate = user?.role === "CENTER_ADMIN" || user?.role === "TEACHER";
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-pulse">
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className="h-72 bg-white/60 border border-slate-100 rounded-[2.5rem]"
-          />
-        ))}
-      </div>
-    );
+  if (isLoading || customLoading) {
+    return <ExamListSkeleton />;
   }
 
   return (

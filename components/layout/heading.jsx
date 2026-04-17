@@ -13,12 +13,13 @@ const PageHeader = ({
   extraActions,
   roles = [],
   icon = <Plus size={18} strokeWidth={3} />,
+  customLoading = false
 }) => {
   const intl = useIntl();
   const { user, loading } = useSelector((state) => state.auth);
 
 
-  if (loading) {
+  if (customLoading || loading) {
     return <PageHeaderSkeleton />
   }
 

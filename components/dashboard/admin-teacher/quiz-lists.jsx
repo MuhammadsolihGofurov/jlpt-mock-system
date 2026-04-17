@@ -6,8 +6,9 @@ import { useModal } from "@/context/modal-context";
 import Pagination from "@/components/ui/pagination";
 import { EmptyMessage } from "@/components/custom/message";
 import { QuizCard } from "@/components/custom/cards";
+import { MockListsSkeleton } from "@/components/skeleton";
 
-const QuizLists = () => {
+const QuizLists = ({customLoading}) => {
   const router = useRouter();
   const { modalClosed } = useModal();
   const { page = 1, search, is_active } = router.query;
@@ -36,17 +37,8 @@ const QuizLists = () => {
     }
   }, [modalClosed, mutate]);
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-pulse">
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className="h-64 bg-white/60 border border-slate-100 rounded-[2.25rem]"
-          />
-        ))}
-      </div>
-    );
+  if (isLoading || customLoading) {
+    return <MockListsSkeleton />;
   }
 
   return (

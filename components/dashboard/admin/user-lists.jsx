@@ -6,8 +6,9 @@ import { useRouter } from "next/router";
 import useSWR, { mutate } from "swr";
 import { UserCard } from "@/components/custom/cards/user-card";
 import { EmptyMessage } from "@/components/custom/message";
+import { UserListsSkeleton } from "@/components/skeleton";
 
-const UserLists = () => {
+const UserLists = ({ customLoading }) => {
   const router = useRouter();
   const { modalClosed } = useModal();
   const { role, is_active, is_approved, page = 1, search } = router.query;
@@ -45,23 +46,14 @@ const UserLists = () => {
     }
   }, [modalClosed, mutate]);
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col gap-3 animate-pulse">
-        {[...Array(5)].map((_, i) => (
-          <div
-            key={i}
-            className="h-20 bg-white border border-slate-100 rounded-[1.25rem]"
-          />
-        ))}
-      </div>
-    );
+  if (isLoading || customLoading) {
+    return <UserListsSkeleton />;
   }
 
   return (
     <div className="flex flex-col min-h-full space-y-6 pb-10">
       {/* List container */}
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 gap-2">
         {data?.results?.map((user) => (
           <UserCard
             key={user.id}

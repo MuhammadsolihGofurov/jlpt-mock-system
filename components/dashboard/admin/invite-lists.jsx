@@ -8,8 +8,9 @@ import { useIntl } from "react-intl";
 import { UserPlus } from "lucide-react";
 import { InvitationCard } from "@/components/custom/cards";
 import { EmptyMessage } from "@/components/custom/message";
+import { InviteListSkeleton } from "@/components/skeleton";
 
-const InvitationLists = () => {
+const InvitationLists = ({ customLoading }) => {
   const router = useRouter();
   const intl = useIntl();
   const { modalClosed } = useModal();
@@ -34,23 +35,14 @@ const InvitationLists = () => {
     }
   }, [modalClosed, mutate]);
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className="h-64 bg-white/50 rounded-[2rem] border border-orange-50"
-          />
-        ))}
-      </div>
-    );
+  if (isLoading || customLoading) {
+    return <InviteListSkeleton />;
   }
 
   return (
     <div className="flex flex-col min-h-full space-y-8 pb-10">
       {/* Grid container */}
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 gap-2">
         {data?.results?.map((item) => (
           <InvitationCard
             key={item.id}

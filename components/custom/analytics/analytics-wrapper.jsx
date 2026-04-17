@@ -32,9 +32,10 @@ import {
 } from "recharts";
 import { useIntl } from "react-intl";
 import { EmptyMessage } from "../message";
+import { AnalyticsSkeleton } from "@/components/skeleton";
 
-const AnalyticsContainer = () => {
-  const { user, loading: loading } = useSelector((state) => state.auth);
+const AnalyticsContainer = ({ customLoading }) => {
+  const { user, loading } = useSelector((state) => state.auth);
   const router = useRouter();
   const intl = useIntl();
 
@@ -61,12 +62,6 @@ const AnalyticsContainer = () => {
     ),
   );
 
-  if (loading || isLoading) return <AnalyticsSkeleton />;
-
-  if (!user || !role) return null;
-
-  // if (isLoading) return <AnalyticsSkeleton />;
-
   if (error)
     return (
       <div className="text-red-500 p-4 bg-red-50 rounded-2xl">
@@ -74,26 +69,24 @@ const AnalyticsContainer = () => {
       </div>
     );
 
-  // 5. Ma'lumot tayyor
-  switch (role) {
-    case "OWNER":
-    case "CENTER_ADMIN":
-      return <AdminAnalytics data={data} role={role} />;
-    case "TEACHER":
-    case "STUDENT":
-      return <UserAnalytics data={data} role={role} />;
-    default:
-      return null;
-  }
+
+  if (customLoading || isLoading) { return <AnalyticsSkeleton /> } else {
+    // 5. Ma'lumot tayyor
+    switch (role) {
+      case "OWNER":
+      case "CENTER_ADMIN":
+        return <AdminAnalytics data={data} role={role} />;
+      case "TEACHER":
+      case "STUDENT":
+        return <UserAnalytics data={data} role={role} />;
+      default:
+        return null;
+    }
+  };
+
 };
 
-const AnalyticsSkeleton = () => (
-  <div className="animate-pulse grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    {[1, 2, 3, 4].map((i) => (
-      <div key={i} className="h-32 bg-gray-100 rounded-3xl" />
-    ))}
-  </div>
-);
+
 
 export default AnalyticsContainer;
 
