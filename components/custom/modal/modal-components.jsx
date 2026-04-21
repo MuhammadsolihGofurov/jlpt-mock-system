@@ -7,6 +7,7 @@ import QuestionFormModal from "./details/admin-teacher/jlpt/question-form-modal"
 import QuestionGroupFormModal from "./details/admin-teacher/jlpt/question-group-form-modal";
 import QuizFilterModal from "./details/admin-teacher/quiz-filter-modal";
 import QuizFormModal from "./details/admin-teacher/quiz-form-modal";
+import QuizQuestionFormModal from "./details/admin-teacher/quiz-question-form-modal";
 import ResultViewModal from "./details/admin-teacher/result-view-modal";
 import SectionFormModal from "./details/admin-teacher/section-form";
 import GroupFormModal from "./details/admin/group-form-modal";
@@ -53,6 +54,7 @@ export const ModalComponents = {
   EXAM_FILTER: ExamFilterModal,
   HOMEWORK_FORM: HomeworkFormModal,
   QUIZ_FORM: QuizFormModal,
+  QUIZ_QUESTION_FORM: QuizQuestionFormModal,
   QUIZ_FILTER: QuizFilterModal,
   RESULT_VIEW: ResultViewModal,
   NOTIFY_MODAL: NotificationDetailModal,

@@ -18,7 +18,7 @@ import { authAxios } from "@/utils/axios";
 import { mutate } from "swr";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { uploadMedia } from "@/utils/uploadMedia";
+import { normalizeMediaReference, uploadMedia } from "@/utils/uploadMedia";
 
 const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = null, question_count = 0, groupName, currentMockType }) => {
   const { closeModal } = useModal();
@@ -130,7 +130,7 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
           return {
             text: opt.text || "",
             is_correct: opt.is_correct,
-            image: typeof opt.image === "string" ? opt.image : null,
+            image: typeof opt.image === "string" ? normalizeMediaReference(opt.image) : null,
           };
         })
       );
