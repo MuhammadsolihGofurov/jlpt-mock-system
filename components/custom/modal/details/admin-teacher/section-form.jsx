@@ -1,5 +1,5 @@
 import { useForm, Controller } from "react-hook-form";
-import { LayoutGrid, Save, Clock, Hash, Award, Activity } from "lucide-react";
+import { LayoutGrid, Save, Clock, Hash, Award } from "lucide-react";
 import { Input, Select } from "@/components/ui";
 import { useModal } from "@/context/modal-context";
 import { useIntl } from "react-intl";
@@ -56,7 +56,8 @@ const SectionFormModal = ({ mockId, section = null, section_count = 0, currentMo
       const method = isEdit ? "patch" : "post";
       const url = isEdit ? `${currentMockType?.section}${section.id}/` : `${currentMockType?.section}`;
 
-      const payload = isEdit ? data : { ...data, mock_test: mockId };
+      const mockTestField = currentMockType?.list?.includes("jft") ? "jft_mock_test" : "mock_test";
+      const payload = isEdit ? data : { ...data, [mockTestField]: mockId };
 
       await authAxios[method](url, payload);
 
@@ -72,7 +73,7 @@ const SectionFormModal = ({ mockId, section = null, section_count = 0, currentMo
       });
 
       closeModal("SECTION_FORM", { refresh: true });
-      mutate([`/mock-tests/${mockId}/`, router.locale]);
+      mutate([`${currentMockType?.list}${mockId}/`, router.locale]);
     } catch (err) {
       toast.dismiss(toastId);
       handleApiError(err, setError);

@@ -1,6 +1,6 @@
 import { useModal } from "@/context/modal-context";
-import { Edit2, Plus, Settings, Trash2 } from "lucide-react";
-import useSWR from "swr";
+import { Edit2, Plus, Trash2 } from "lucide-react";
+import useSWR, { mutate } from "swr";
 import { useRouter } from "next/router";
 import fetcher from "@/utils/fetcher";
 import { useIntl } from "react-intl";
@@ -11,7 +11,7 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
   const router = useRouter();
   const intl = useIntl();
 
-  const { data: groups, mutate } = useSWR(
+  const { data: groups } = useSWR(
     section ? [`jft-shared-contents/`, router.locale, section?.id] : null,
     (url, locale) =>
       fetcher(
@@ -58,9 +58,11 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
         body: "Ushbu savollar guruhini o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
         confirmText: "Ha, o'chirilsin",
         variant: "danger",
-        mutateKey: [`jft-questions/`, router.locale, section?.id],
+        mutateKey: [`jft-shared-contents/`, router.locale, section?.id],
         onConfirm: async () => {
-          return await authAxios.delete(`jft-shared-contents/${id}/`);
+          const result = await authAxios.delete(`jft-shared-contents/${id}/`);
+          mutate([`jft-questions/`, router.locale, section?.id]);
+          return result;
         },
       },
       "small",
@@ -116,8 +118,8 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
 
       <div className="space-y-4">
         {questions?.length > 0 ? (
-          Object.values(groupedQuestions).map((group, groupIdx) => (
-            <div key={groupIdx} className="mb-6 border border-slate-200 rounded-3xl overflow-hidden bg-white">
+          Object.values(groupedQuestions).map((group, _groupIdx) => (
+            <div key={_groupIdx} className="mb-6 border border-slate-200 rounded-3xl overflow-hidden bg-white">
 
               {/* SHARED CONTENT BLOCK (Agar mavjud bo'lsa) */}
               {group.sharedData && (
@@ -135,12 +137,12 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
                     >
                       <Edit2 size={14} />
                     </button>
-                    {/* <button
+                    <button
                       onClick={() => handleDeleteGroup(group?.sharedData?.id)}
                       className="p-1.5 text-red-500 bg-white rounded-lg border border-slate-200 shadow-sm hover:bg-red-50"
                     >
                       <Trash2 size={14} />
-                    </button> */}
+                    </button>
                   </div>
                 </div>
               )}
