@@ -942,5 +942,9 @@
   "Tinglashlar": "再生回数",
   "Keyingisiga o'tish": "次へ",
   "Qayta tinglash": "再生する",
-  "Savol audiosi": "問題の音声"
+  "Savol audiosi": "問題の音声",
+  "Savollar guruhi": "問題グループ",
+  "Savollar guruhlari": "問題グループ一覧",
+  "Yangi guruh qo'shish": "グループを追加",
+  "Hozircha savollar guruhi yo'q": "問題グループはまだありません"
 }
