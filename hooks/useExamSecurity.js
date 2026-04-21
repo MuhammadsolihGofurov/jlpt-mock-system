@@ -18,18 +18,16 @@ export const useExamSecurity = (currentExamType) => {
   const securityStartedAt = useRef(0);
   const devtoolsDetectionHits = useRef(0);
 
-  // Interval va timeout'larni saqlash uchun ref'lar
   const devtoolsIntervalRef = useRef(null);
   const fullscreenIntervalRef = useRef(null);
 
-  const MAX_ATTEMPTS = 5;
-  const DEBOUNCE_MS = 1200;
+  const MAX_ATTEMPTS = 4;
+  const DEBOUNCE_MS = 1500; // Biroz ko'paytirildi
 
   const attachSubmissionId = useCallback((id) => {
     setSubmissionId(id);
   }, []);
 
-  // Violation report (faqat oxirida yuboriladi)
   const reportViolation = useCallback(async (type, messageId) => {
     if (!submissionId || hasFinalizedViolation.current) return;
     hasFinalizedViolation.current = true;
@@ -56,32 +54,44 @@ export const useExamSecurity = (currentExamType) => {
     }
   }, [submissionId, currentExamType?.report_exam, intl]);
 
-  // DevTools aniqlash (eng ishonchli usullar)
+  // DevTools aniqlash - barcha OS'lar uchun moslashtirilgan
   const detectDevTools = useCallback(() => {
     if (!isActive) return false;
 
-    // 1. O'lcham farqi (DevTools ochiq bo'lsa ko'pincha farq bo'ladi)
-    const widthDiff = window.outerWidth - window.innerWidth;
-    const heightDiff = window.outerHeight - window.innerHeight;
-    const sizeSignal = widthDiff > 320 || heightDiff > 260;
+    // 1. O'lcham signali (Linux va HiDPI ekranlarda window borderlari farq qiladi)
+    const widthDiff = Math.abs(window.outerWidth - window.innerWidth);
+    const heightDiff = Math.abs(window.outerHeight - window.innerHeight);
+    
+    // Linuxda UI elementlari ko'p joy egallashi mumkin (Threshold oshirildi)
+    const isLinux = navigator.platform.toLowerCase().includes('linux');
+    const sizeThresholdWidth = isLinux ? 350 : 250;
+    const sizeThresholdHeight = isLinux ? 350 : 250;
 
-    // 2. Performance timing trick
+    const sizeSignal = widthDiff > sizeThresholdWidth || heightDiff > sizeThresholdHeight;
+
+    // 2. Timing signal (Debugger check)
+    // Console log sekinlashuvidan foydalanamiz
     const start = performance.now();
-    // debugger; // Test uchun ochsa bo'ladi, productionda tavsiya etilmaydi
+    for (let i = 0; i < 20; i++) {
+        // Bo'sh loglar devtools ochiq bo'lsa timingga ta'sir qiladi
+        console.log(); 
+    }
     const end = performance.now();
-
-    const timingSignal = end - start > 120;
+    
+    // Protsessor tezligiga qarab 100ms dan 200ms gacha o'zgarishi mumkin
+    const timingSignal = (end - start) > 150;
 
     if (sizeSignal || timingSignal) {
       devtoolsDetectionHits.current += 1;
     } else {
-      devtoolsDetectionHits.current = 0;
+      // Bir martalik xatolik bo'lsa reset qilamiz
+      devtoolsDetectionHits.current = Math.max(0, devtoolsDetectionHits.current - 1);
     }
 
-    return devtoolsDetectionHits.current >= 3;
+    // Ketma-ket 6 marta aniqlansa (taxminan 3-4 sekund) keyin ban beradi
+    return devtoolsDetectionHits.current >= 6;
   }, [isActive]);
 
-  // Violation handler
   const handleViolation = useCallback((messageId, type) => {
     if (!isActive || hasFinalizedViolation.current) return;
 
@@ -90,46 +100,44 @@ export const useExamSecurity = (currentExamType) => {
     lastViolationTime.current = now;
 
     violationCount.current += 1;
+    
     if (violationCount.current >= MAX_ATTEMPTS) {
       setIsActive(false);
       reportViolation(type, messageId);
-      toast.error(intl.formatMessage({ id: "no_attempts_left" }));
-      setTimeout(() => router.push("/blocked"), 1000);
+      toast.error(intl.formatMessage({ id: "no_attempts_left" }), { autoClose: 2000 });
+      setTimeout(() => router.push("/blocked"), 1500);
       return;
     }
 
-    toast.error(
-      `${intl.formatMessage({ id: messageId })}.`,
-      { position: "top-center" }
-    );
+    toast.error(intl.formatMessage({ id: messageId }), {
+      position: "top-center",
+      autoClose: 3000
+    });
   }, [isActive, intl, reportViolation, router]);
 
-  // Fullscreen funksiyalari
- const enterFullscreen = useCallback(() => {
-  const elem = document.documentElement;
-  if (!document.fullscreenElement) {
-    const request = elem.requestFullscreen?.() || 
-                    elem.webkitRequestFullscreen?.() || 
-                    elem.msRequestFullscreen?.() || 
-                    elem.mozRequestFullScreen?.();
-    
-    // Add this to catch the error silently or log it
-    if (request instanceof Promise) {
-      request.catch((err) => {
-        console.warn(`Fullscreen blocked: ${err.message}`);
-      });
+  const enterFullscreen = useCallback(() => {
+    const elem = document.documentElement;
+    if (!document.fullscreenElement) {
+      const request = elem.requestFullscreen?.() || 
+                      elem.webkitRequestFullscreen?.() || 
+                      elem.msRequestFullscreen?.() || 
+                      elem.mozRequestFullScreen?.();
+      
+      if (request instanceof Promise) {
+        request.catch(() => {
+          console.warn("Fullscreen manually blocked by user or OS.");
+        });
+      }
     }
-  }
-}, []);
-
-  const exitFullscreen = useCallback(() => {
-    document.exitFullscreen?.() ||
-    document.webkitExitFullscreen?.() ||
-    document.msExitFullscreen?.() ||
-    document.mozCancelFullScreen?.();
   }, []);
 
-  // Extensionlarni tekshirish
+  const exitFullscreen = useCallback(() => {
+    if (document.fullscreenElement) {
+        (document.exitFullscreen || document.webkitExitFullscreen || 
+         document.msExitFullscreen || document.mozCancelFullScreen).call(document);
+    }
+  }, []);
+
   const checkExtensions = useCallback(async () => {
     const extensions = [
       { name: "Google Translate", id: "aapbdbdomjkkjkaonfhkkikfgjllcleb", resource: "popup.html" },
@@ -141,7 +149,7 @@ export const useExamSecurity = (currentExamType) => {
       try {
         const res = await fetch(`chrome-extension://${ext.id}/${ext.resource}`, { method: "HEAD" });
         if (res.ok) detected.push(ext.name);
-      } catch (e) {}
+      } catch (e) { /* Extension yo'q bo'lsa fetch xato beradi - bu normal */ }
     }
 
     if (detected.length > 0) {
@@ -150,11 +158,9 @@ export const useExamSecurity = (currentExamType) => {
     }
   }, [handleViolation]);
 
-  // Securityni boshlash
   const startSecurity = useCallback(() => {
     setIsActive(true);
     violationCount.current = 0;
-    lastViolationTime.current = 0;
     hasFinalizedViolation.current = false;
     securityStartedAt.current = Date.now();
     devtoolsDetectionHits.current = 0;
@@ -163,142 +169,102 @@ export const useExamSecurity = (currentExamType) => {
     document.documentElement.style.userSelect = "none";
     document.documentElement.style.webkitUserSelect = "none";
 
-    setTimeout(checkExtensions, 1500);
+    setTimeout(checkExtensions, 2000);
   }, [enterFullscreen, checkExtensions]);
 
-  // Securityni to'xtatish (ENG MUHIM QISM)
   const stopSecurity = useCallback(() => {
     setIsActive(false);
-
-    // Intervallarni tozalash
-    if (devtoolsIntervalRef.current) {
-      clearInterval(devtoolsIntervalRef.current);
-      devtoolsIntervalRef.current = null;
-    }
-    if (fullscreenIntervalRef.current) {
-      clearInterval(fullscreenIntervalRef.current);
-      fullscreenIntervalRef.current = null;
-    }
-
+    if (devtoolsIntervalRef.current) clearInterval(devtoolsIntervalRef.current);
+    if (fullscreenIntervalRef.current) clearInterval(fullscreenIntervalRef.current);
     exitFullscreen();
-
-    // Stilni tiklash
     document.documentElement.style.userSelect = "";
     document.documentElement.style.webkitUserSelect = "";
-
-    // Qo'shimcha tozalash
-    violationCount.current = 0;
-    lastViolationTime.current = 0;
-    devtoolsDetectionHits.current = 0;
   }, [exitFullscreen]);
 
-  // Asosiy event listeners
   useEffect(() => {
     if (!isActive) return;
 
-    // DevTools tekshirish
+    // DevTools checking loop
     devtoolsIntervalRef.current = setInterval(() => {
       if (detectDevTools()) {
         handleViolation("devtools_detected", "devtools_open");
       }
-    }, 600);
+    }, 700);
 
-    // Fullscreen tekshirish
+    // Fullscreen auto-recovery
     fullscreenIntervalRef.current = setInterval(() => {
-      const gracePeriodNotFinished = Date.now() - securityStartedAt.current < 4000;
-      if (gracePeriodNotFinished) return;
-      if (isActive && !document.fullscreenElement && document.hasFocus()) {
+      const gracePeriod = Date.now() - securityStartedAt.current < 5000;
+      if (gracePeriod) return;
+
+      if (!document.fullscreenElement && document.hasFocus()) {
         handleViolation("fs_exit_msg", "fullscreen_exit");
         enterFullscreen();
       }
-    }, 2000);
+    }, 3000);
 
-    // Klaviatura bloklash
-    const blockAllKeyboard = (e) => {
-      const forbidden = ["f12", "f11", "f5"];
+    const blockEvents = (e) => {
+      const forbiddenKeys = ["f12", "f11", "f5"];
       const key = e.key.toLowerCase();
-      const ctrlShift = e.ctrlKey && e.shiftKey;
+      const isDevToolsKey = (e.ctrlKey && e.shiftKey && ["i", "j", "c"].includes(key)) || 
+                           (e.ctrlKey && key === "u") || 
+                           (e.metaKey && e.altKey && key === "i"); // Mac uchun
 
-      if (
-        forbidden.includes(key) ||
-        (ctrlShift && ["i", "j", "c"].includes(key)) ||
-        (e.ctrlKey && e.key.toLowerCase() === "u")
-      ) {
+      if (forbiddenKeys.includes(key) || isDevToolsKey) {
         e.preventDefault();
-        e.stopImmediatePropagation();
+        e.stopPropagation();
         handleViolation("forbidden_key", `key_${key}`);
-        return false;
       }
     };
 
-    const handleContextMenu = (e) => {
+    const disableAction = (e) => {
       e.preventDefault();
-      e.stopImmediatePropagation();
-      handleViolation("context_menu", "right_click");
-    };
-
-    const disableClipboard = (e) => {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      handleViolation("clipboard_disabled", "clipboard_attempt");
+      e.stopPropagation();
+      handleViolation(
+          e.type === 'contextmenu' ? "context_menu" : "clipboard_disabled", 
+          e.type
+      );
     };
 
     const handleVisibility = () => {
       if (document.hidden) handleViolation("tab_switch_msg", "tab_switch");
     };
 
-    const handleBlur = () => handleViolation("window_blur_msg", "window_blur");
-
-    const handleFSChange = () => {
-      const gracePeriodNotFinished = Date.now() - securityStartedAt.current < 4000;
-      if (gracePeriodNotFinished) return;
-      if (!document.fullscreenElement && isActive && document.hasFocus()) {
-        handleViolation("fs_exit_msg", "fullscreen_exit");
-        setTimeout(enterFullscreen, 800);
-      }
+    const handleBlur = () => {
+        // Ba'zi OS'larda qisqa blurlar bo'lishi mumkin (masalan system toast)
+        // Shuning uchun 200ms dan keyin hali ham blur bo'lsagina hisoblaymiz
+        setTimeout(() => {
+            if (!document.hasFocus() && isActive) {
+                handleViolation("window_blur_msg", "window_blur");
+            }
+        }, 300);
     };
 
-    // Event listeners qo'shish
-    window.addEventListener("keydown", blockAllKeyboard, true);
-    window.addEventListener("keypress", blockAllKeyboard, true);
-    window.addEventListener("keyup", blockAllKeyboard, true);
-
-    window.addEventListener("contextmenu", handleContextMenu, true);
-    window.addEventListener("copy", disableClipboard, true);
-    window.addEventListener("paste", disableClipboard, true);
-    window.addEventListener("cut", disableClipboard, true);
-
+    // Listeners
+    window.addEventListener("keydown", blockEvents, true);
+    window.addEventListener("contextmenu", disableAction, true);
+    window.addEventListener("copy", disableAction, true);
+    window.addEventListener("cut", disableAction, true);
+    window.addEventListener("paste", disableAction, true);
     window.addEventListener("blur", handleBlur);
     document.addEventListener("visibilitychange", handleVisibility);
-    document.addEventListener("fullscreenchange", handleFSChange);
 
-    // Sahifani yopishni oldini olish
     const handleBeforeUnload = (e) => {
       e.preventDefault();
-      e.returnValue = "";
+      return (e.returnValue = "Imtihon davom etmoqda!");
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
 
-    // Cleanup
     return () => {
-      if (devtoolsIntervalRef.current) clearInterval(devtoolsIntervalRef.current);
-      if (fullscreenIntervalRef.current) clearInterval(fullscreenIntervalRef.current);
-
-      window.removeEventListener("keydown", blockAllKeyboard, true);
-      window.removeEventListener("keypress", blockAllKeyboard, true);
-      window.removeEventListener("keyup", blockAllKeyboard, true);
-
-      window.removeEventListener("contextmenu", handleContextMenu, true);
-      window.removeEventListener("copy", disableClipboard, true);
-      window.removeEventListener("paste", disableClipboard, true);
-      window.removeEventListener("cut", disableClipboard, true);
-
+      clearInterval(devtoolsIntervalRef.current);
+      clearInterval(fullscreenIntervalRef.current);
+      window.removeEventListener("keydown", blockEvents, true);
+      window.removeEventListener("contextmenu", disableAction, true);
+      window.removeEventListener("copy", disableAction, true);
+      window.removeEventListener("cut", disableAction, true);
+      window.removeEventListener("paste", disableAction, true);
       window.removeEventListener("blur", handleBlur);
-      document.removeEventListener("visibilitychange", handleVisibility);
-      document.removeEventListener("fullscreenchange", handleFSChange);
       window.removeEventListener("beforeunload", handleBeforeUnload);
-
-      document.onselectstart = null;
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [isActive, detectDevTools, handleViolation, enterFullscreen]);
 
@@ -309,6 +275,6 @@ export const useExamSecurity = (currentExamType) => {
     checkExtensions,
     detectedExtensions,
     violationCount: violationCount.current,
-    isActive, // agar kerak bo'lsa monitoring uchun
+    isActive,
   };
 };
