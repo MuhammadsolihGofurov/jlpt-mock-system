@@ -68,7 +68,7 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
   };
 
   const groupedQuestions = questions && questions?.reduce((acc, q) => {
-    const sharedId = q.shared_content || 'no-shared';
+    const sharedId = q.shared_content?.id || 'no-shared';
     if (!acc[sharedId]) {
       acc[sharedId] = {
         sharedData: q.shared_content,
@@ -162,7 +162,7 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
 
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
-                        onClick={() => openModal("JFT_QUESTION_FORM", { question: q, sectionId: section?.id, groupName: group?.sharedData?.title }, "middle")}
+                        onClick={() => openModal("JFT_QUESTION_FORM", { question: q, sectionId: section?.id, groupName: group?.sharedData?.title, groups: groups }, "middle")}
                         className="p-2 text-emerald-500 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md"
                       >
                         <Edit2 size={14} />

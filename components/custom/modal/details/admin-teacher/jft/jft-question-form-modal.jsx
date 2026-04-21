@@ -7,7 +7,8 @@ import {
   CheckCircle2,
   ImageIcon,
   Star,
-  X, // Rasm o'chirish uchun
+  Music,
+  X,
 } from "lucide-react";
 import { Input, RichTextarea, Select } from "@/components/ui";
 import { useModal } from "@/context/modal-context";
@@ -18,6 +19,7 @@ import { authAxios } from "@/utils/axios";
 import { mutate } from "swr";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { uploadMedia } from "@/utils/uploadMedia";
 
 const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count = 0, groupName, groups }) => {
   const { closeModal } = useModal();
@@ -41,6 +43,7 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
       question_number: question_count + 1,
       score: 1,
       image: null,
+      audio_file: null,
       options: [
         { text: "", is_correct: false, image: null },
         { text: "", is_correct: false, image: null },
@@ -96,58 +99,60 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
   const onSubmit = async (values) => {
     const toastId = toast.loading(intl.formatMessage({ id: "Saqlanmoqda..." }));
     try {
-      const hasCorrect = values.options.some(opt => opt.is_correct);
+      const hasCorrect = values.options.some((opt) => opt.is_correct);
       if (!hasCorrect) {
         toast.error(intl.formatMessage({ id: "Kamida bitta to'g'ri javobni belgilang!" }));
         toast.dismiss(toastId);
         return;
       }
 
-      const formData = new FormData();
-      formData.append("section", sectionId);
-      formData.append("shared_content", values.shared_content ?? "");
-      formData.append("text", values.text);
-      formData.append("order", values.question_number);
-      formData.append("question_number", values.question_number);
-      formData.append("score", values.score);
-
-      values.options.forEach((opt, index) => {
-        // 1. ID bo'lsa qo'shamiz
-        if (opt.id) {
-          formData.append(`options[${index}][id]`, opt.id);
-        }
-
-        formData.append(`options[${index}][text]`, opt.text || "");
-        formData.append(`options[${index}][is_correct]`, opt.is_correct ? true : false);
-
-        if (opt.image) {
-          if (opt.image instanceof FileList && opt.image.length > 0) {
-            formData.append(`options[${index}][image]`, opt.image[0]);
-          } else if (opt.image instanceof File) {
-            formData.append(`options[${index}][image]`, opt.image);
-          } else if (typeof opt.image === "string") {
-            formData.append(`options[${index}][image]`, opt.image);
-          }
-        }
-      });
-
-      if (values.image) {
-        if (values.image[0] instanceof File) {
-          formData.append("image", values.image[0]);
-        } else if (typeof values.image === "string") {
-          formData.append("image", values.image);
-        }
+      // 1. Savol rasmi upload
+      let image_key = undefined;
+      const imageFile = values.image instanceof FileList ? values.image[0] : values.image;
+      if (imageFile instanceof File) {
+        image_key = await uploadMedia(imageFile, "jft_question");
       }
+
+      // 2. Savol audiosi upload
+      let audio_key = undefined;
+      const audioFile = values.audio_file instanceof FileList ? values.audio_file[0] : values.audio_file;
+      if (audioFile instanceof File) {
+        audio_key = await uploadMedia(audioFile, "jft_question_audio");
+      }
+
+      // 3. Options rasmlari upload
+      const processedOptions = await Promise.all(
+        values.options.map(async (opt) => {
+          const optImageFile = opt.image instanceof FileList ? opt.image[0] : opt.image;
+          if (optImageFile instanceof File) {
+            const optKey = await uploadMedia(optImageFile, "jft_question");
+            return { text: opt.text || "", is_correct: opt.is_correct, image: optKey };
+          }
+          return {
+            text: opt.text || "",
+            is_correct: opt.is_correct,
+            image: typeof opt.image === "string" ? opt.image : null,
+          };
+        })
+      );
+
+      // 4. JSON payload yuborish
+      const payload = {
+        section: sectionId,
+        text: values.text,
+        order: values.question_number,
+        question_number: values.question_number,
+        score: values.score,
+        options: processedOptions,
+      };
+      if (values.shared_content) payload.shared_content = values.shared_content;
+      if (image_key !== undefined) payload.image_key = image_key;
+      if (audio_key !== undefined) payload.audio_key = audio_key;
 
       const method = isEdit ? "patch" : "post";
       const url = isEdit ? `jft-questions/${question.id}/` : `jft-questions/`;
 
-      await authAxios({
-        method,
-        url,
-        data: formData,
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await authAxios[method](url, payload);
 
       toast.update(toastId, {
         render: intl.formatMessage({ id: "Muvaffaqiyatli saqlandi!" }),
@@ -156,8 +161,8 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
         autoClose: 2000,
       });
 
-      mutate(['jft-shared-contents/', router.locale, sectionId]);
-      mutate(['jft-questions/', router.locale, sectionId]);
+      mutate(["jft-shared-contents/", router.locale, sectionId]);
+      mutate(["jft-questions/", router.locale, sectionId]);
       setTimeout(() => closeModal("JFT_QUESTION_FORM"), 500);
     } catch (err) {
       handleApiError(err, setError);
@@ -166,7 +171,7 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
         type: "error",
         isLoading: false,
         autoClose: 2000,
-      })
+      });
     } finally {
       toast.dismiss(toastId);
     }
@@ -233,6 +238,19 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
             </div>
           )}
           <input type="file" accept="image/*" {...register("image", { onChange: (e) => { const file = e.target.files[0]; if (file) setPreview(URL.createObjectURL(file)); } })} className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
+        </div>
+
+        {/* Savol audiosi */}
+        <div className="space-y-2">
+          <label className="text-sm font-black text-heading ml-1 flex items-center gap-2">
+            <Music size={16} /> Audio (Optional)
+          </label>
+          <input
+            type="file"
+            accept="audio/*"
+            {...register("audio_file")}
+            className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
         </div>
 
         {/* Variantlar qismi */}
