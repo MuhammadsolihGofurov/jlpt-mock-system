@@ -144,13 +144,12 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
           const optImageFile = opt.image instanceof FileList ? opt.image[0] : opt.image;
           if (optImageFile instanceof File) {
             const optKey = await uploadMedia(optImageFile, "jft_question");
-            return { text: opt.text || "", is_correct: opt.is_correct, image: optKey };
+            return { text: opt.text || "", is_correct: opt.is_correct, image_key: optKey };
           }
-          return {
-            text: opt.text || "",
-            is_correct: opt.is_correct,
-            image: typeof opt.image === "string" ? opt.image : null,
-          };
+          if (opt.image === null) {
+            return { text: opt.text || "", is_correct: opt.is_correct, image: null };
+          }
+          return { text: opt.text || "", is_correct: opt.is_correct };
         })
       );
 
