@@ -92,10 +92,10 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <button
-            onClick={() => openModal("JFT_QUESTION_GROUP", { section, group_count: groups?.length }, "middle")}
+            onClick={() => openModal("JFT_QUESTION_GROUP_LIST", { section, groups }, "middle")}
             className="text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-100"
           >
-            {intl.formatMessage({ id: "Savollar guruhi qo'shish" })}
+            {intl.formatMessage({ id: "Savollar guruhi" })}
           </button>
           <button
             onClick={() => openModal(
@@ -149,7 +149,7 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
 
               {/* QUESTIONS UNDER THIS SHARED CONTENT */}
               <div className="divide-y divide-slate-100">
-                {group.items.map((q, idx) => (
+                {group.items.map((q) => (
                   <div
                     key={q.id}
                     className="group flex items-center justify-between p-4 hover:bg-slate-50 transition-all"

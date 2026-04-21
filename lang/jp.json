@@ -937,5 +937,9 @@
   "fs_exit_msg": "フルスクリーンモードの解除は禁止されています",
   "exam_finished": "試験は正常に完了しました",
   "error_submitting": "送信中にエラーが発生しました。もう一度お試しください。",
-  "please_answer_all": "すべての質問に回答してください"
+  "please_answer_all": "すべての質問に回答してください",
+  "Savollar guruhi": "問題グループ",
+  "Savollar guruhlari": "問題グループ",
+  "Yangi guruh qo'shish": "グループを追加",
+  "Hozircha savollar guruhi yo'q": "問題グループはまだありません"
 }

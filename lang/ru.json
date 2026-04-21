@@ -937,5 +937,9 @@
   "fs_exit_msg": "Выход из полноэкранного режима запрещен",
   "exam_finished": "Экзамен успешно завершен",
   "error_submitting": "Произошла ошибка при отправке. Пожалуйста, попробуйте еще раз.",
-  "please_answer_all": "Пожалуйста, ответьте на все вопросы"
+  "please_answer_all": "Пожалуйста, ответьте на все вопросы",
+  "Savollar guruhi": "Группы вопросов",
+  "Savollar guruhlari": "Группы вопросов",
+  "Yangi guruh qo'shish": "Добавить группу",
+  "Hozircha savollar guruhi yo'q": "Групп вопросов пока нет"
 }
