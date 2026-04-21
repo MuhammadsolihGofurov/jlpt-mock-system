@@ -2,17 +2,19 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import fetcher from "@/utils/fetcher";
-import { Plus, ChevronRight, Settings, LayoutGrid } from "lucide-react";
+import { Plus, ChevronRight, LayoutGrid } from "lucide-react";
 import { Seo } from "@/components/seo";
 import { AuthGuard } from "@/components/guard";
 import { useIntl } from "react-intl";
 import { mockTypes } from "@/types/mock-types";
 import { SectionList } from "@/components/dashboard/admin-teacher/jft";
 import { GroupAndQuestionArea } from "@/components/dashboard/admin-teacher/jft";
+import { useModal } from "@/context/modal-context";
 
 const MockManagePage = () => {
   const router = useRouter();
   const intl = useIntl();
+  const { openModal } = useModal();
   const { id: mockId } = router.query;
   const [activeSection, setActiveSection] = useState(null);
 
@@ -63,14 +65,14 @@ const MockManagePage = () => {
                 <span className="font-black text-slate-800 uppercase text-sm tracking-widest">
                   {intl.formatMessage({ id: "Bo'limlar" })}
                 </span>
-                {/* <button
+                <button
                   onClick={() =>
-                    openModal("SECTION_FORM", { mockId, section_count: mock?.sections?.length }, "middle")
+                    openModal("SECTION_FORM", { mockId, section_count: mock?.sections?.length, currentMockType }, "middle")
                   }
                   className="p-2 bg-primary text-white rounded-xl shadow-lg shadow-orange-100 hover:scale-105 transition-all"
                 >
                   <Plus size={18} />
-                </button> */}
+                </button>
               </div>
               <div className="flex-1 overflow-y-auto p-4">
                 <SectionList
