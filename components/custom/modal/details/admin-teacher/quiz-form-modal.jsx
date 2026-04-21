@@ -10,7 +10,9 @@ import {
   LayoutList,
   Clock,
   AlertCircle,
+  ImageIcon,
 } from "lucide-react";
+import { uploadMedia } from "@/utils/uploadMedia";
 import { Input, Textarea, Select } from "@/components/ui";
 import { useModal } from "@/context/modal-context";
 import { useIntl } from "react-intl";
@@ -135,6 +137,7 @@ const QuizFormModal = ({ quiz = null }) => {
           question_type: "QUIZ",
           // duration: 10,
           points: 1,
+          image: null,
           options: [
             { text: "", is_correct: false },
             { text: "", is_correct: false },
@@ -193,16 +196,22 @@ const QuizFormModal = ({ quiz = null }) => {
       }
 
       // 2. Savollarni tayyorlaymiz
-      const questionsRequests = values.questions.map((q, index) => {
+      const questionsRequests = values.questions.map(async (q, index) => {
+        let image_key = undefined;
+        const imageFile = q.image instanceof FileList ? q.image[0] : q.image;
+        if (imageFile instanceof File) {
+          image_key = await uploadMedia(imageFile, "quiz_question");
+        }
+
         const questionPayload = {
           quiz: quizId,
           text: q.text,
           question_type: q.question_type,
-          duration: q.duration,
           points: q.points,
           order: index + 1,
           options: q.options,
         };
+        if (image_key !== undefined) questionPayload.image_key = image_key;
 
         if (q.id) {
           return authAxios.patch(`/quiz-questions/${q.id}/`, questionPayload);
@@ -225,7 +234,6 @@ const QuizFormModal = ({ quiz = null }) => {
     } catch (err) {
       toast.dismiss(toastId);
       handleApiError(err, setError);
-      console.error("Quiz saqlashda xatolik:", err);
     }
   };
 
@@ -299,6 +307,7 @@ const QuizFormModal = ({ quiz = null }) => {
                   question_type: "QUIZ",
                   // duration: 10,
                   points: 1,
+                  image: null,
                   options: [
                     { text: "", is_correct: false },
                     { text: "", is_correct: false },
@@ -368,6 +377,19 @@ const QuizFormModal = ({ quiz = null }) => {
                   placeholder={intl.formatMessage({ id: "Savol matnini bu yerga yozing..." })}
                   rows={3}
                 />
+
+                {/* Savol rasmi */}
+                <div className="space-y-2">
+                  <label className="text-sm font-black text-heading ml-1 flex items-center gap-2">
+                    <ImageIcon size={16} /> Rasm (Optional)
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    {...register(`questions.${qIndex}.image`)}
+                    className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                  />
+                </div>
 
                 {/* Dinamik Variantlar Ro'yxati */}
                 <OptionsList

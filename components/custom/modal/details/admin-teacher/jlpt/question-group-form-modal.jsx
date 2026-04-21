@@ -18,6 +18,7 @@ import { authAxios } from "@/utils/axios";
 import { mutate } from "swr";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { uploadMedia } from "@/utils/uploadMedia";
 
 const QuestionGroupFormModal = ({ section, group = null, group_count = 0, currentMockType }) => {
   const { closeModal } = useModal();
@@ -67,31 +68,38 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0, curren
     );
 
     try {
-      const formData = new FormData();
-      Object.keys(values).forEach((key) => {
-        if (values[key] !== null && values[key] !== undefined) {
-          if (
-            (key === "audio_file" || key === "image") &&
-            values[key] instanceof FileList
-          ) {
-            if (values[key][0]) formData.append(key, values[key][0]);
-          } else {
-            formData.append(key, values[key]);
-          }
-        }
-      });
+      // 1. Rasm upload
+      let image_key = undefined;
+      const imageFile = values.image instanceof FileList ? values.image[0] : values.image;
+      if (imageFile instanceof File) {
+        image_key = await uploadMedia(imageFile, "jlpt_group");
+      }
 
-      if (!isEdit) formData.append("section", sectionId);
-      formData.append("order", values?.mondai_number);
+      // 2. Audio upload
+      let audio_key = undefined;
+      const audioFile = values.audio_file instanceof FileList ? values.audio_file[0] : values.audio_file;
+      if (audioFile instanceof File) {
+        audio_key = await uploadMedia(audioFile, "jlpt_group_audio");
+      }
+
+      // 3. JSON payload
+      const payload = {
+        mondai_number: values.mondai_number,
+        title: values.title,
+        instruction: values.instruction,
+        reading_text: values.reading_text,
+        order: values.mondai_number,
+      };
+      if (!isEdit) payload.section = sectionId;
+      if (image_key !== undefined) payload.image_key = image_key;
+      if (audio_key !== undefined) payload.audio_key = audio_key;
 
       const method = isEdit ? "patch" : "post";
       const url = isEdit
         ? `${currentMockType?.question_group}${group.id}/`
         : `${currentMockType?.question_group}`;
 
-      await authAxios[method](url, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await authAxios[method](url, payload);
 
       toast.update(toastId, {
         render: intl.formatMessage({

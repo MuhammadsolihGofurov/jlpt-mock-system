@@ -18,6 +18,7 @@ import { authAxios } from "@/utils/axios";
 import useSWR, { mutate } from "swr";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { uploadMedia } from "@/utils/uploadMedia";
 
 const JFTQuestionGroupFormModal = ({ section, group_count = 0, group = null, }) => {
     const { closeModal } = useModal();
@@ -26,7 +27,6 @@ const JFTQuestionGroupFormModal = ({ section, group_count = 0, group = null, }) 
     const intl = useIntl();
 
     const sectionId = section?.id;
-    const sectionType = section?.section_type;
 
     const {
         register,
@@ -40,7 +40,7 @@ const JFTQuestionGroupFormModal = ({ section, group_count = 0, group = null, }) 
             mondai_number: group_count + 1,
             title: "",
             instruction: "",
-            reading_text: "",
+            content_text: "",
             order: group_count + 1,
             audio_file: null,
             image: null,
@@ -53,7 +53,7 @@ const JFTQuestionGroupFormModal = ({ section, group_count = 0, group = null, }) 
                 mondai_number: group.mondai_number,
                 title: group.title,
                 instruction: group.instruction,
-                reading_text: group.reading_text || "",
+                content_text: group.content_text || "",
                 order: group.order,
             });
         }
@@ -67,31 +67,36 @@ const JFTQuestionGroupFormModal = ({ section, group_count = 0, group = null, }) 
         );
 
         try {
-            const formData = new FormData();
-            Object.keys(values).forEach((key) => {
-                if (values[key] !== null && values[key] !== undefined) {
-                    if (
-                        (key === "audio_file" || key === "image") &&
-                        values[key] instanceof FileList
-                    ) {
-                        if (values[key][0]) formData.append(key, values[key][0]);
-                    } else {
-                        formData.append(key, values[key]);
-                    }
-                }
-            });
-
-            if (!isEdit) formData.append("section", sectionId);
-            formData.append("order", values?.mondai_number);
-
+            // 1. Image upload (agar yangi fayl tanlangan bo'lsa)
+            let image_key = undefined;
+            const imageFile = values.image instanceof FileList ? values.image[0] : values.image;
+            if (imageFile instanceof File) {
+              image_key = await uploadMedia(imageFile, "jft_shared_content");
+            }
+        
+            // 2. Audio upload (agar yangi fayl tanlangan bo'lsa)
+            let audio_key = undefined;
+            const audioFile = values.audio_file instanceof FileList ? values.audio_file[0] : values.audio_file;
+            if (audioFile instanceof File) {
+              audio_key = await uploadMedia(audioFile, "jft_shared_content_audio");
+            }
+        
+            // 3. JSON payload — reading_text → content_text
+            const payload = {
+              title: values.title,
+              instruction: values.instruction,
+              content_text: values.content_text,   // ← o'zgardi!
+              order: values.mondai_number,
+            };
+        
+            if (!isEdit) payload.section = sectionId;
+            if (image_key !== undefined) payload.image_key = image_key;
+            if (audio_key !== undefined) payload.audio_key = audio_key;
+        
             const method = isEdit ? "patch" : "post";
-            const url = isEdit
-                ? `jft-shared-contents/${group.id}/`
-                : `jft-shared-contents/`;
-
-            await authAxios[method](url, formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
+            const url = isEdit ? `jft-shared-contents/${group.id}/` : `jft-shared-contents/`;
+        
+            await authAxios[method](url, payload);
 
             toast.update(toastId, {
                 render: intl.formatMessage({
@@ -168,7 +173,7 @@ const JFTQuestionGroupFormModal = ({ section, group_count = 0, group = null, }) 
                 {
                     (section?.section_type === "GRAMMAR_READING" || section?.section_type === "READING") &&
                     <Controller
-                        name="reading_text"
+                        name="content_text"
                         control={control}
                         render={({ field: { value, onChange }, fieldState: { error } }) => (
                             <RichTextarea
@@ -194,20 +199,17 @@ const JFTQuestionGroupFormModal = ({ section, group_count = 0, group = null, }) 
                         />
                     </div>
 
-                    {/* Faqat LISTENING bo'lsa AUDIO chiqadi */}
-                    {sectionType === "LISTENING" && (
-                        <div className="space-y-2">
-                            <label className="text-sm font-black text-heading ml-1 flex items-center gap-2">
-                                <Music size={16} /> Audio Fayl
-                            </label>
-                            <input
-                                type="file"
-                                accept="audio/*"
-                                {...register("audio_file")}
-                                className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                            />
-                        </div>
-                    )}
+                    <div className="space-y-2">
+                      <label className="text-sm font-black text-heading ml-1 flex items-center gap-2">
+                        <Music size={16} /> Audio Fayl (Optional)
+                      </label>
+                      <input
+                        type="file"
+                        accept="audio/*"
+                        {...register("audio_file")}
+                        className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      />
+                    </div>
                 </div>
 
                 <div className="flex items-center justify-end flex-col-reverse sm:flex-row  pt-6 border-t border-gray-100">

@@ -18,6 +18,7 @@ import { authAxios } from "@/utils/axios";
 import { mutate } from "swr";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { uploadMedia } from "@/utils/uploadMedia";
 
 const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = null, question_count = 0, groupName, currentMockType }) => {
   const { closeModal } = useModal();
@@ -89,60 +90,54 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
   const onSubmit = async (values) => {
     const toastId = toast.loading(intl.formatMessage({ id: "Saqlanmoqda..." }));
     try {
-      const hasCorrect = values.options.some(opt => opt.is_correct);
+      const hasCorrect = values.options.some((opt) => opt.is_correct);
       if (!hasCorrect) {
         toast.error(intl.formatMessage({ id: "Kamida bitta to'g'ri javobni belgilang!" }));
         toast.dismiss(toastId);
         return;
       }
 
-      const formData = new FormData();
-      formData.append("section", sectionId);
-      formData.append(currentMockType?.question_group_type, groupId);
-      formData.append("text", values.text);
-      formData.append("order", values.question_number);
-      formData.append("question_number", values.question_number);
-      formData.append("score", values.score);
-
-      // Optionlarni rasmsiz qismini yuborish (logika o'zgarmadi)
-      values.options.forEach((opt, index) => {
-        // 1. ID bo'lsa qo'shamiz
-        if (opt.id) {
-          formData.append(`options[${index}][id]`, opt.id);
-        }
-
-        formData.append(`options[${index}][text]`, opt.text || "");
-        formData.append(`options[${index}][is_correct]`, opt.is_correct ? true : false);
-
-        if (opt.image) {
-          if (opt.image instanceof FileList && opt.image.length > 0) {
-            formData.append(`options[${index}][image]`, opt.image[0]);
-          } else if (opt.image instanceof File) {
-            formData.append(`options[${index}][image]`, opt.image);
-          } else if (typeof opt.image === "string") {
-            formData.append(`options[${index}][image]`, opt.image);
-          }
-        }
-      });
-
-      // Asosiy savol rasmi
-      if (values.image) {
-        if (values.image[0] instanceof File) {
-          formData.append("image", values.image[0]);
-        } else if (typeof values.image === "string") {
-          formData.append("image", values.image);
-        }
+      // 1. Savol rasmi upload
+      let image_key = undefined;
+      const imageFile = values.image instanceof FileList ? values.image[0] : values.image;
+      if (imageFile instanceof File) {
+        image_key = await uploadMedia(imageFile, "jlpt_question");
       }
 
-      const method = isEdit ? "patch" : "post";
-      const url = isEdit ? `${currentMockType?.question}${question.id}/` : `${currentMockType?.question}`;
+      // 2. Options rasmlari upload
+      const processedOptions = await Promise.all(
+        values.options.map(async (opt) => {
+          const optImageFile = opt.image instanceof FileList ? opt.image[0] : opt.image;
+          if (optImageFile instanceof File) {
+            const optKey = await uploadMedia(optImageFile, "jlpt_question");
+            return { text: opt.text || "", is_correct: opt.is_correct, image: optKey };
+          }
+          return {
+            text: opt.text || "",
+            is_correct: opt.is_correct,
+            image: typeof opt.image === "string" ? opt.image : null,
+          };
+        })
+      );
 
-      await authAxios({
-        method,
-        url,
-        data: formData,
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // 3. JSON payload yuborish
+      const payload = {
+        section: sectionId,
+        [currentMockType?.question_group_type]: groupId,
+        text: values.text,
+        order: values.question_number,
+        question_number: values.question_number,
+        score: values.score,
+        options: processedOptions,
+      };
+      if (image_key !== undefined) payload.image_key = image_key;
+
+      const method = isEdit ? "patch" : "post";
+      const url = isEdit
+        ? `${currentMockType?.question}${question.id}/`
+        : `${currentMockType?.question}`;
+
+      await authAxios[method](url, payload);
 
       toast.update(toastId, {
         render: intl.formatMessage({ id: "Muvaffaqiyatli saqlandi!" }),
@@ -161,7 +156,7 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
         type: "error",
         isLoading: false,
         autoClose: 2000,
-      })
+      });
     } finally {
       toast.dismiss(toastId);
     }
