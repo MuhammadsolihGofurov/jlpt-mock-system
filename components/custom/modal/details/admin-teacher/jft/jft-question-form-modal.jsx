@@ -44,11 +44,11 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
       score: 1,
       image: null,
       audio_file: null,
-      options: [
-        { text: "", is_correct: false, image: null },
-        { text: "", is_correct: false, image: null },
-        { text: "", is_correct: false, image: null },
-        { text: "", is_correct: false, image: null },
+      options: question?.options || [
+      { text: "", is_correct: false, image: null },
+      { text: "", is_correct: false, image: null },
+      { text: "", is_correct: false, image: null },
+      { text: "", is_correct: false, image: null },
       ],
     },
   });
@@ -61,12 +61,20 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
   const watchedOptions = watch("options");
 
   useEffect(() => {
-    if (question) {
-      reset(question);
-      if (question.shared_content) setValue("shared_content", question?.shared_content?.id)
-      if (question.image) setPreview(question.image);
-    }
-  }, [question]);
+  if (question) {
+    reset({
+      ...question,
+      shared_content: question.shared_content?.id || null,
+      options: question.options.map(opt => ({
+        text: opt.text || "",
+        is_correct: opt.is_correct || false,
+        image: opt.image || null
+      }))
+    });
+    
+    if (question.image) setPreview(question.image);
+  }
+}, [question, reset]);
 
   const handlePaste = (e) => {
     const items = e.clipboardData?.items;
@@ -98,6 +106,16 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
 
   const onSubmit = async (values) => {
     const toastId = toast.loading(intl.formatMessage({ id: "Saqlanmoqda..." }));
+    
+    const cleanOptions = values.options.filter(opt => 
+        opt.text.trim() !== "" || opt.image !== null
+      );
+
+    if (cleanOptions.length === 0) {
+      toast.error(intl.formatMessage({ id: "Kamida bitta variant bo'lishi kerak!" }));
+      return;
+    }
+    
     try {
       const hasCorrect = values.options.some((opt) => opt.is_correct);
       if (!hasCorrect) {
