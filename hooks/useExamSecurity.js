@@ -105,15 +105,22 @@ export const useExamSecurity = (currentExamType) => {
   }, [isActive, intl, reportViolation, router]);
 
   // Fullscreen funksiyalari
-  const enterFullscreen = useCallback(() => {
-    const elem = document.documentElement;
-    if (!document.fullscreenElement) {
-      elem.requestFullscreen?.() ||
-      elem.webkitRequestFullscreen?.() ||
-      elem.msRequestFullscreen?.() ||
-      elem.mozRequestFullScreen?.();
+ const enterFullscreen = useCallback(() => {
+  const elem = document.documentElement;
+  if (!document.fullscreenElement) {
+    const request = elem.requestFullscreen?.() || 
+                    elem.webkitRequestFullscreen?.() || 
+                    elem.msRequestFullscreen?.() || 
+                    elem.mozRequestFullScreen?.();
+    
+    // Add this to catch the error silently or log it
+    if (request instanceof Promise) {
+      request.catch((err) => {
+        console.warn(`Fullscreen blocked: ${err.message}`);
+      });
     }
-  }, []);
+  }
+}, []);
 
   const exitFullscreen = useCallback(() => {
     document.exitFullscreen?.() ||
