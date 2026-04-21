@@ -90,7 +90,7 @@ const QuizCard = ({ item, mutate }) => {
               <Shuffle size={14} />
             </button>
             <button
-              onClick={() => openModal("QUIZ_FORM", { quiz: item }, "video")}
+              onClick={() => router.push(`/dashboard/mocks/quiz-builder/${item.id}`)}
               className="p-2 bg-slate-50 text-slate-600 rounded-xl hover:bg-blue-500 hover:text-white transition-all"
             >
               <Edit2 size={14} />

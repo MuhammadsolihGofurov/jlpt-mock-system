@@ -19,7 +19,7 @@ import { authAxios } from "@/utils/axios";
 import { mutate } from "swr";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { uploadMedia } from "@/utils/uploadMedia";
+import { normalizeMediaReference, uploadMedia } from "@/utils/uploadMedia";
 
 const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count = 0, groupName, groups }) => {
   const { closeModal } = useModal();
@@ -146,10 +146,11 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
             const optKey = await uploadMedia(optImageFile, "jft_question");
             return { text: opt.text || "", is_correct: opt.is_correct, image_key: optKey };
           }
-          if (opt.image === null) {
-            return { text: opt.text || "", is_correct: opt.is_correct, image: null };
-          }
-          return { text: opt.text || "", is_correct: opt.is_correct };
+          return {
+            text: opt.text || "",
+            is_correct: opt.is_correct,
+            image: typeof opt.image === "string" ? normalizeMediaReference(opt.image) : null,
+          };
         })
       );
 
@@ -197,21 +198,21 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
   return (
     <div className="p-8">
       <div className="flex items-center gap-4 mb-8">
-        <div className="bg-blue-100 p-4 rounded-3xl text-blue-600">
+        <div className="p-4 text-blue-600 bg-blue-100 rounded-3xl">
           <HelpCircle size={32} />
         </div>
         <div>
           <h2 className="text-2xl font-black text-heading">
             {isEdit ? "Savolni tahrirlash" : "Yangi savol"}
           </h2>
-          <p className="text-muted text-sm font-medium italic">
+          <p className="text-sm italic font-medium text-muted">
             {intl.formatMessage({ id: "Guruh" })}: {groupName}
           </p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           <Input label="Savol raqami" name="question_number" type="number" register={register} error={errors.question_number} />
           <div className="md:col-span-2">
             <Input label="Ball" name="score" type="number" register={register} error={errors.score} />
@@ -243,13 +244,13 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
 
         {/* Savol rasmi qismi */}
         <div className="space-y-2">
-          <label className="text-sm font-black text-heading ml-1 flex items-center gap-2">
+          <label className="flex items-center gap-2 ml-1 text-sm font-black text-heading">
             <ImageIcon size={16} /> {intl.formatMessage({ id: "Rasm (Optional)" })}
           </label>
           {preview && (
-            <div className="mb-2 relative w-40 h-24 overflow-hidden rounded-xl border border-slate-200">
-              <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-              <button type="button" onClick={() => { setPreview(null); setValue("image", null); }} className="absolute top-1 right-1 bg-white/80 p-1 rounded-full shadow-sm text-red-500 hover:bg-white">
+            <div className="relative w-40 h-24 mb-2 overflow-hidden border rounded-xl border-slate-200">
+              <img src={preview} alt="Preview" className="object-cover w-full h-full" />
+              <button type="button" onClick={() => { setPreview(null); setValue("image", null); }} className="absolute p-1 text-red-500 rounded-full shadow-sm top-1 right-1 bg-white/80 hover:bg-white">
                 <X size={14} />
               </button>
             </div>
@@ -259,7 +260,7 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
 
         {/* Savol audiosi */}
         <div className="space-y-2">
-          <label className="text-sm font-black text-heading ml-1 flex items-center gap-2">
+          <label className="flex items-center gap-2 ml-1 text-sm font-black text-heading">
             <Music size={16} /> Audio (Optional)
           </label>
           <input
@@ -271,19 +272,19 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
         </div>
 
         {/* Variantlar qismi */}
-        <div className="space-y-4 pt-4 border-t">
+        <div className="pt-4 space-y-4 border-t">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-black text-heading flex items-center gap-2">
+            <h3 className="flex items-center gap-2 text-lg font-black text-heading">
               <Star size={20} className="text-orange-400" /> {intl.formatMessage({ id: "Variantlar" })}
             </h3>
-            <button type="button" onClick={() => append({ text: "", is_correct: false, image: null })} className="text-xs font-bold text-primary flex items-center gap-1">
+            <button type="button" onClick={() => append({ text: "", is_correct: false, image: null })} className="flex items-center gap-1 text-xs font-bold text-primary">
               <Plus size={16} /> {intl.formatMessage({ id: "Qo'shish" })}
             </button>
           </div>
 
           <div className="space-y-3">
             {fields.map((field, index) => (
-              <div key={field.id} className="flex flex-col gap-2 p-3 rounded-2xl border border-slate-50 bg-slate-50/30 group">
+              <div key={field.id} className="flex flex-col gap-2 p-3 border rounded-2xl border-slate-50 bg-slate-50/30 group">
                 <div className="flex items-center gap-3">
                   <div className="pt-1">
                     <Controller
@@ -318,7 +319,7 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
                       />
                       <ImageIcon size={20} />
                       {watchedOptions[index]?.image?.length > 0 && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-white" />
+                        <div className="absolute w-3 h-3 bg-blue-500 border-2 border-white rounded-full -top-1 -right-1" />
                       )}
                     </label>
                   </div>
@@ -332,10 +333,10 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
 
                 {/* Variant rasm preview */}
                 {watchedOptions[index]?.image && (watchedOptions[index].image[0] || typeof watchedOptions[index].image === 'string') && (
-                  <div className="ml-12 relative w-20 h-14 rounded-lg overflow-hidden border border-slate-200">
+                  <div className="relative w-20 ml-12 overflow-hidden border rounded-lg h-14 border-slate-200">
                     <img
                       src={watchedOptions[index].image[0] instanceof File ? URL.createObjectURL(watchedOptions[index].image[0]) : watchedOptions[index].image}
-                      className="w-full h-full object-cover"
+                      className="object-cover w-full h-full"
                       alt=""
                     />
                     <button
@@ -354,10 +355,10 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
 
         {/* Buttons section... (Oldingidek qoladi) */}
         <div className="flex justify-end gap-3 pt-6 border-t">
-          <button type="button" onClick={() => closeModal("JFT_QUESTION_FORM")} className="px-6 py-3 rounded-2xl font-bold text-muted">
+          <button type="button" onClick={() => closeModal("JFT_QUESTION_FORM")} className="px-6 py-3 font-bold rounded-2xl text-muted">
             {intl.formatMessage({ id: "Bekor qilish" })}
           </button>
-          <button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black px-10 py-3 rounded-2xl shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2">
+          <button type="submit" disabled={isSubmitting} className="flex items-center gap-2 px-10 py-3 font-black text-white shadow-lg bg-primary rounded-2xl active:scale-95 disabled:opacity-50">
             <Save size={18} /> {intl.formatMessage({ id: isSubmitting ? "Saqlanmoqda..." : "Saqlash" })}
           </button>
         </div>

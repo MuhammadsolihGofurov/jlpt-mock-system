@@ -14,27 +14,38 @@ export const useExamSecurity = (currentExamType) => {
 
   const violationCount = useRef(0);
   const lastViolationTime = useRef(0);
+  const hasFinalizedViolation = useRef(false);
+  const securityStartedAt = useRef(0);
+  const devtoolsDetectionHits = useRef(0);
 
   // Interval va timeout'larni saqlash uchun ref'lar
   const devtoolsIntervalRef = useRef(null);
   const fullscreenIntervalRef = useRef(null);
 
   const MAX_ATTEMPTS = 5;
-  const DEBOUNCE_MS = 800;
+  const DEBOUNCE_MS = 1200;
 
   const attachSubmissionId = useCallback((id) => {
     setSubmissionId(id);
   }, []);
 
   // Violation report (faqat oxirida yuboriladi)
-  const reportViolation = useCallback(async (type) => {
-    if (!submissionId) return;
+  const reportViolation = useCallback(async (type, messageId) => {
+    if (!submissionId || hasFinalizedViolation.current) return;
+    hasFinalizedViolation.current = true;
 
     const payload = {
       submission_id: submissionId,
       incident: {
-        type: intl.formatMessage({ id: type }),
-        timestamp: new Date().toISOString(),
+        source: "frontend_exam_security",
+        events: [
+          {
+            type,
+            message_id: messageId,
+            message: intl.formatMessage({ id: messageId }),
+            at: new Date().toISOString(),
+          },
+        ],
       },
     };
 
@@ -50,36 +61,38 @@ export const useExamSecurity = (currentExamType) => {
     if (!isActive) return false;
 
     // 1. O'lcham farqi (DevTools ochiq bo'lsa ko'pincha farq bo'ladi)
-    if (
-      window.outerWidth - window.innerWidth > 150 ||
-      window.outerHeight - window.innerHeight > 120
-    ) {
-      return true;
-    }
+    const widthDiff = window.outerWidth - window.innerWidth;
+    const heightDiff = window.outerHeight - window.innerHeight;
+    const sizeSignal = widthDiff > 320 || heightDiff > 260;
 
     // 2. Performance timing trick
     const start = performance.now();
     // debugger; // Test uchun ochsa bo'ladi, productionda tavsiya etilmaydi
     const end = performance.now();
 
-    if (end - start > 40) return true;
+    const timingSignal = end - start > 120;
 
-    return false;
+    if (sizeSignal || timingSignal) {
+      devtoolsDetectionHits.current += 1;
+    } else {
+      devtoolsDetectionHits.current = 0;
+    }
+
+    return devtoolsDetectionHits.current >= 3;
   }, [isActive]);
 
   // Violation handler
   const handleViolation = useCallback((messageId, type) => {
-    if (!isActive) return;
+    if (!isActive || hasFinalizedViolation.current) return;
 
     const now = Date.now();
     if (now - lastViolationTime.current < DEBOUNCE_MS) return;
     lastViolationTime.current = now;
 
     violationCount.current += 1;
-    const remaining = MAX_ATTEMPTS - violationCount.current;
-
     if (violationCount.current >= MAX_ATTEMPTS) {
-      reportViolation(messageId);
+      setIsActive(false);
+      reportViolation(type, messageId);
       toast.error(intl.formatMessage({ id: "no_attempts_left" }));
       setTimeout(() => router.push("/blocked"), 1000);
       return;
@@ -135,6 +148,9 @@ export const useExamSecurity = (currentExamType) => {
     setIsActive(true);
     violationCount.current = 0;
     lastViolationTime.current = 0;
+    hasFinalizedViolation.current = false;
+    securityStartedAt.current = Date.now();
+    devtoolsDetectionHits.current = 0;
 
     enterFullscreen();
     document.documentElement.style.userSelect = "none";
@@ -166,6 +182,7 @@ export const useExamSecurity = (currentExamType) => {
     // Qo'shimcha tozalash
     violationCount.current = 0;
     lastViolationTime.current = 0;
+    devtoolsDetectionHits.current = 0;
   }, [exitFullscreen]);
 
   // Asosiy event listeners
@@ -181,7 +198,9 @@ export const useExamSecurity = (currentExamType) => {
 
     // Fullscreen tekshirish
     fullscreenIntervalRef.current = setInterval(() => {
-      if (isActive && !document.fullscreenElement) {
+      const gracePeriodNotFinished = Date.now() - securityStartedAt.current < 4000;
+      if (gracePeriodNotFinished) return;
+      if (isActive && !document.fullscreenElement && document.hasFocus()) {
         handleViolation("fs_exit_msg", "fullscreen_exit");
         enterFullscreen();
       }
@@ -224,7 +243,9 @@ export const useExamSecurity = (currentExamType) => {
     const handleBlur = () => handleViolation("window_blur_msg", "window_blur");
 
     const handleFSChange = () => {
-      if (!document.fullscreenElement && isActive) {
+      const gracePeriodNotFinished = Date.now() - securityStartedAt.current < 4000;
+      if (gracePeriodNotFinished) return;
+      if (!document.fullscreenElement && isActive && document.hasFocus()) {
         handleViolation("fs_exit_msg", "fullscreen_exit");
         setTimeout(enterFullscreen, 800);
       }
