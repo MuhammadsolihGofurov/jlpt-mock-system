@@ -42,7 +42,7 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
       question_number: question_count + 1,
       score: 1,
       image: null,
-      options: [
+      options: question?.options || [
         { text: "", is_correct: false, image: null },
         { text: "", is_correct: false, image: null },
         { text: "", is_correct: false, image: null },
@@ -59,10 +59,15 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
   const watchedOptions = watch("options");
 
   useEffect(() => {
-    if (question) {
-      reset(question);
-      if (question.image) setPreview(question.image);
-    }
+    reset({
+      ...question,
+      shared_content: question.shared_content?.id || null,
+      options: question.options.map(opt => ({
+        text: opt.text || "",
+        is_correct: opt.is_correct || false,
+        image: opt.image || null
+      }))
+    });
   }, [question, reset]);
 
   const handlePaste = (e) => {
@@ -89,6 +94,16 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
 
   const onSubmit = async (values) => {
     const toastId = toast.loading(intl.formatMessage({ id: "Saqlanmoqda..." }));
+
+    const cleanOptions = values.options.filter(opt =>
+      opt.text.trim() !== "" || opt.image !== null
+    );
+
+    if (cleanOptions.length === 0) {
+      toast.error(intl.formatMessage({ id: "Kamida bitta variant bo'lishi kerak!" }));
+      return;
+    }
+
     try {
       const hasCorrect = values.options.some((opt) => opt.is_correct);
       if (!hasCorrect) {
