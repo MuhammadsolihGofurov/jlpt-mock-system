@@ -56,41 +56,25 @@ export const useExamSecurity = (currentExamType) => {
 
   // DevTools aniqlash - barcha OS'lar uchun moslashtirilgan
   const detectDevTools = useCallback(() => {
-    if (!isActive) return false;
+  if (!isActive) return false;
 
-    // 1. O'lcham signali (Linux va HiDPI ekranlarda window borderlari farq qiladi)
-    const widthDiff = Math.abs(window.outerWidth - window.innerWidth);
-    const heightDiff = Math.abs(window.outerHeight - window.innerHeight);
-    
-    // Linuxda UI elementlari ko'p joy egallashi mumkin (Threshold oshirildi)
-    const isLinux = navigator.platform.toLowerCase().includes('linux');
-    const sizeThresholdWidth = isLinux ? 350 : 250;
-    const sizeThresholdHeight = isLinux ? 350 : 250;
+  const widthDiff = Math.abs(window.outerWidth - window.innerWidth);
+  const heightDiff = Math.abs(window.outerHeight - window.innerHeight);
 
-    const sizeSignal = widthDiff > sizeThresholdWidth || heightDiff > sizeThresholdHeight;
+  const isLinux = navigator.platform.toLowerCase().includes('linux');
 
-    // 2. Timing signal (Debugger check)
-    // Console log sekinlashuvidan foydalanamiz
-    const start = performance.now();
-    for (let i = 0; i < 20; i++) {
-        // Bo'sh loglar devtools ochiq bo'lsa timingga ta'sir qiladi
-        console.log(); 
-    }
-    const end = performance.now();
-    
-    // Protsessor tezligiga qarab 100ms dan 200ms gacha o'zgarishi mumkin
-    const timingSignal = (end - start) > 150;
+  const sizeSignal =
+    widthDiff > (isLinux ? 500 : 250) ||
+    heightDiff > (isLinux ? 500 : 250);
 
-    if (sizeSignal || timingSignal) {
-      devtoolsDetectionHits.current += 1;
-    } else {
-      // Bir martalik xatolik bo'lsa reset qilamiz
-      devtoolsDetectionHits.current = Math.max(0, devtoolsDetectionHits.current - 1);
-    }
+  if (sizeSignal) {
+    devtoolsDetectionHits.current += 1;
+  } else {
+    devtoolsDetectionHits.current = Math.max(0, devtoolsDetectionHits.current - 1);
+  }
 
-    // Ketma-ket 6 marta aniqlansa (taxminan 3-4 sekund) keyin ban beradi
-    return devtoolsDetectionHits.current >= 6;
-  }, [isActive]);
+  return devtoolsDetectionHits.current >= 10;
+}, [isActive]);
 
   const handleViolation = useCallback((messageId, type) => {
     if (!isActive || hasFinalizedViolation.current) return;
