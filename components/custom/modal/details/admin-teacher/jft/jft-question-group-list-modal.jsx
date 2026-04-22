@@ -34,6 +34,20 @@ const JFTQuestionGroupListModal = ({ section }) => {
         variant: "danger",
         mutateKey: [`jft-shared-contents/`, router.locale, section?.id],
         onConfirm: async () => {
+          // First delete all questions belonging to this group
+          const questionsRes = await authAxios.get(
+            `jft-questions/?section=${section?.id}&page=all`
+          );
+          const allQuestions = Array.isArray(questionsRes.data)
+            ? questionsRes.data
+            : questionsRes.data?.results || [];
+          const groupQuestions = allQuestions.filter(
+            (q) => q.shared_content?.id === item.id
+          );
+          await Promise.all(
+            groupQuestions.map((q) => authAxios.delete(`jft-questions/${q.id}/`))
+          );
+          // Then delete the group itself
           const result = await authAxios.delete(`jft-shared-contents/${item.id}/`);
           mutate([`jft-questions/`, router.locale, section?.id]);
           return result;

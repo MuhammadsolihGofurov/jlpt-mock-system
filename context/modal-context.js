@@ -13,10 +13,12 @@ export const ModalProvider = ({ children }) => {
       console.warn(`Modal with key "${key}" does not exist`);
       return;
     }
-    setModals((prev) => ({
-      ...prev,
-      [key]: { isOpen: true, props, size },
-    }));
+    setModals((prev) => {
+      const updated = { ...prev };
+      delete updated[key];
+      updated[key] = { isOpen: true, props, size };
+      return updated;
+    });
   };
 
   const closeModal = (key, data = null) => {

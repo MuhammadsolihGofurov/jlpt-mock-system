@@ -60,6 +60,18 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
         variant: "danger",
         mutateKey: [`jft-shared-contents/`, router.locale, section?.id],
         onConfirm: async () => {
+          const questionsRes = await authAxios.get(
+            `jft-questions/?section=${section?.id}&page=all`
+          );
+          const allQuestions = Array.isArray(questionsRes.data)
+            ? questionsRes.data
+            : questionsRes.data?.results || [];
+          const groupQuestions = allQuestions.filter(
+            (q) => q.shared_content?.id === id
+          );
+          await Promise.all(
+            groupQuestions.map((q) => authAxios.delete(`jft-questions/${q.id}/`))
+          );
           const result = await authAxios.delete(`jft-shared-contents/${id}/`);
           mutate([`jft-questions/`, router.locale, section?.id]);
           return result;
