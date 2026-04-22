@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { QuestionRenderer } from "../details/question-renderer";
 import ExamHeader from "../details/exam-header";
 import ExamFooter from "../details/exam-footer";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { authAxios } from "@/utils/axios";
 import { useIntl } from "react-intl";
-import { ListeningModeSelector } from "../details/listening-mode-selector";
-import { useExamSecurity } from "@/hooks/useExamSecurity";
+import { JFTQuestionRenderer } from "../details/jft-question-renderer";
+import JFTExamHeader from "../details/jft-exam-header";
 
 const JFTExamPlayground = ({ examData, currentExamType, stopSecurity }) => {
     const router = useRouter();
@@ -17,16 +16,14 @@ const JFTExamPlayground = ({ examData, currentExamType, stopSecurity }) => {
     const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
     const [answers, setAnswers] = useState({});
     const [activeGroupIndex, setActiveGroupIndex] = useState(0);
-    const [isAudioStarted, setIsAudioStarted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [audioMode, setAudioMode] = useState(null);
 
-    // Xavfsiz ma'lumot olish: sections mavjudligini tekshiramiz
     const sections = examData?.exam_paper?.sections;
     const currentSection = sections[currentSectionIndex || 0];
     const isLastSection = currentSectionIndex === sections.length - 1;
+    const isListening = currentSection?.section_type === "LISTENING";
 
-    // Guruhlash mantiqi: currentSection o'zgarganda qayta hisoblanadi
+    // Group questions by shared_content
     const groupedQuestions = useMemo(() => {
         if (!currentSection?.questions) return [];
 
@@ -34,7 +31,7 @@ const JFTExamPlayground = ({ examData, currentExamType, stopSecurity }) => {
         let currentGroup = null;
 
         currentSection.questions.forEach((question) => {
-            const sharedId = question.shared_content;
+            const sharedId = question.shared_content?.id;
             if (sharedId) {
                 if (currentGroup && currentGroup.shared_content === sharedId) {
                     currentGroup.questions.push(question);
@@ -43,6 +40,10 @@ const JFTExamPlayground = ({ examData, currentExamType, stopSecurity }) => {
                         id: `shared-${sharedId}-${question.id}`,
                         shared_content: sharedId,
                         questions: [question],
+                        audio_file: question?.shared_content?.audio_file || null,
+                        mondai_number: question?.mondai_number,
+                        title: question?.shared_content?.title,
+                        instruction: question?.shared_content?.instruction,
                     };
                     groups.push(currentGroup);
                 }
@@ -51,53 +52,51 @@ const JFTExamPlayground = ({ examData, currentExamType, stopSecurity }) => {
                     id: `single-${question.id}`,
                     shared_content: null,
                     questions: [question],
+                    audio_file: null, // will use question-level audio_file
+                    mondai_number: question?.mondai_number,
+                    title: null,
+                    instruction: null,
                 };
                 groups.push(currentGroup);
             }
         });
+
         return groups;
     }, [currentSection]);
 
-    // Bo'lim o'zgarganda holatlarni tozalash
+    // Reset state on section change
     useEffect(() => {
         setActiveGroupIndex(0);
-        setIsAudioStarted(false);
-
-        // Agar keyingi bo'lim LISTENING bo'lmasa, audioMode ni avtomatik 'manual' 
-        // yoki boshqa neytral holatga o'tkazish kerak, aks holda QuestionRenderer yopilib qoladi
-        if (currentSection?.section_type !== "LISTENING") {
-            setAudioMode('none');
-        } else {
-            setAudioMode(null); // Listening bo'lsa qaytadan tanlovni so'raydi
-        }
-
         if (mainRef.current) {
             mainRef.current.scrollTo(0, 0);
         }
-    }, [currentSectionIndex, currentSection?.section_type]);
+    }, [currentSectionIndex]);
 
-    // AUDIO yakunlanganda keyingi guruhga o'tish
+    // Scroll to active group on change (Listening mode)
+    useEffect(() => {
+        if (!isListening) return;
+        const group = groupedQuestions[activeGroupIndex];
+        if (!group) return;
+
+        setTimeout(() => {
+            document.getElementById(`group-${group.id}`)?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
+        }, 150);
+    }, [activeGroupIndex, isListening]);
+
+    // Called by JFTQuestionRenderer when audio finishes + 3s countdown passed
     const handleAudioEnd = () => {
-        if (currentSection?.section_type === "LISTENING" && audioMode === 'auto') {
-            if (activeGroupIndex < groupedQuestions.length - 1) {
-                const nextIdx = activeGroupIndex + 1;
-                setActiveGroupIndex(nextIdx);
+        if (!isListening) return;
 
-                // Keyingi savolga scroll qilish
-                const nextGroup = groupedQuestions[nextIdx];
-                setTimeout(() => {
-                    document.getElementById(`group-${nextGroup.id}`)?.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                }, 100);
-            } else {
-                toast.info(intl.formatMessage({ id: "listening_finished" }));
-            }
+        if (activeGroupIndex < groupedQuestions.length - 1) {
+            setActiveGroupIndex((prev) => prev + 1);
+        } else {
+            toast.info(intl.formatMessage({ id: "listening_finished" }));
         }
     };
 
-    // Savollarga to'liq javob berilganini tekshirish
     const isAllAnswered = useMemo(() => {
         if (!currentSection?.questions) return false;
         return currentSection.questions.every(
@@ -110,15 +109,11 @@ const JFTExamPlayground = ({ examData, currentExamType, stopSecurity }) => {
     };
 
     const handleNext = () => {
-        if (!isLastSection) {
-            setCurrentSectionIndex((prev) => prev + 1);
-        }
+        if (!isLastSection) setCurrentSectionIndex((prev) => prev + 1);
     };
 
     const handlePrev = () => {
-        if (currentSectionIndex > 0) {
-            setCurrentSectionIndex((prev) => prev - 1);
-        }
+        if (currentSectionIndex > 0) setCurrentSectionIndex((prev) => prev - 1);
     };
 
     const handleTimeUp = () => {
@@ -130,12 +125,6 @@ const JFTExamPlayground = ({ examData, currentExamType, stopSecurity }) => {
     };
 
     const handleSubmit = async (isAuto = false) => {
-
-        // if (!isAuto && !isAllAnswered) {
-        //     toast.error(intl.formatMessage({ id: "please_answer_all" }));
-        //     return;
-        // }
-
         stopSecurity();
 
         try {
@@ -154,18 +143,6 @@ const JFTExamPlayground = ({ examData, currentExamType, stopSecurity }) => {
         }
     };
 
-
-    // const handleBegin = async () => {
-    //     const extensions = await checkExtensions();
-    //     if (extensions.length > 0) {
-    //         setShowExtModal(true);
-    //         return;
-    //     }
-    // };
-
-    // handleBegin();
-
-    // MUHIM: currentSection undefined bo'lsa, xatolik bermasligi uchun
     if (!currentSection) {
         return (
             <div className="fixed inset-0 flex items-center justify-center bg-white">
@@ -176,26 +153,8 @@ const JFTExamPlayground = ({ examData, currentExamType, stopSecurity }) => {
 
     return (
         <div className="fixed inset-0 bg-slate-50 flex flex-col overflow-hidden select-none">
-            {/* Listening Mode Selector */}
-            {currentSection.section_type === "LISTENING" && !audioMode && (
-                <ListeningModeSelector
-                    onSelect={(mode) => {
-                        setAudioMode(mode);
-                        setIsAudioStarted(true);
-                    }}
-                />
-            )}
-
-            {/* {showExtModal && (
-                <div className="modal">
-                    <h3>Extensionlarni o'chiring!</h3>
-                    <p>Sizda quyidagi extensionlar aniqlandi: {detectedExtensions.join(", ")}</p>
-                    <button onClick={() => setShowExtModal(false)}>Tayyorman</button>
-                </div>
-            )} */}
-
-            <ExamHeader
-                key={`header-${currentSection.id}`}
+            <JFTExamHeader
+                // key={`header-${currentSection.id}`}
                 title={examData?.exam_paper?.title}
                 sectionName={currentSection?.name}
                 duration={examData?.exam_paper?.duration_minutes}
@@ -203,7 +162,10 @@ const JFTExamPlayground = ({ examData, currentExamType, stopSecurity }) => {
             />
 
             <div className="flex-1 flex overflow-hidden">
-                <main ref={mainRef} className="flex-1 overflow-y-auto p-6 md:p-10 bg-white shadow-inner scroll-smooth">
+                <main
+                    ref={mainRef}
+                    className="flex-1 overflow-y-auto p-6 md:p-10 bg-white shadow-inner scroll-smooth"
+                >
                     <div className="max-w-4xl mx-auto">
                         <h2 className="text-lg sm:text-2xl font-black text-slate-800 mb-6 border-b pb-4 flex items-center justify-between">
                             <span>{currentSection?.name}</span>
@@ -213,27 +175,25 @@ const JFTExamPlayground = ({ examData, currentExamType, stopSecurity }) => {
                         </h2>
 
                         {groupedQuestions.map((group, index) => {
-                            // Ko'rinish mantiqi
-                            const isVisible =
-                                currentSection.section_type !== "LISTENING" ||
-                                audioMode === 'manual' ||
-                                (isAudioStarted && index === activeGroupIndex);
+                            // LISTENING: faqat activeGroupIndex va undan oldingilari ko'rinadi
+                            // (oldingilari read-only, faqat aktiv guruh interaktiv)
+                            const isActive = !isListening || index === activeGroupIndex;
+                            const isPast = isListening && index < activeGroupIndex;
 
-                            // Listeningda faqat faol guruhni ko'rsatish (yoki manualda hammasini)
-                            if (currentSection.section_type === "LISTENING" && audioMode === 'auto' && !isVisible) {
-                                return null;
-                            }
+                            // Listening rejimida faqat aktiv va o'tgan guruhlarni ko'rsatamiz
+                            if (isListening && index > activeGroupIndex) return null;
 
                             return (
                                 <div id={`group-${group.id}`} key={group.id} className="mb-10">
-                                    <QuestionRenderer
-                                        isActiveGroup={isVisible}
-                                        audioMode={audioMode}
+                                    <JFTQuestionRenderer
                                         group={group}
                                         onSelect={handleSelectOption}
                                         sectionType={currentSection.section_type}
                                         selectedAnswers={answers}
                                         onAudioEnd={handleAudioEnd}
+                                        isActiveGroup={isActive}
+                                        isPastGroup={isPast}
+                                        isLastGroup={isListening && index === groupedQuestions.length - 1}
                                     />
                                 </div>
                             );

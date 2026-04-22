@@ -937,5 +937,10 @@
     "fs_exit_msg": "Exiting fullscreen mode is prohibited",
     "exam_finished": "Exam submitted successfully",
     "error_submitting": "An error occurred while submitting. Please try again.",
-    "please_answer_all": "Please answer all questions"
+    "please_answer_all": "Please answer all questions",
+    "Maksimal tinglash soni: 2 marta": "Max listening limit: 2 times",
+    "Tinglashlar": "Listens",
+    "Keyingisiga o'tish": "Next",
+    "Qayta tinglash": "Replay",
+    "Savol audiosi": "Question audio"
 }

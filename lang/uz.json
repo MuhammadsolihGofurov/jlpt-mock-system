@@ -938,5 +938,10 @@
   "fs_exit_msg": "Fullscreen rejimdan chiqish taqiqlangan",
   "exam_finished": "Imtihon muvaffaqiyatli topshirildi",
   "error_submitting": "Imtihonni yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring",
-  "please_answer_all": "Iltimos, barcha savollarga javob bering"
+  "please_answer_all": "Iltimos, barcha savollarga javob bering",
+  "Maksimal tinglash soni: 2 marta": "Maksimal tinglash soni: 2 marta",
+  "Tinglashlar": "Tinglashlar",
+  "Keyingisiga o'tish": "Keyingisiga o'tish",
+  "Qayta tinglash": "Qayta tinglash",
+  "Savol audiosi":"Savol audiosi"
 }
