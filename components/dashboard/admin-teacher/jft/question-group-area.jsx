@@ -72,8 +72,9 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
   const groupedQuestions = questions && questions?.reduce((acc, q) => {
     const sharedId = q.shared_content?.id || 'no-shared';
     if (!acc[sharedId]) {
+      const groupStillExists = sharedId === 'no-shared' || groups?.some(g => g.id === sharedId);
       acc[sharedId] = {
-        sharedData: q.shared_content,
+        sharedData: groupStillExists ? q.shared_content : null,
         items: []
       };
     }
