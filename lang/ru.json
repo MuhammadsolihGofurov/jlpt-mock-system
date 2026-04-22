@@ -941,5 +941,10 @@
   "Savollar guruhi": "Группы вопросов",
   "Savollar guruhlari": "Группы вопросов",
   "Yangi guruh qo'shish": "Добавить группу",
-  "Hozircha savollar guruhi yo'q": "Групп вопросов пока нет"
+  "Hozircha savollar guruhi yo'q": "Групп вопросов пока нет",
+  "Maksimal tinglash soni: 2 marta": "Макс. кол-во прослушиваний: 2",
+  "Tinglashlar": "Прослушивания",
+  "Keyingisiga o'tish": "Перейти к следующему",
+  "Qayta tinglash": "Прослушать еще раз",
+  "Savol audiosi": "Аудио к вопросу"
 }

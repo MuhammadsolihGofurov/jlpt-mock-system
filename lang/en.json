@@ -941,5 +941,10 @@
     "Savollar guruhi": "Question Groups",
     "Savollar guruhlari": "Question Groups",
     "Yangi guruh qo'shish": "Add New Group",
-    "Hozircha savollar guruhi yo'q": "No question groups yet"
+    "Hozircha savollar guruhi yo'q": "No question groups yet",
+    "Maksimal tinglash soni: 2 marta": "Max listening limit: 2 times",
+    "Tinglashlar": "Listens",
+    "Keyingisiga o'tish": "Next",
+    "Qayta tinglash": "Replay",
+    "Savol audiosi": "Question audio"
 }

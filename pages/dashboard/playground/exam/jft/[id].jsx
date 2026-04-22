@@ -15,7 +15,7 @@ import {
   ArrowRight,
   Loader2
 } from "lucide-react";
-import { ExamPlayground, JFTExamPlayground } from "@/components/custom/playground";
+import { JFTExamPlayground } from "@/components/custom/playground";
 import { authAxios } from "@/utils/axios";
 import { handleApiError } from "@/utils/handle-error";
 import { toast } from "react-toastify";
