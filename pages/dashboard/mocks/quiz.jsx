@@ -3,6 +3,7 @@ import Seo from "@/components/seo/seo";
 import { AuthGuard, withAuthGuard } from "@/components/guard";
 import { PageHeader } from "@/components/layout";
 import { useModal } from "@/context/modal-context";
+import { useRouter } from "next/router";
 import { MaterialLists, UserLists } from "@/components/dashboard/admin";
 import { Book, BookOpen, FileQuestion, Filter, Search } from "lucide-react";
 import { SearchInput } from "@/components/ui";
@@ -17,6 +18,7 @@ import { mockTabs } from "@/types/tabs";
 function QuizPage({ customLoading }) {
   const intl = useIntl();
   const { openModal } = useModal();
+  const router = useRouter();
 
   return (
     <>
@@ -31,7 +33,7 @@ function QuizPage({ customLoading }) {
         badge="Faol"
         buttonLabel="Quiz qo'shish"
         roles={["CENTER_ADMIN", "TEACHER"]}
-        onButtonClick={() => openModal("QUIZ_FORM", {}, "video")}
+        onButtonClick={() => router.push("/dashboard/mocks/quiz-builder/new")}
         extraActions={
           <>
             <SearchInput />

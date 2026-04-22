@@ -1,15 +1,12 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { BottomNav, Sidebar } from "..";
-import { Menu } from "lucide-react";
-import { toggleSidebar } from "@/redux/slice/ui";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import MobileHeader from "./mobile-header";
-import useSWR, { mutate } from "swr";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
-import fetcher from "@/utils/fetcher";
 import Script from "next/script";
+import useWebSocket from "@/hooks/useWebSocket";
 
 const WITHOUT_SIDEBAR = [
   "/login",
@@ -27,26 +24,28 @@ const WITHOUT_SIDEBAR = [
 
 const Layout = ({ children }) => {
   const router = useRouter();
-  const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
   const hasSidebar = WITHOUT_SIDEBAR.some((path) => router.pathname.includes(path));
 
-  useEffect(() => {
-    if (!user?.id) return;
+  const notificationsWsUrl = useMemo(() => {
+    if (!user?.id) return "";
 
-    const token = localStorage.getItem("access");
-    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WEB_SOKET_API_URL}ws/notifications/?token=${token}`);
+    const baseWsUrl = (process.env.NEXT_PUBLIC_WEB_SOKET_API_URL || "").trim();
+    if (!baseWsUrl) return "";
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      toast.success(data.message, {
-        duration: 5000,
-      });
-    };
-
-    return () => ws.close();
+    return `${baseWsUrl}ws/notifications/`;
   }, [user?.id]);
+
+  const { lastMessage: notificationMessage } = useWebSocket(notificationsWsUrl);
+
+  useEffect(() => {
+    if (!notificationMessage || typeof notificationMessage !== "object") return;
+    if (!notificationMessage.message) return;
+
+    toast.success(notificationMessage.message, {
+      duration: 5000,
+    });
+  }, [notificationMessage]);
 
   return (
     <>

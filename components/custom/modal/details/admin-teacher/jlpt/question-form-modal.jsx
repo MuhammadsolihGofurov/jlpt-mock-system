@@ -18,7 +18,7 @@ import { authAxios } from "@/utils/axios";
 import { mutate } from "swr";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { uploadMedia } from "@/utils/uploadMedia";
+import { normalizeMediaReference, uploadMedia } from "@/utils/uploadMedia";
 
 const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = null, question_count = 0, groupName, currentMockType }) => {
   const { closeModal } = useModal();
@@ -42,7 +42,7 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
       question_number: question_count + 1,
       score: 1,
       image: null,
-      options: [
+      options: question?.options || [
         { text: "", is_correct: false, image: null },
         { text: "", is_correct: false, image: null },
         { text: "", is_correct: false, image: null },
@@ -60,7 +60,14 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
 
   useEffect(() => {
     if (question) {
-      reset(question);
+      reset({
+        ...question,
+        options: question?.options.map(opt => ({
+          text: opt.text || "",
+          is_correct: opt.is_correct || false,
+          image: opt.image || null
+        }))
+      });
       if (question.image) setPreview(question.image);
     }
   }, [question, reset]);
@@ -89,6 +96,16 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
 
   const onSubmit = async (values) => {
     const toastId = toast.loading(intl.formatMessage({ id: "Saqlanmoqda..." }));
+
+    const cleanOptions = values.options.filter(opt =>
+      opt.text.trim() !== "" || opt.image !== null
+    );
+
+    if (cleanOptions.length === 0) {
+      toast.error(intl.formatMessage({ id: "Kamida bitta variant bo'lishi kerak!" }));
+      return;
+    }
+
     try {
       const hasCorrect = values.options.some((opt) => opt.is_correct);
       if (!hasCorrect) {
@@ -115,7 +132,7 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
           return {
             text: opt.text || "",
             is_correct: opt.is_correct,
-            image: typeof opt.image === "string" ? opt.image : null,
+            image: typeof opt.image === "string" ? normalizeMediaReference(opt.image) : null,
           };
         })
       );

@@ -20,7 +20,7 @@ const HomeworkQuestionRenderer = ({ question, index, onSelect, result, isCheckin
             <div className="mb-8 text-center">
                 <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6">
                     <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                    <span className="text-[12px] font-black tracking-[0.2em] uppercase uppercase text-white/80">{intl.formatMessage({ id: "Savol" })} {index + 1}</span>
+                    <span className="text-[12px] font-black tracking-[0.2em] uppercase text-white/80">{intl.formatMessage({ id: "Savol" })} {index + 1}</span>
                 </div>
                 <h2
                     className="text-2xl md:text-4xl font-black text-white leading-tight drop-shadow-xl"
@@ -65,9 +65,23 @@ const HomeworkQuestionRenderer = ({ question, index, onSelect, result, isCheckin
                             </div>
 
                             {/* VARIANT MATNI */}
-                            <span className={`flex-1 font-bold text-lg md:text-xl drop-shadow-sm ${isCorrect || isWrong ? 'text-white' : 'text-white/90'}`}>
-                                {option.text}
-                            </span>
+                            <div className="flex-1 min-w-0">
+                                {option.image && (
+                                    <div className="mb-2 rounded-xl bg-black/20 p-2 border border-white/20">
+                                        <img
+                                            src={option.image}
+                                            alt={`Option ${idx + 1}`}
+                                            className="w-full h-40 md:h-48 rounded-lg object-contain"
+                                        />
+                                    </div>
+                                )}
+
+                                {option.text ? (
+                                    <span className={`block font-bold text-lg md:text-xl drop-shadow-sm break-words ${isCorrect || isWrong ? 'text-white' : 'text-white/90'}`}>
+                                        {option.text}
+                                    </span>
+                                ) : null}
+                            </div>
 
                             {/* JAVOB HOLATI */}
                             <div className="absolute top-4 right-4">

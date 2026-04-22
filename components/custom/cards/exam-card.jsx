@@ -139,7 +139,7 @@ const ExamCard = ({ item, currentExamType, exam_type }) => {
         {canManage && (
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
             <button
-              onClick={() => openModal("EXAM_FORM", { exam: item }, "middle")}
+              onClick={() => openModal("EXAM_FORM", { exam: item, currentExamType, exam_type }, "middle")}
               className="p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-primary hover:text-white transition-all"
             >
               <Edit2 size={16} />

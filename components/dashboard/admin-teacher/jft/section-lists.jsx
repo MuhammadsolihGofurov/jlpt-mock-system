@@ -149,7 +149,7 @@ const SectionList = ({ mockId, activeSection, sections, onSelect, currentMockTyp
               >
                 <Edit2 size={12} />
               </button>
-              <button
+              {/* <button
                 onClick={(e) => handleDeleteSection(e, section)}
                 className={`p-1.5 rounded-lg transition-colors ${activeSection?.id === section.id
                   ? "hover:bg-white/20"
@@ -157,7 +157,7 @@ const SectionList = ({ mockId, activeSection, sections, onSelect, currentMockTyp
                   }`}
               >
                 <Trash2 size={12} />
-              </button>
+              </button> */}
             </div>
           </div>
         ))

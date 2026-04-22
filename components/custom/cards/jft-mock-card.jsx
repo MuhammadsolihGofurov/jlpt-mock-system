@@ -13,12 +13,14 @@ import { useModal } from "@/context/modal-context";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useIntl } from "react-intl";
+import { useSelector } from "react-redux";
 
 const JftCard = ({ item }) => {
     const { openModal } = useModal();
     const intl = useIntl();
     const router = useRouter();
     const isPublished = item.status === "PUBLISHED";
+    const { user } = useSelector(state => state.auth);
 
     // 1. Publish / Unpublish
     const handleTogglePublish = () => {
@@ -79,6 +81,8 @@ const JftCard = ({ item }) => {
 
     const makedHref = `/dashboard/mock-tests/jft/${item.id}`;
 
+    const isCreator = user?.id === item?.created_by_id;
+
     return (
         <div className="group bg-white border border-slate-100 p-5 rounded-[2.25rem] shadow-sm hover:shadow-2xl hover:shadow-orange-100/50 transition-all duration-500 flex flex-col h-full relative overflow-hidden text-left">
             {/* Top Floating Actions */}
@@ -91,7 +95,7 @@ const JftCard = ({ item }) => {
                     <Copy size={16} />
                 </button>
 
-                {!isPublished && (
+                {!isPublished && isCreator && (
                     <>
                         <button
                             onClick={() => openModal("JFT_MOCK_FORM", { mock: item }, "middle")}
@@ -142,9 +146,9 @@ const JftCard = ({ item }) => {
 
             {/* Footer Actions */}
             <div
-                className={`mt-6 pt-5 border-t border-slate-50 flex items-center ${!isPublished ? "justify-between" : "justify-end"}`}
+                className={`mt-6 pt-5 border-t border-slate-50 flex items-center ${!isPublished && isCreator ? "justify-between" : "justify-end"}`}
             >
-                {!isPublished && (
+                {!isPublished && isCreator && (
                     <Link href={makedHref}>
                         <button className="flex items-center gap-2 text-[11px] font-black text-primary hover:gap-3 transition-all uppercase tracking-widest">
                             {intl.formatMessage({ id: "Savollar" })}{" "}

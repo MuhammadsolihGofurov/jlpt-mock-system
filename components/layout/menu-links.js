@@ -6,6 +6,7 @@ import {
   FileQuestion,
   Files,
   Home,
+  MessageCircle,
   MonitorCogIcon,
   Settings,
   Ticket,
@@ -93,7 +94,14 @@ export const menus = [{
     href: "/dashboard/flashcards",
     icon: FileQuestion,
     roles: ["STUDENT", "OWNER", "CENTER_ADMIN", "TEACHER"],
-    is_mobile: true,
+    is_mobile: false,
+  },
+  {
+    label: "Live Chat",
+    href: "/dashboard/roulette",
+    icon: MessageCircle,
+    roles: ["OWNER", "CENTER_ADMIN", "TEACHER", "STUDENT"],
+    is_mobile: false,
   },
   {
     label: "Profil",
