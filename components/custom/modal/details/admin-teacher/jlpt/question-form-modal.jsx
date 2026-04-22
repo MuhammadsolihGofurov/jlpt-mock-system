@@ -59,15 +59,17 @@ const QuestionFormModal = ({ sectionType, sectionId = 0, groupId, question = nul
   const watchedOptions = watch("options");
 
   useEffect(() => {
-    reset({
-      ...question,
-      shared_content: question.shared_content?.id || null,
-      options: question.options.map(opt => ({
-        text: opt.text || "",
-        is_correct: opt.is_correct || false,
-        image: opt.image || null
-      }))
-    });
+    if (question) {
+      reset({
+        ...question,
+        options: question?.options.map(opt => ({
+          text: opt.text || "",
+          is_correct: opt.is_correct || false,
+          image: opt.image || null
+        }))
+      });
+      if (question.image) setPreview(question.image);
+    }
   }, [question, reset]);
 
   const handlePaste = (e) => {
