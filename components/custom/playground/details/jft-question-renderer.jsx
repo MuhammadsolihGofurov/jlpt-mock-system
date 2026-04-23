@@ -323,7 +323,7 @@ export const JFTQuestionRenderer = ({
                                 max={duration}
                                 step={0.1}
                                 value={currentTime}
-                                onChange={handleSeek}
+                                // onChange={handleSeek}
                                 className="flex-1 h-1.5 rounded-full accent-primary cursor-pointer"
                                 style={{
                                     background: `linear-gradient(to right, #f97316 ${(currentTime / duration) * 100}%, #e2e8f0 ${(currentTime / duration) * 100}%)`
