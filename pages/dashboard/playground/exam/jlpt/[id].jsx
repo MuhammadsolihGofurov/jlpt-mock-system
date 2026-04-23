@@ -84,7 +84,7 @@ const ExamPlaygroundPage = ({ customLoading }) => {
   if (examData) {
     return <>
       <Seo title={examInfo?.title || "Exam"} />
-      <JLPTExamPlayground examData={examData} currentExamType={currentExamType} stopSecurity={stopSecurity}/>
+      <JLPTExamPlayground examData={examData} currentExamType={currentExamType} stopSecurity={stopSecurity} />
     </>;
   }
 

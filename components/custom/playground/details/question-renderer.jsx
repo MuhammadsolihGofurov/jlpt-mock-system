@@ -68,7 +68,7 @@ export const QuestionRenderer = ({
         {group?.questions.map((q) => (
           <div key={q.id} className="relative">
             {/* Savol ichidagi rasm bo'lsa */}
-            {q.image && (
+            {q?.image && (
               <div className="mb-4 max-w-md mx-auto rounded-2xl overflow-hidden shadow-md">
                 <img src={q.image} alt="Q" className="w-full h-auto" />
               </div>
@@ -106,11 +106,11 @@ export const QuestionRenderer = ({
 
                     {/* Variant tarkibi: Matn yoki Rasm */}
                     <div className="flex-1 min-w-0">
-                      {option.image ? (
+                      {option?.image ? (
                         // Agar rasm bo'lsa
                         <div className="flex justify-center">
                           <img
-                            src={option.image}
+                            src={option?.image}
                             alt={`Variant ${idx + 1}`}
                             className="max-h-52 max-w-full rounded-xl object-contain border border-slate-100"
                           />

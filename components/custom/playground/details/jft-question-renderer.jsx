@@ -10,12 +10,12 @@ export const JFTQuestionRenderer = ({
     isActiveGroup,
     onAudioEnd,
     sectionType,
-    isLastGroup,   // oxirgi guruh — countdown va auto-next ishlamaydi
-    audioMode,     // kept for compatibility but logic is internal now
+    isLastGroup,  // oxirgi guruh — auto-next va skip ishlamaydi
+    audioMode,    // kept for compatibility
 }) => {
+    const intl = useIntl();
     const audioRef = useRef(null);
     const replayTimerRef = useRef(null);
-    const autoNextTimerRef = useRef(null);
 
     const [playCounts, setPlayCounts] = useState({});
     const [isPlaying, setIsPlaying] = useState(false);
@@ -24,76 +24,44 @@ export const JFTQuestionRenderer = ({
     const [isMuted, setIsMuted] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
-    const [countdown, setCountdown] = useState(null); // 3,2,1 countdown before next group
     const [replayRequested, setReplayRequested] = useState(false);
-    const intl = useIntl();
 
     // Audio URL: group.audio_file (shared) yoki birinchi question.audio_file
     const audioUrl = group.audio_file || group.questions?.[0]?.audio_file;
 
-    // Har yangi group kelganda reset
+    // Har yangi group kelganda barcha holatni tozalash
     useEffect(() => {
         setIsPlaying(false);
         setIsAudioFinished(false);
-        setCountdown(null);
         setReplayRequested(false);
         setCurrentTime(0);
         setDuration(0);
-        clearTimers();
+        if (replayTimerRef.current) clearTimeout(replayTimerRef.current);
     }, [group.id]);
 
     // LISTENING + isActiveGroup bo'lganda audio avtomatik boshlash
     useEffect(() => {
         if (sectionType === "LISTENING" && isActiveGroup && audioUrl) {
-            // Birozdan keyin avtomatik boshlaymiz (smooth UX)
             const delayTimer = setTimeout(() => {
-                playAudio(audioUrl, true); // isAuto=true
+                playAudio(audioUrl);
             }, 600);
             return () => clearTimeout(delayTimer);
         }
     }, [isActiveGroup, group.id, sectionType]);
 
-    // Volume/mute effect
+    // Volume/mute sinxronlash
     useEffect(() => {
         if (audioRef.current) {
             audioRef.current.volume = isMuted ? 0 : volume;
         }
     }, [volume, isMuted]);
 
-    // Countdown effect: audio tugagach 3 soniya kutib keyingiga o'tish
-    // Oxirgi guruhda countdown UMUMAN ishlamaydi
-    useEffect(() => {
-        if (!isAudioFinished || replayRequested || isLastGroup) return;
-
-        let count = 3;
-        setCountdown(count);
-
-        const interval = setInterval(() => {
-            count -= 1;
-            if (count <= 0) {
-                clearInterval(interval);
-                setCountdown(null);
-                if (onAudioEnd) onAudioEnd();
-            } else {
-                setCountdown(count);
-            }
-        }, 1000);
-
-        autoNextTimerRef.current = interval;
-        return () => clearInterval(interval);
-    }, [isAudioFinished, replayRequested, isLastGroup]);
-
-    const clearTimers = () => {
-        if (replayTimerRef.current) clearTimeout(replayTimerRef.current);
-        if (autoNextTimerRef.current) clearInterval(autoNextTimerRef.current);
-    };
-
-    const playAudio = useCallback((url, isAuto = false) => {
+    const playAudio = useCallback((url) => {
         if (!url || !audioRef.current) return;
 
         const currentCount = playCounts[url] || 0;
         if (currentCount >= 2) {
-            toast.warn(intl.formatMessage({ id: "Maksimal tinglash soni: 2 marta" }));
+            toast.warn("Maksimal tinglash soni: 2 marta");
             return;
         }
 
@@ -104,8 +72,6 @@ export const JFTQuestionRenderer = ({
             .then(() => {
                 setIsPlaying(true);
                 setIsAudioFinished(false);
-                setCountdown(null);
-                clearTimers();
                 setPlayCounts(prev => ({ ...prev, [url]: (prev[url] || 0) + 1 }));
             })
             .catch(err => {
@@ -117,8 +83,7 @@ export const JFTQuestionRenderer = ({
         if (!audioUrl) return;
         setReplayRequested(true);
         setIsAudioFinished(false);
-        setCountdown(null);
-        clearTimers();
+        if (replayTimerRef.current) clearTimeout(replayTimerRef.current);
         playAudio(audioUrl);
     };
 
@@ -139,6 +104,7 @@ export const JFTQuestionRenderer = ({
         setIsPlaying(false);
         setIsAudioFinished(true);
         setReplayRequested(false);
+        // Avtomatik keyingi guruhga O'TILMAYDI — faqat user tugma bosganida o'tiladi
     };
 
     const handleTimeUpdate = () => {
@@ -178,33 +144,32 @@ export const JFTQuestionRenderer = ({
         return `${m}:${s}`;
     };
 
-    const VolumeIcon = isMuted || volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
-    const playCount = playCounts[audioUrl] || 0;
-
     // Guruhning barcha savollari javoblanganligi
     const isAllGroupAnswered = useMemo(() => {
         if (!group?.questions?.length) return false;
         return group.questions.every(
-            (q) => selectedAnswers.hasOwnProperty(q.id) && selectedAnswers[q.id] !== undefined && selectedAnswers[q.id] !== null
+            (q) =>
+                selectedAnswers.hasOwnProperty(q.id) &&
+                selectedAnswers[q.id] !== undefined &&
+                selectedAnswers[q.id] !== null
         );
     }, [group.questions, selectedAnswers]);
 
-    // Audio hali tugamagan, lekin barcha javoblar berilgan → skip
-    // Oxirgi guruhda skip ham ishlamaydi
-    const canSkip = sectionType === "LISTENING" && isActiveGroup && isAllGroupAnswered && !isAudioFinished && !isLastGroup;
+    // "Keyingi savol" tugmasi: barcha javoblar berilgan + LISTENING + oxirgi guruh emas
+    const canSkip = sectionType === "LISTENING" && isActiveGroup && isAllGroupAnswered && !isLastGroup;
 
     const handleSkipToNext = () => {
-        if (!audioRef.current) return;
-        // Audioni to'xtatamiz
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+        }
         setIsPlaying(false);
-        setIsAudioFinished(false);
-        setCountdown(null);
-        clearTimers();
-        // To'g'ridan-to'g'ri keyingiga o'tish
+        if (replayTimerRef.current) clearTimeout(replayTimerRef.current);
         if (onAudioEnd) onAudioEnd();
     };
+
+    const VolumeIcon = isMuted || volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
+    const playCount = playCounts[audioUrl] || 0;
 
     return (
         <div
@@ -224,20 +189,18 @@ export const JFTQuestionRenderer = ({
                 hidden
             />
 
-            {/* ── LISTENING Audio Player Panel ── */}
+            {/* LISTENING Audio Player Panel */}
             {sectionType === "LISTENING" && audioUrl && (
                 <div className={`px-6 pt-6 pb-4 transition-colors duration-300
                     ${isPlaying
                         ? "bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-200"
-                        : isAudioFinished
-                            ? "bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200"
-                            : "bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200"
+                        : "bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200"
                     }`}
                 >
-                    {/* Top row: icon + status + replay */}
+                    {/* Top row */}
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                            {/* Play/Pause button */}
+                            {/* Play/Pause */}
                             <button
                                 onClick={handleTogglePlayPause}
                                 disabled={playCount >= 2 && !isPlaying}
@@ -255,7 +218,7 @@ export const JFTQuestionRenderer = ({
                                 }
                             </button>
 
-                            {/* Headset icon animated */}
+                            {/* Headset */}
                             <div className={`p-2 rounded-full transition-all
                                 ${isPlaying ? "bg-primary/10 text-primary" : "bg-slate-200 text-slate-400"}`}>
                                 <Headset size={18} className={isPlaying ? "animate-pulse" : ""} />
@@ -271,36 +234,15 @@ export const JFTQuestionRenderer = ({
                                 </p>
                                 <p className="text-xs text-slate-500">
                                     {intl.formatMessage({ id: "Tinglashlar" })}: {playCount}/2
-                                    {playCount >= 2 && <span className="text-red-400 ml-1">(limit)</span>}
+                                    {playCount >= 2 && (
+                                        <span className="text-red-400 ml-1">(limit)</span>
+                                    )}
                                 </p>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-2">
-                            {/* Countdown badge */}
-                            {countdown !== null && (
-                                <div className="flex items-center gap-1 bg-amber-100 border border-amber-300 text-amber-700 px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-                                    <span>{intl.formatMessage({ id: "Keyingisi" })}</span>
-                                    <span className="w-5 h-5 bg-amber-400 text-white rounded-full flex items-center justify-center font-black text-xs">
-                                        {countdown}
-                                    </span>
-                                </div>
-                            )}
-
-                            {/* Skip button — barcha javoblar berilgan, audio hali o'ynayapti */}
-                            {canSkip && (
-                                <button
-                                    onClick={handleSkipToNext}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow-sm shadow-emerald-200"
-                                >
-                                    <SkipForward size={12} />
-                                    {
-                                        intl.formatMessage({ id: "Keyingisiga o'tish" })
-                                    }
-                                </button>
-                            )}
-
-                            {/* Replay button */}
+                            {/* Qayta tinglash */}
                             {isAudioFinished && playCount < 2 && (
                                 <button
                                     onClick={handleReplay}
@@ -310,13 +252,26 @@ export const JFTQuestionRenderer = ({
                                     {intl.formatMessage({ id: "Qayta tinglash" })}
                                 </button>
                             )}
+
+                            {/* Keyingi savol */}
+                            {canSkip && (
+                                <button
+                                    onClick={handleSkipToNext}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow-sm shadow-emerald-200"
+                                >
+                                    <SkipForward size={12} />
+                                    {intl.formatMessage({ id: "Keyingi savol" })}
+                                </button>
+                            )}
                         </div>
                     </div>
 
                     {/* Progress bar */}
                     {duration > 0 && (
                         <div className="flex items-center gap-2 mb-2">
-                            <span className="text-xs text-slate-400 w-8 text-right tabular-nums">{formatTime(currentTime)}</span>
+                            <span className="text-xs text-slate-400 w-8 text-right tabular-nums">
+                                {formatTime(currentTime)}
+                            </span>
                             <input
                                 type="range"
                                 min={0}
@@ -329,13 +284,18 @@ export const JFTQuestionRenderer = ({
                                     background: `linear-gradient(to right, #f97316 ${(currentTime / duration) * 100}%, #e2e8f0 ${(currentTime / duration) * 100}%)`
                                 }}
                             />
-                            <span className="text-xs text-slate-400 w-8 tabular-nums">{formatTime(duration)}</span>
+                            <span className="text-xs text-slate-400 w-8 tabular-nums">
+                                {formatTime(duration)}
+                            </span>
                         </div>
                     )}
 
                     {/* Volume control */}
                     <div className="flex items-center gap-2">
-                        <button onClick={toggleMute} className="text-slate-400 hover:text-slate-600 transition-colors">
+                        <button
+                            onClick={toggleMute}
+                            className="text-slate-400 hover:text-slate-600 transition-colors"
+                        >
                             <VolumeIcon size={15} />
                         </button>
                         <input
@@ -350,12 +310,14 @@ export const JFTQuestionRenderer = ({
                                 background: `linear-gradient(to right, #f97316 ${(isMuted ? 0 : volume) * 100}%, #e2e8f0 ${(isMuted ? 0 : volume) * 100}%)`
                             }}
                         />
-                        <span className="text-xs text-slate-400">{Math.round((isMuted ? 0 : volume) * 100)}%</span>
+                        <span className="text-xs text-slate-400">
+                            {Math.round((isMuted ? 0 : volume) * 100)}%
+                        </span>
                     </div>
                 </div>
             )}
 
-            {/* ── Question Content ── */}
+            {/* Question Content */}
             <div className="p-6 sm:p-8">
                 <div className="mb-6">
                     <span className="px-4 py-1 rounded-full text-xs font-black uppercase bg-primary text-white">
@@ -376,17 +338,16 @@ export const JFTQuestionRenderer = ({
 
                 <div className="space-y-8">
                     {group?.questions.map((q) => {
-                        // Per-question audio (only if no group-level audio)
                         const qAudioUrl = !group.audio_file ? q.audio_file : null;
 
                         return (
                             <div key={q.id} className="p-4 rounded-2xl border border-dashed border-slate-200">
-                                {/* Per-question audio player (mini) */}
+                                {/* Mini audio player (question-level) */}
                                 {sectionType === "LISTENING" && qAudioUrl && (
                                     <div className="mb-3 flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200">
                                         <button
                                             onClick={() => playAudio(qAudioUrl)}
-                                            disabled={(playCounts[qAudioUrl] || 0) >= 2 && !isPlaying}
+                                            disabled={(playCounts[qAudioUrl] || 0) >= 2}
                                             className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center hover:bg-orange-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
                                         >
                                             <Play size={12} fill="currentColor" className="ml-0.5" />
@@ -398,7 +359,9 @@ export const JFTQuestionRenderer = ({
                                 )}
 
                                 <div className="text-slate-800 mb-4 text-lg flex gap-3">
-                                    <span className="font-black text-primary shrink-0">{q.question_number}.</span>
+                                    <span className="font-black text-primary shrink-0">
+                                        {q.question_number}.
+                                    </span>
                                     <div dangerouslySetInnerHTML={{ __html: q.text }} />
                                 </div>
 
@@ -422,9 +385,7 @@ export const JFTQuestionRenderer = ({
                                                     }`}>
                                                     {oIdx + 1}
                                                 </span>
-
                                                 <span className="font-medium text-sm text-slate-700 flex items-center gap-2 flex-wrap">
-                                                    {/* Image support */}
                                                     {option.image && (
                                                         <img
                                                             src={option.image}

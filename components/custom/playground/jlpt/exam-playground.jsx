@@ -100,7 +100,7 @@ const JLPTExamPlayground = ({ examData, currentExamType, examType, stopSecurity 
 
             await authAxios.post(currentExamType?.submit_exam, payload);
             toast.success(intl.formatMessage({ id: "Imtihon yakunlandi!" }));
-            router.push(examType === "jlpt" ? "/dashboard/assignments/exam-jlpt" : "/dashboard/assignments/exam-jft");
+            router.push("/dashboard/assignments/exam-jlpt");
         } catch (error) {
             console.error("Submission error:", error);
             toast.error(intl.formatMessage({ id: "Topshirishda xatolik yuz berdi." }));
