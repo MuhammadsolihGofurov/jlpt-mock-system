@@ -45,8 +45,17 @@ const ExamCard = ({ item, currentExamType, exam_type }) => {
   const isOpen = item.status === "OPEN" && !isCompleted;
   const isPublished = item.is_published;
 
+  // Linked mock test status (live or graded snapshot). Re-opening a closed
+  // exam is gated on the backend when the mock is not PUBLISHED, so mirror
+  // that here by disabling the "Ochish" button with a clear hint.
+  const linkedMockStatus =
+    item?.mock_test_data?.status || item?.jft_mock_test_data?.status || null;
+  const isMockPublished = !linkedMockStatus || linkedMockStatus === "PUBLISHED";
+  const blockOpen = !isOpen && !isMockPublished;
+
   // 1. Status o'zgartirish (OPEN / CLOSED)
   const handleToggleStatus = () => {
+    if (blockOpen) return;
     const newStatus = isOpen ? "CLOSED" : "OPEN";
     openModal(
       "CONFIRM_MODAL",
@@ -200,10 +209,21 @@ const ExamCard = ({ item, currentExamType, exam_type }) => {
         <div className="grid grid-cols-2 gap-2 mb-4">
           <button
             onClick={handleToggleStatus}
-            className={`flex items-center justify-center gap-2 py-3 rounded-2xl text-[11px] font-black uppercase tracking-tighter transition-all ${isOpen
-              ? "bg-red-50 text-red-600 hover:bg-red-100"
-              : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
-              }`}
+            disabled={blockOpen}
+            title={
+              blockOpen
+                ? intl.formatMessage({
+                    id: "Bog'langan mock test e'lon qilinmagan. Avval mockni e'lon qiling.",
+                  })
+                : undefined
+            }
+            className={`flex items-center justify-center gap-2 py-3 rounded-2xl text-[11px] font-black uppercase tracking-tighter transition-all ${
+              blockOpen
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : isOpen
+                  ? "bg-red-50 text-red-600 hover:bg-red-100"
+                  : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+            }`}
           >
             {isOpen ? <Lock size={14} /> : <Unlock size={14} />}
             {intl.formatMessage({ id: isOpen ? "Yopish" : "Ochish" })}

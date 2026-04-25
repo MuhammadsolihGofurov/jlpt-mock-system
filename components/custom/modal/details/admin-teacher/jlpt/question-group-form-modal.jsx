@@ -2,21 +2,19 @@ import { useForm, Controller } from "react-hook-form";
 import {
   Layers,
   Save,
-  Type,
-  AlignLeft,
-  Hash,
   Music,
   ImageIcon,
-  FileText,
+  X,
+  Trash2,
 } from "lucide-react";
-import { Input, RichTextarea, Textarea } from "@/components/ui";
+import { Input, RichTextarea } from "@/components/ui";
 import { useModal } from "@/context/modal-context";
 import { useIntl } from "react-intl";
 import { toast } from "react-toastify";
 import { handleApiError } from "@/utils/handle-error";
 import { authAxios } from "@/utils/axios";
 import { mutate } from "swr";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { uploadMedia } from "@/utils/uploadMedia";
 
@@ -29,12 +27,21 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0, curren
   const sectionId = section?.id;
   const sectionType = section?.section_type;
 
+  // Track currently-saved media URLs separately from form file inputs.
+  // null means "remove on save"; undefined means "leave unchanged".
+  const [existingAudioUrl, setExistingAudioUrl] = useState(null);
+  const [existingImageUrl, setExistingImageUrl] = useState(null);
+  const [audioRemoved, setAudioRemoved] = useState(false);
+  const [imageRemoved, setImageRemoved] = useState(false);
+
   const {
     register,
     handleSubmit,
     control,
     setError,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -48,6 +55,11 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0, curren
     },
   });
 
+  const watchedAudio = watch("audio_file");
+  const watchedImage = watch("image");
+  const newAudioFile = watchedAudio instanceof FileList ? watchedAudio[0] : watchedAudio;
+  const newImageFile = watchedImage instanceof FileList ? watchedImage[0] : watchedImage;
+
   useEffect(() => {
     if (group) {
       reset({
@@ -56,9 +68,35 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0, curren
         instruction: group.instruction,
         reading_text: group.reading_text || "",
         order: group.order,
+        audio_file: null,
+        image: null,
       });
+      setExistingAudioUrl(group.audio_file || null);
+      setExistingImageUrl(group.image || null);
+      setAudioRemoved(false);
+      setImageRemoved(false);
     }
-  }, [group]);
+  }, [group, reset]);
+
+  const handleRemoveExistingAudio = () => {
+    setExistingAudioUrl(null);
+    setAudioRemoved(true);
+    setValue("audio_file", null);
+  };
+
+  const handleClearNewAudio = () => {
+    setValue("audio_file", null);
+  };
+
+  const handleRemoveExistingImage = () => {
+    setExistingImageUrl(null);
+    setImageRemoved(true);
+    setValue("image", null);
+  };
+
+  const handleClearNewImage = () => {
+    setValue("image", null);
+  };
 
   const onSubmit = async (values) => {
     const toastId = toast.loading(
@@ -68,21 +106,22 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0, curren
     );
 
     try {
-      // 1. Rasm upload
-      let image_key = undefined;
+      let image_key;
       const imageFile = values.image instanceof FileList ? values.image[0] : values.image;
       if (imageFile instanceof File) {
         image_key = await uploadMedia(imageFile, "jlpt_group");
+      } else if (imageRemoved) {
+        image_key = null;
       }
 
-      // 2. Audio upload
-      let audio_key = undefined;
+      let audio_key;
       const audioFile = values.audio_file instanceof FileList ? values.audio_file[0] : values.audio_file;
       if (audioFile instanceof File) {
         audio_key = await uploadMedia(audioFile, "jlpt_group_audio");
+      } else if (audioRemoved) {
+        audio_key = null;
       }
 
-      // 3. JSON payload
       const payload = {
         mondai_number: values.mondai_number,
         title: values.title,
@@ -157,16 +196,6 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0, curren
           </div>
         </div>
 
-        {/* <Textarea
-          label="Yo'riqnoma (Instruction)"
-          name="instruction"
-          register={register}
-          error={errors.instruction}
-          rows={2}
-          placeholder="Savollar uchun ko'rsatma yozing..."
-          rules={{ required: "Yo'riqnoma majburiy" }}
-        /> */}
-
         <Controller
           name="instruction"
           control={control}
@@ -182,16 +211,7 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0, curren
           )}
         />
 
-        {
-          (section?.section_type === "GRAMMAR_READING" || section?.section_type === "READING") &&
-          // <Textarea
-          //   label="Reading Text / Context"
-          //   name="reading_text"
-          //   register={register}
-          //   error={errors.reading_text}
-          //   rows={6}
-          //   placeholder="Asosiy matnni kiriting..."
-          // />
+        {(section?.section_type === "GRAMMAR_READING" || section?.section_type === "READING") && (
           <Controller
             name="reading_text"
             control={control}
@@ -205,13 +225,47 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0, curren
               />
             )}
           />
-        }
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {
-            currentMockType?.image && <div className="space-y-2">
+          {currentMockType?.image && (
+            <div className="space-y-2">
               <label className="text-sm font-black text-heading ml-1 flex items-center gap-2">
                 <ImageIcon size={16} /> {intl.formatMessage({ id: "Rasm (Optional)" })}
               </label>
+
+              {existingImageUrl && !newImageFile && (
+                <div className="relative w-40 h-24 overflow-hidden rounded-xl border border-slate-200">
+                  <img
+                    src={existingImageUrl}
+                    alt="group"
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveExistingImage}
+                    title={intl.formatMessage({ id: "O'chirish" })}
+                    className="absolute top-1 right-1 bg-white/80 p-1 rounded-full shadow-sm text-red-500 hover:bg-white"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              )}
+
+              {newImageFile instanceof File && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-100 text-xs text-emerald-700 font-bold">
+                  <ImageIcon size={14} />
+                  <span className="truncate flex-1">{newImageFile.name}</span>
+                  <button
+                    type="button"
+                    onClick={handleClearNewImage}
+                    className="text-emerald-700 hover:text-red-500"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
               <input
                 type="file"
                 accept="image/*"
@@ -219,7 +273,7 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0, curren
                 className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
               />
             </div>
-          }
+          )}
 
           {/* Faqat LISTENING bo'lsa AUDIO chiqadi */}
           {sectionType === "LISTENING" && (
@@ -227,6 +281,38 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0, curren
               <label className="text-sm font-black text-heading ml-1 flex items-center gap-2">
                 <Music size={16} /> Audio Fayl
               </label>
+
+              {existingAudioUrl && !newAudioFile && (
+                <div className="space-y-2">
+                  <audio
+                    controls
+                    src={existingAudioUrl}
+                    className="w-full h-10 rounded-xl"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveExistingAudio}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-red-500 hover:text-red-600"
+                  >
+                    <Trash2 size={14} /> {intl.formatMessage({ id: "Audio faylni o'chirish" })}
+                  </button>
+                </div>
+              )}
+
+              {newAudioFile instanceof File && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-700 font-bold">
+                  <Music size={14} />
+                  <span className="truncate flex-1">{newAudioFile.name}</span>
+                  <button
+                    type="button"
+                    onClick={handleClearNewAudio}
+                    className="text-blue-700 hover:text-red-500"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
               <input
                 type="file"
                 accept="audio/*"
@@ -237,15 +323,7 @@ const QuestionGroupFormModal = ({ section, group = null, group_count = 0, curren
           )}
         </div>
 
-        <div className="flex items-center justify-end flex-col-reverse sm:flex-row  pt-6 border-t border-gray-100">
-          {/* <div className="w-32">
-            <Input
-              label="Tartib"
-              name="order"
-              type="number"
-              register={register}
-            />
-          </div> */}
+        <div className="flex items-center justify-end flex-col-reverse sm:flex-row pt-6 border-t border-gray-100">
           <div className="flex gap-3">
             <button
               type="button"

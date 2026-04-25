@@ -21,9 +21,15 @@ const MockCard = ({ item }) => {
   const router = useRouter();
   const { user } = useSelector(state => state.auth);
   const isPublished = item.status === "PUBLISHED";
+  const openExamCount = Number(item.open_exam_assignments_count || 0);
+  // Server rejects unpublishing while open exam assignments exist; mirror that
+  // here so the user can't even click the button. Publish (DRAFT -> PUBLISHED)
+  // remains allowed regardless.
+  const blockUnpublish = isPublished && openExamCount > 0;
 
   // 1. Publish / Unpublish
   const handleTogglePublish = () => {
+    if (blockUnpublish) return;
     openModal(
       "CONFIRM_MODAL",
       {
@@ -168,11 +174,22 @@ const MockCard = ({ item }) => {
 
           <button
             onClick={handleTogglePublish}
-            title={isPublished ? "Nashrdan olish" : "Nashr qilish"}
-            className={`p-3 rounded-2xl transition-all active:scale-90 ${isPublished
-              ? "bg-slate-900 text-white hover:bg-slate-800"
-              : "bg-primary text-white hover:bg-primary-dark shadow-lg shadow-orange-100"
-              }`}
+            disabled={blockUnpublish}
+            title={
+              blockUnpublish
+                ? intl.formatMessage(
+                    { id: "{count} ta ochiq imtihon mavjud. Avval imtihonlarni yoping." },
+                    { count: openExamCount },
+                  )
+                : isPublished ? "Nashrdan olish" : "Nashr qilish"
+            }
+            className={`p-3 rounded-2xl transition-all active:scale-90 ${
+              blockUnpublish
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : isPublished
+                  ? "bg-slate-900 text-white hover:bg-slate-800"
+                  : "bg-primary text-white hover:bg-primary-dark shadow-lg shadow-orange-100"
+            }`}
           >
             {isPublished ? <RotateCcw size={18} /> : <Send size={18} />}
           </button>
