@@ -28,6 +28,10 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
   const intl = useIntl();
   const [preview, setPreview] = useState(null);
 
+  const [existingAudioUrl, setExistingAudioUrl] = useState(null);
+  const [audioRemoved, setAudioRemoved] = useState(false);
+  const [imageRemoved, setImageRemoved] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -59,12 +63,16 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
   });
 
   const watchedOptions = watch("options");
+  const watchedAudio = watch("audio_file");
+  const newAudioFile = watchedAudio instanceof FileList ? watchedAudio[0] : watchedAudio;
 
   useEffect(() => {
     if (question) {
       reset({
         ...question,
         shared_content: question.shared_content?.id || null,
+        audio_file: null,
+        image: null,
         options: question.options.map(opt => ({
           text: opt.text || "",
           is_correct: opt.is_correct || false,
@@ -72,9 +80,28 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
         }))
       });
 
-      if (question.image) setPreview(question.image);
+      setPreview(question.image || null);
+      setExistingAudioUrl(question.audio_file || null);
+      setAudioRemoved(false);
+      setImageRemoved(false);
     }
   }, [question, reset]);
+
+  const handleRemoveExistingAudio = () => {
+    setExistingAudioUrl(null);
+    setAudioRemoved(true);
+    setValue("audio_file", null);
+  };
+
+  const handleClearNewAudio = () => {
+    setValue("audio_file", null);
+  };
+
+  const handleRemoveImage = () => {
+    setPreview(null);
+    setValue("image", null);
+    setImageRemoved(true);
+  };
 
   const handlePaste = (e) => {
     const items = e.clipboardData?.items;
@@ -124,18 +151,23 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
         return;
       }
 
-      // 1. Savol rasmi upload
+      // 1. Savol rasmi upload (yangi fayl bo'lsa) yoki olib tashlash (null) yoki
+      // o'zgartirmaslik (undefined - eski rasm saqlanadi).
       let image_key = undefined;
       const imageFile = values.image instanceof FileList ? values.image[0] : values.image;
       if (imageFile instanceof File) {
         image_key = await uploadMedia(imageFile, "jft_question");
+      } else if (imageRemoved) {
+        image_key = null;
       }
 
-      // 2. Savol audiosi upload
+      // 2. Savol audiosi (xuddi shu mantiq).
       let audio_key = undefined;
       const audioFile = values.audio_file instanceof FileList ? values.audio_file[0] : values.audio_file;
       if (audioFile instanceof File) {
         audio_key = await uploadMedia(audioFile, "jft_question_audio");
+      } else if (audioRemoved) {
+        audio_key = null;
       }
 
       // 3. Options rasmlari upload
@@ -250,12 +282,25 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
           {preview && (
             <div className="relative w-40 h-24 mb-2 overflow-hidden border rounded-xl border-slate-200">
               <img src={preview} alt="Preview" className="object-cover w-full h-full" />
-              <button type="button" onClick={() => { setPreview(null); setValue("image", null); }} className="absolute p-1 text-red-500 rounded-full shadow-sm top-1 right-1 bg-white/80 hover:bg-white">
+              <button type="button" onClick={handleRemoveImage} className="absolute p-1 text-red-500 rounded-full shadow-sm top-1 right-1 bg-white/80 hover:bg-white">
                 <X size={14} />
               </button>
             </div>
           )}
-          <input type="file" accept="image/*" {...register("image", { onChange: (e) => { const file = e.target.files[0]; if (file) setPreview(URL.createObjectURL(file)); } })} className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
+          <input
+            type="file"
+            accept="image/*"
+            {...register("image", {
+              onChange: (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  setPreview(URL.createObjectURL(file));
+                  setImageRemoved(false);
+                }
+              },
+            })}
+            className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+          />
         </div>
 
         {/* Savol audiosi */}
@@ -263,10 +308,44 @@ const JFTQuestionFormModal = ({ sectionId = 0, question = null, question_count =
           <label className="flex items-center gap-2 ml-1 text-sm font-black text-heading">
             <Music size={16} /> Audio (Optional)
           </label>
+
+          {existingAudioUrl && !(newAudioFile instanceof File) && (
+            <div className="space-y-2">
+              <audio
+                controls
+                src={existingAudioUrl}
+                className="w-full h-10 rounded-xl"
+              />
+              <button
+                type="button"
+                onClick={handleRemoveExistingAudio}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-red-500 hover:text-red-600"
+              >
+                <Trash2 size={14} /> {intl.formatMessage({ id: "Audio faylni o'chirish" })}
+              </button>
+            </div>
+          )}
+
+          {newAudioFile instanceof File && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-700 font-bold">
+              <Music size={14} />
+              <span className="truncate flex-1">{newAudioFile.name}</span>
+              <button
+                type="button"
+                onClick={handleClearNewAudio}
+                className="text-blue-700 hover:text-red-500"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
+
           <input
             type="file"
             accept="audio/*"
-            {...register("audio_file")}
+            {...register("audio_file", {
+              onChange: () => setAudioRemoved(false),
+            })}
             className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
         </div>
