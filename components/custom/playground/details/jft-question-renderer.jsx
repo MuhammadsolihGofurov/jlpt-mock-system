@@ -363,14 +363,15 @@ export const JFTQuestionRenderer = ({
                                         {q.question_number}.
                                     </span>
                                     <div dangerouslySetInnerHTML={{ __html: q.text }} />
+                                </div>
                                     {q.image && (
                                         <img
                                             src={q.image}
                                             alt={`Question ${q.question_number}`}
-                                            className="mt-3 max-w-sm rounded-xl border border-slate-100 object-contain"
+                                            className="mt-3 w-full rounded-xl border border-slate-100 object-contain"
                                         />
                                     )}
-                                </div>
+
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {q.options.map((option, oIdx) => {
