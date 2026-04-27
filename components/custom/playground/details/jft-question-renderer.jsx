@@ -320,9 +320,9 @@ export const JFTQuestionRenderer = ({
             {/* Question Content */}
             <div className="p-6 sm:p-8">
                 <div className="mb-6">
-                    <span className="px-4 py-1 rounded-full text-xs font-black uppercase bg-primary text-white">
+                    {/* <span className="px-4 py-1 rounded-full text-xs font-black uppercase bg-primary text-white">
                         Mondai {group.mondai_number || "1"}
-                    </span>
+                    </span> */}
                     {group?.title && (
                         <h4 className="text-xl font-black mt-4 text-slate-800 leading-tight">
                             {group.title}
