@@ -1,6 +1,6 @@
 import { useModal } from "@/context/modal-context";
-import { Edit2, Plus, Settings, Trash2 } from "lucide-react";
-import useSWR from "swr";
+import { Edit2, Plus, Trash2 } from "lucide-react";
+import useSWR, { mutate } from "swr";
 import { useRouter } from "next/router";
 import fetcher from "@/utils/fetcher";
 import { useIntl } from "react-intl";
@@ -11,7 +11,7 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
   const router = useRouter();
   const intl = useIntl();
 
-  const { data: groups, mutate } = useSWR(
+  const { data: groups } = useSWR(
     section ? [`jft-shared-contents/`, router.locale, section?.id] : null,
     (url, locale) =>
       fetcher(
@@ -58,9 +58,23 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
         body: "Ushbu savollar guruhini o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
         confirmText: "Ha, o'chirilsin",
         variant: "danger",
-        mutateKey: [`jft-questions/`, router.locale, section?.id],
+        mutateKey: [`jft-shared-contents/`, router.locale, section?.id],
         onConfirm: async () => {
-          return await authAxios.delete(`jft-shared-contents/${id}/`);
+          const questionsRes = await authAxios.get(
+            `jft-questions/?section=${section?.id}&page=all`
+          );
+          const allQuestions = Array.isArray(questionsRes.data)
+            ? questionsRes.data
+            : questionsRes.data?.results || [];
+          const groupQuestions = allQuestions.filter(
+            (q) => q.shared_content?.id === id
+          );
+          await Promise.all(
+            groupQuestions.map((q) => authAxios.delete(`jft-questions/${q.id}/`))
+          );
+          const result = await authAxios.delete(`jft-shared-contents/${id}/`);
+          mutate([`jft-questions/`, router.locale, section?.id]);
+          return result;
         },
       },
       "small",
@@ -70,8 +84,9 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
   const groupedQuestions = questions && questions?.reduce((acc, q) => {
     const sharedId = q.shared_content?.id || 'no-shared';
     if (!acc[sharedId]) {
+      const groupStillExists = sharedId === 'no-shared' || groups?.some(g => g.id === sharedId);
       acc[sharedId] = {
-        sharedData: q.shared_content,
+        sharedData: groupStillExists ? q.shared_content : null,
         items: []
       };
     }
@@ -90,10 +105,10 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <button
-            onClick={() => openModal("JFT_QUESTION_GROUP", { section, group_count: groups?.length }, "middle")}
+            onClick={() => openModal("JFT_QUESTION_GROUP_LIST", { section, groups }, "middle")}
             className="text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-100"
           >
-            {intl.formatMessage({ id: "Savollar guruhi qo'shish" })}
+            {intl.formatMessage({ id: "Savollar guruhi" })}
           </button>
           <button
             onClick={() => openModal(
@@ -116,8 +131,8 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
 
       <div className="space-y-4">
         {questions?.length > 0 ? (
-          Object.values(groupedQuestions).map((group, groupIdx) => (
-            <div key={groupIdx} className="mb-6 border border-slate-200 rounded-3xl overflow-hidden bg-white">
+          Object.values(groupedQuestions).map((group, _groupIdx) => (
+            <div key={_groupIdx} className="mb-6 border border-slate-200 rounded-3xl overflow-hidden bg-white">
 
               {/* SHARED CONTENT BLOCK (Agar mavjud bo'lsa) */}
               {group.sharedData && (
@@ -135,19 +150,19 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
                     >
                       <Edit2 size={14} />
                     </button>
-                    {/* <button
+                    <button
                       onClick={() => handleDeleteGroup(group?.sharedData?.id)}
                       className="p-1.5 text-red-500 bg-white rounded-lg border border-slate-200 shadow-sm hover:bg-red-50"
                     >
                       <Trash2 size={14} />
-                    </button> */}
+                    </button>
                   </div>
                 </div>
               )}
 
               {/* QUESTIONS UNDER THIS SHARED CONTENT */}
               <div className="divide-y divide-slate-100">
-                {group.items.map((q, idx) => (
+                {group.items.map((q) => (
                   <div
                     key={q.id}
                     className="group flex items-center justify-between p-4 hover:bg-slate-50 transition-all"

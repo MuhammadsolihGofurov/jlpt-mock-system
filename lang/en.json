@@ -942,5 +942,9 @@
     "Tinglashlar": "Listens",
     "Keyingisiga o'tish": "Next",
     "Qayta tinglash": "Replay",
-    "Savol audiosi": "Question audio"
+    "Savol audiosi": "Question audio",
+    "Savollar guruhi": "Question Group",
+    "Savollar guruhlari": "Question Groups",
+    "Yangi guruh qo'shish": "Add New Group",
+    "Hozircha savollar guruhi yo'q": "No question groups yet"
 }

@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import fetcher from "@/utils/fetcher";
-import { Plus, ChevronRight, Settings, LayoutGrid } from "lucide-react";
+import { ChevronRight, LayoutGrid } from "lucide-react";
 import { Seo } from "@/components/seo";
 import { AuthGuard } from "@/components/guard";
 import { useIntl } from "react-intl";
 import { mockTypes } from "@/types/mock-types";
 import { SectionList } from "@/components/dashboard/admin-teacher/jft";
 import { GroupAndQuestionArea } from "@/components/dashboard/admin-teacher/jft";
-
 const MockManagePage = () => {
   const router = useRouter();
   const intl = useIntl();
@@ -59,18 +58,10 @@ const MockManagePage = () => {
           <div className="flex flex-1 xl:flex-row flex-col overflow-hidden p-6 gap-3 xl:gap-6">
             {/* 1. SECTIONS SIDEBAR */}
             <aside className="w-full xl:w-1/4 bg-white rounded-[2.5rem] border border-slate-100 flex flex-col overflow-hidden shadow-sm">
-              <div className="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+              <div className="p-6 border-b border-slate-50 bg-slate-50/50">
                 <span className="font-black text-slate-800 uppercase text-sm tracking-widest">
                   {intl.formatMessage({ id: "Bo'limlar" })}
                 </span>
-                {/* <button
-                  onClick={() =>
-                    openModal("SECTION_FORM", { mockId, section_count: mock?.sections?.length }, "middle")
-                  }
-                  className="p-2 bg-primary text-white rounded-xl shadow-lg shadow-orange-100 hover:scale-105 transition-all"
-                >
-                  <Plus size={18} />
-                </button> */}
               </div>
               <div className="flex-1 overflow-y-auto p-4">
                 <SectionList

@@ -29,6 +29,7 @@ import FlashcardPracticeModal from "./details/all/flashcard-practice-modal";
 import CategoryFormModal from "./details/admin/category-form-modal";
 import JFTMockFormModal from "./details/admin-teacher/jft/jft-form-modal";
 import JFTQuestionGroupFormModal from "./details/admin-teacher/jft/jft-question-group-modal";
+import JFTQuestionGroupListModal from "./details/admin-teacher/jft/jft-question-group-list-modal";
 import { JFTQuestionFormModal } from "./details/admin-teacher/jft";
 import CheckedConfirmModal from "./details/checked-confirm-modal";
 
@@ -64,6 +65,7 @@ export const ModalComponents = {
   CATEGORY_MODAL: CategoryFormModal,
   JFT_MOCK_FORM: JFTMockFormModal,
   JFT_QUESTION_GROUP: JFTQuestionGroupFormModal,
+  JFT_QUESTION_GROUP_LIST: JFTQuestionGroupListModal,
   JFT_QUESTION_FORM: JFTQuestionFormModal,
   CHECKED_CONFIRM_MODAL: CheckedConfirmModal
 };
