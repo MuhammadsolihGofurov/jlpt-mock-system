@@ -59,7 +59,7 @@ export const QuestionRenderer = ({
         )}
 
         {group?.reading_text && (
-          <div className="mt-6 p-6 bg-slate-50 rounded-3xl text-slate-700 leading-relaxed text-lg"
+          <div className="mt-6 p-6 bg-slate-50 rounded-3xl overflow-x-auto text-slate-700 leading-relaxed text-lg"
             dangerouslySetInnerHTML={{ __html: group?.reading_text }} />
         )}
       </div>
