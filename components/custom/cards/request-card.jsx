@@ -61,9 +61,9 @@ const RequestCard = ({ item, onEdit, onDelete }) => {
         openModal(
             "CONFIRM_MODAL",
             {
-                title: "So'rovni o'chirish",
-                body: `Ushbu so'rovni butunlay o'chirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.`,
-                confirmText: "Ha",
+                title: intl.formatMessage({ id: "So'rovni o'chirish" }),
+                body: intl.formatMessage({ id: "Ushbu so'rovni butunlay o'chirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi." }),
+                confirmText: intl.formatMessage({ id: "Ha" }),
                 variant: "danger",
                 onConfirm: async () => await authAxios.delete(`owner-contact-requests//${item.id}/`),
                 mutateKey: [`owner-contact-requests/`, router.locale],

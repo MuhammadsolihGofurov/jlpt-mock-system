@@ -1,0 +1,21 @@
+[1mdiff --cc lang/uz.json[m
+[1mindex bb6c4a4,8250421..0000000[m
+[1m--- a/lang/uz.json[m
+[1m+++ b/lang/uz.json[m
+[36m@@@ -939,8 -939,9 +939,16 @@@[m
+    "exam_finished": "Imtihon muvaffaqiyatli topshirildi",[m
+    "error_submitting": "Imtihonni yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring",[m
+    "please_answer_all": "Iltimos, barcha savollarga javob bering",[m
+[32m++<<<<<<< HEAD[m
+[32m +  "Savollar guruhi": "Savollar guruhi",[m
+[32m +  "Savollar guruhlari": "Savollar guruhlari",[m
+[32m +  "Yangi guruh qo'shish": "Yangi guruh qo'shish",[m
+[32m +  "Hozircha savollar guruhi yo'q": "Hozircha savollar guruhi yo'q"[m
+[32m++=======[m
+[32m+   "Maksimal tinglash soni: 2 marta": "Maksimal tinglash soni: 2 marta",[m
+[32m+   "Tinglashlar": "Tinglashlar",[m
+[32m+   "Keyingisiga o'tish": "Keyingisiga o'tish",[m
+[32m+   "Qayta tinglash": "Qayta tinglash",[m
+[32m+   "Savol audiosi":"Savol audiosi"[m
+[32m++>>>>>>> 29b56586b7374e0c1e1b886a7eab0776769e300c[m
+  }[m

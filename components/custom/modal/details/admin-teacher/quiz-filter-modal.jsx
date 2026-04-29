@@ -72,15 +72,15 @@ const QuizFilterModal = () => {
             control={control}
             render={({ field }) => (
               <Select
-                label="Quiz holati"
+                label={intl.formatMessage({ id: "Quiz holati" })}
                 options={[
-                  { value: "", label: "Barchasi" },
-                  { value: "true", label: "Faol (Active)" },
-                  { value: "false", label: "Noaktiv (Inactive)" },
+                  { value: "", label: intl.formatMessage({ id: "Barchasi" }) },
+                  { value: "true", label: intl.formatMessage({ id: "Faol (Active)" }) },
+                  { value: "false", label: intl.formatMessage({ id: "Noaktiv (Inactive)" }) },
                 ]}
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Holatni tanlang"
+                placeholder={intl.formatMessage({ id: "Holatni tanlang" })}
               />
             )}
           />

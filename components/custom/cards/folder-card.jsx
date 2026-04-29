@@ -17,9 +17,9 @@ const FolderCard = ({ item }) => {
         openModal(
             "CONFIRM_MODAL",
             {
-                title: "Jildni o'chirish",
-                body: "Ushbu jildni o'chirib tashlamoqchimisiz?",
-                confirmText: "Ha, o'chirilsin",
+                title: intl.formatMessage({ id: "Jildni o'chirish" }),
+                body: intl.formatMessage({ id: "Ushbu jildni o'chirib tashlamoqchimisiz?" }),
+                confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
                 variant: "danger",
                 onConfirm: async () => {
                     return await authAxios.delete(`material-categories/${item.id}/`);

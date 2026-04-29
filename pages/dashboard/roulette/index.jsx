@@ -140,7 +140,7 @@ function RoulettePage() {
 
     if (lastMessage.event === "match_found") {
       fetchStatus();
-      toast.success("Match found. Joining room...");
+      toast.success(intl.formatMessage({ id: "Match found. Joining room..." }));
       return;
     }
 
@@ -151,7 +151,7 @@ function RoulettePage() {
 
     if (lastMessage.event === "match_ended") {
       resetToIdle();
-      toast.info("Match ended.");
+      toast.info(intl.formatMessage({ id: "Match ended." }));
     }
   }, [fetchStatus, lastMessage, resetToIdle]);
 
@@ -252,14 +252,13 @@ function RoulettePage() {
               <div className="space-y-3">
                 <p className="inline-flex items-center gap-2 rounded-xl bg-orange-50 px-3 py-1 text-xs font-black uppercase tracking-wide text-primary">
                   <MessageCircle size={14} />
-                  Roulette
+                  {intl.formatMessage({ id: "Roulette" })}
                 </p>
                 <h2 className="text-2xl font-black tracking-tight text-heading">
                   {intl.formatMessage({ id: "Ready for a random conversation?" })}
                 </h2>
                 <p className="max-w-2xl text-sm font-medium text-muted">
-                  Join the queue and get matched in real time. When a partner is found,
-                  your video room opens automatically.
+                  {intl.formatMessage({ id: "Join the queue and get matched in real time. When a partner is found, your video room opens automatically." })}
                 </p>
               </div>
 
@@ -272,7 +271,7 @@ function RoulettePage() {
 
               {isWaiting && queueInfo && (
                 <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700">
-                  Waiting in queue: <span className="font-black">{queueInfo.queue_id}</span>
+                  {intl.formatMessage({ id: "Waiting in queue:" })} <span className="font-black">{queueInfo.queue_id}</span>
                   {queueExpiryText ? ` (expires at ${queueExpiryText})` : ""}
                 </div>
               )}
@@ -297,7 +296,7 @@ function RoulettePage() {
                   ) : (
                     <PlayCircle size={18} />
                   )}
-                  Start
+                  {intl.formatMessage({ id: "Start" })}
                 </button>
 
                 <button
@@ -306,7 +305,7 @@ function RoulettePage() {
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-5 py-3 font-semibold text-heading transition-all hover:bg-gray-50"
                 >
                   <RefreshCw size={17} />
-                  Refresh Status
+                  {intl.formatMessage({ id: "Refresh Status" })}
                 </button>
 
                 {isWaiting && (
@@ -316,7 +315,7 @@ function RoulettePage() {
                     className="inline-flex items-center justify-center gap-2 rounded-2xl border border-orange-200 bg-orange-50 px-5 py-3 font-semibold text-orange-600 transition-all hover:bg-orange-100"
                   >
                     <XCircle size={17} />
-                    Cancel Queue
+                    {intl.formatMessage({ id: "Cancel Queue" })}
                   </button>
                 )}
               </div>

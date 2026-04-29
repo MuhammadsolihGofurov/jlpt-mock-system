@@ -33,11 +33,11 @@ const JftCard = ({ item }) => {
         openModal(
             "CONFIRM_MODAL",
             {
-                title: isPublished ? "Nashrdan olish" : "Nashr qilish",
+                title: isPublished ? intl.formatMessage({ id: "Nashrdan olish" }) : intl.formatMessage({ id: "Nashr qilish" }),
                 body: isPublished
-                    ? "Ushbu mock testni nashrdan olmoqchimisiz? Bunda u o'quvchilarga ko'rinmaydi."
-                    : "Ushbu mock testni nashr qilmoqchimisiz? Bunda u barcha o'quvchilar uchun ochiq bo'ladi.",
-                confirmText: isPublished ? "Ha, nashrdan olinsin" : "Ha, nashr etilsin",
+                    ? intl.formatMessage({ id: "Ushbu mock testni nashrdan olmoqchimisiz? Bunda u o'quvchilarga ko'rinmaydi." })
+                    : intl.formatMessage({ id: "Ushbu mock testni nashr qilmoqchimisiz? Bunda u barcha o'quvchilar uchun ochiq bo'ladi." }),
+                confirmText: isPublished ? intl.formatMessage({ id: "Ha, nashrdan olinsin" }) : intl.formatMessage({ id: "Ha, nashr etilsin" }),
                 variant: isPublished ? "warning" : "primary",
                 mutateKey: [`jft-mock-tests/`, router.locale],
                 onConfirm: async () => {
@@ -54,9 +54,9 @@ const JftCard = ({ item }) => {
         openModal(
             "CONFIRM_MODAL",
             {
-                title: "Mockdan nusxa olish",
-                body: `"${item.title}" testidan nusxa ko'chirmoqchimisiz? Bunda barcha savollar yangi testga ko'chiriladi.`,
-                confirmText: "Ha, nusxa olinsin",
+                title: intl.formatMessage({ id: "Mockdan nusxa olish" }),
+                body: `"${item.title}" ${intl.formatMessage({ id: "testidan nusxa ko'chirmoqchimisiz? Bunda barcha savollar yangi testga ko'chiriladi." })}`,
+                confirmText: intl.formatMessage({ id: "Ha, nusxa olinsin" }),
                 variant: "primary",
                 mutateKey: [`jft-mock-tests/`, router.locale],
                 onConfirm: async () => {
@@ -72,9 +72,9 @@ const JftCard = ({ item }) => {
         openModal(
             "CONFIRM_MODAL",
             {
-                title: "Mockni o'chirish",
-                body: "Ushbu mock testni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan savollar va natijalar ham yo'qolishi mumkin.",
-                confirmText: "Ha, o'chirilsin",
+                title: intl.formatMessage({ id: "Mockni o'chirish" }),
+                body: intl.formatMessage({ id: "Ushbu mock testni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan savollar va natijalar ham yo'qolishi mumkin." }),
+                confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
                 variant: "danger",
                 mutateKey: [`jft-mock-tests/`, router.locale],
                 onConfirm: async () => {
@@ -95,7 +95,7 @@ const JftCard = ({ item }) => {
             <div className="absolute top-4 right-4 flex gap-2 z-10 opacity-0 group-hover:opacity-100 transition-all transform translate-y-[-10px] group-hover:translate-y-0">
                 <button
                     onClick={handleClone}
-                    title="Nusxa olish"
+                    title={intl.formatMessage({ id: "Nusxa olish" })}
                     className="p-2 bg-white/90 backdrop-blur-md text-blue-500 rounded-xl border border-slate-100 shadow-sm hover:bg-blue-50 transition-all"
                 >
                     <Copy size={16} />
@@ -181,7 +181,7 @@ const JftCard = ({ item }) => {
                                     { id: "{count} ta ochiq imtihon mavjud. Avval imtihonlarni yoping." },
                                     { count: openExamCount },
                                 )
-                                : isPublished ? "Nashrdan olish" : "Nashr qilish"
+                                : isPublished ? intl.formatMessage({ id: "Nashrdan olish" }) : intl.formatMessage({ id: "Nashr qilish" })
                         }
                         className={`p-3 rounded-2xl transition-all active:scale-90 ${
                             blockUnpublish

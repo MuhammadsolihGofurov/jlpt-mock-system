@@ -76,9 +76,9 @@ const MaterialCard = ({ item }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Material o'chirish",
-        body: "Ushbu materialni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
-        confirmText: "Ha, o'chirilsin",
+        title: intl.formatMessage({ id: "Material o'chirish" }),
+        body: intl.formatMessage({ id: "Ushbu materialni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin." }),
+        confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
         variant: "danger",
         mutateKey: ["materials/"],
         onConfirm: async () => {

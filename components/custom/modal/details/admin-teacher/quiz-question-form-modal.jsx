@@ -315,7 +315,7 @@ const QuizQuestionFormModal = ({ quizId, question = null, nextOrder = 1, onSaved
             disabled={isSubmitting}
             className="bg-primary text-white px-6 py-2.5 rounded-xl font-black flex items-center gap-2 disabled:opacity-50"
           >
-            <Save size={16} /> {isSubmitting ? "Saqlanmoqda..." : "Saqlash"}
+            <Save size={16} /> {intl.formatMessage({ id: isSubmitting ? "Saqlanmoqda..." : "Saqlash" })}
           </button>
         </div>
       </form>

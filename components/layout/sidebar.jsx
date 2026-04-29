@@ -103,9 +103,9 @@ const Sidebar = () => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Chiqish",
-        body: "Tizimdan chiqmoqchimisiz? Tizimga qayta kirishingiz uchun login sahifasiga o'tishingiz kerak.",
-        confirmText: "Ha",
+        title: intl.formatMessage({ id: "Chiqish" }),
+        body: intl.formatMessage({ id: "Tizimdan chiqmoqchimisiz? Tizimga qayta kirishingiz uchun login sahifasiga o'tishingiz kerak." }),
+        confirmText: intl.formatMessage({ id: "Ha" }),
         variant: "danger",
         local: "clear",
         onConfirm: async () => {

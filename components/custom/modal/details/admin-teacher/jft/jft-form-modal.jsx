@@ -100,12 +100,12 @@ const JFTMockFormModal = ({ mock = null }) => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Input
-                        label="Test nomi"
+                        label={intl.formatMessage({ id: "Test nomi" })}
                         name="title"
                         register={register}
                         error={errors.title}
-                        placeholder="Masalan, JFT A2 Mock - April Batch"
-                        rules={{ required: "Nom majburiy" }}
+                        placeholder={intl.formatMessage({ id: "Masalan, JFT A2 Mock - April Batch" })}
+                        rules={{ required: intl.formatMessage({ id: "Nom majburiy" }) }}
                     />
 
                     <Controller
@@ -113,7 +113,7 @@ const JFTMockFormModal = ({ mock = null }) => {
                         control={control}
                         render={({ field }) => (
                             <Select
-                                label="Daraja (Level)"
+                                label={intl.formatMessage({ id: "Daraja (Level)" })}
                                 options={[
                                     { value: "A1", label: "A1" },
                                     { value: "A2", label: "A2" },
@@ -128,17 +128,17 @@ const JFTMockFormModal = ({ mock = null }) => {
                 </div>
 
                 <Input
-                    label="Tavsif (Description)"
+                    label={intl.formatMessage({ id: "Tavsif" })}
                     name="description"
                     register={register}
                     error={errors.description}
-                    placeholder="Beginner communication-focused mock."
+                    placeholder={intl.formatMessage({ id: "Beginner communication-focused mock." })}
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="relative">
                         <Input
-                            label="Umumiy ball"
+                            label={intl.formatMessage({ id: "Umumiy ball" })}
                             name="total_score"
                             type="number"
                             register={register}
@@ -151,7 +151,7 @@ const JFTMockFormModal = ({ mock = null }) => {
 
                     <div className="relative">
                         <Input
-                            label="O'tish bali"
+                            label={intl.formatMessage({ id: "O'tish bali" })}
                             name="pass_score"
                             type="number"
                             register={register}
@@ -164,7 +164,7 @@ const JFTMockFormModal = ({ mock = null }) => {
 
                     <div className="relative">
                         <Input
-                            label="Davomiyligi (minut)"
+                            label={intl.formatMessage({ id: "Davomiyligi (minut)" })}
                             name="duration_minutes"
                             type="number"
                             register={register}

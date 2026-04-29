@@ -23,9 +23,9 @@ const GroupCard = ({ item }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Guruhni o'chirish",
-        body: "Ushbu guruhni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
-        confirmText: "Ha, o'chirilsin",
+        title: intl.formatMessage({ id: "Guruhni o'chirish" }),
+        body: intl.formatMessage({ id: "Ushbu guruhni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin." }),
+        confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
         variant: "danger",
         mutateKey: ["groups/"],
         onConfirm: async () => {
@@ -74,7 +74,7 @@ const GroupCard = ({ item }) => {
         <ActionDropdown>
           <DropdownItem
             icon={Users2}
-            label="A'zolar"
+            label={intl.formatMessage({ id: "A'zolar" })}
             variant="blue"
             onClick={() =>
               openModal("GROUP_MEMBERS", { group: item }, "middle")
@@ -82,14 +82,14 @@ const GroupCard = ({ item }) => {
           />
           <DropdownItem
             icon={Edit2}
-            label="Tahrirlash"
+            label={intl.formatMessage({ id: "Tahrirlash" })}
             variant="blue"
             onClick={() => openModal("GROUP_FORM", { group: item }, "middle")}
           />
           <div className="h-[1px] bg-gray-100 mx-2 my-1" />
           <DropdownItem
             icon={Trash2}
-            label="O'chirish"
+            label={intl.formatMessage({ id: "O'chirish" })}
             variant="danger"
             onClick={() => handleDelete(item?.id)}
           />
@@ -130,7 +130,7 @@ const GroupCard = ({ item }) => {
               {intl.formatMessage({ id: "O'quvchilar" })}
             </p>
             <p className="text-sm font-black text-heading">
-              {item.student_count} ta
+              {item.student_count} {intl.formatMessage({ id: "ta" })}
             </p>
           </div>
         </div>
