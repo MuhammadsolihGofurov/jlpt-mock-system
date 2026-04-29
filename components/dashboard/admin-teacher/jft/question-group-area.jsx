@@ -37,9 +37,9 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Savolni o'chirish",
-        body: "Ushbu savolni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
-        confirmText: "Ha, o'chirilsin",
+        title: intl.formatMessage({ id: "Savolni o'chirish" }),
+        body: intl.formatMessage({ id: "Ushbu savolni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin." }),
+        confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
         variant: "danger",
         mutateKey: [`jft-questions/`, router.locale, section?.id],
         onConfirm: async () => {
@@ -54,9 +54,9 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Savollar guruhini o'chirish",
-        body: "Ushbu savollar guruhini o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
-        confirmText: "Ha, o'chirilsin",
+        title: intl.formatMessage({ id: "Savollar guruhini o'chirish" }),
+        body: intl.formatMessage({ id: "Ushbu savollar guruhini o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin." }),
+        confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
         variant: "danger",
         mutateKey: [`jft-shared-contents/`, router.locale, section?.id],
         onConfirm: async () => {

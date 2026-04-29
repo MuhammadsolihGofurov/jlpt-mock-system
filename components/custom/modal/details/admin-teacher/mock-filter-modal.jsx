@@ -73,14 +73,14 @@ const MockFilterModal = () => {
             control={control}
             render={({ field }) => (
               <Select
-                label="JLPT Darajasi"
+                label={intl.formatMessage({ id: "JLPT Darajasi" })}
                 options={[
-                  { value: "", label: "Barchasi" },
-                  { value: "N1", label: "N1 (Advanced)" },
-                  { value: "N2", label: "N2 (Upper-Intermediate)" },
-                  { value: "N3", label: "N3 (Intermediate)" },
-                  { value: "N4", label: "N4 (Elementary)" },
-                  { value: "N5", label: "N5 (Beginner)" },
+                  { value: "", label: intl.formatMessage({ id: "Barchasi" }) },
+                  { value: "N1", label: intl.formatMessage({ id: "N1 (Advanced)" }) },
+                  { value: "N2", label: intl.formatMessage({ id: "N2 (Upper-Intermediate)" }) },
+                  { value: "N3", label: intl.formatMessage({ id: "N3 (Intermediate)" }) },
+                  { value: "N4", label: intl.formatMessage({ id: "N4 (Elementary)" }) },
+                  { value: "N5", label: intl.formatMessage({ id: "N5 (Beginner)" }) },
                 ]}
                 value={field.value}
                 onChange={field.onChange}
@@ -94,11 +94,11 @@ const MockFilterModal = () => {
             control={control}
             render={({ field }) => (
               <Select
-                label="Imtihon holati"
+                label={intl.formatMessage({ id: "Imtihon holati" })}
                 options={[
-                  { value: "", label: "Barchasi" },
-                  { value: "DRAFT", label: "Qoralama (Draft)" },
-                  { value: "PUBLISHED", label: "Nashr qilingan (Published)" },
+                  { value: "", label: intl.formatMessage({ id: "Barchasi" }) },
+                  { value: "DRAFT", label: intl.formatMessage({ id: "Qoralama (Draft)" }) },
+                  { value: "PUBLISHED", label: intl.formatMessage({ id: "Nashr qilingan (Published)" }) },
                 ]}
                 value={field.value}
                 onChange={field.onChange}

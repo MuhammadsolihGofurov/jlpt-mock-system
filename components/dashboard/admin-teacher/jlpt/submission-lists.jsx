@@ -52,7 +52,7 @@ const SubmissionLists = ({ customLoading }) => {
     return (
       <EmptyMessage
         titleKey="Natijalar topilmadi"
-        descriptionKey="Ushbu imtihon bo'yicha hali hech qanday natija mavjud emas"
+        descriptionKey={intl.formatMessage({ id: "Ushbu imtihon bo'yicha hali hech qanday natija mavjud emas" })}
         iconKey="exams"
       />
     );

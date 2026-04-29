@@ -94,7 +94,7 @@ const UserFormModal = ({ user = null }) => {
         {/* Name Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
-            label="Ism"
+            label={intl.formatMessage({ id: "Ism" })}
             name="first_name"
             register={register}
             error={errors.first_name}
@@ -102,7 +102,7 @@ const UserFormModal = ({ user = null }) => {
             rules={{ required: intl.formatMessage({ id: "Ism majburiy" }) }}
           />
           <Input
-            label="Familiya"
+            label={intl.formatMessage({ id: "Familiya" })}
             name="last_name"
             register={register}
             error={errors.last_name}

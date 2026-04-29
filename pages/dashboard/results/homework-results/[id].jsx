@@ -20,7 +20,7 @@ function HomeworkSubmissionsPage() {
             <AuthGuard roles={["CENTER_ADMIN", "TEACHER"]}>
                 <PageHeader
                     title="Homework Natijalari"
-                    description="Uy vazifasi doirasidagi topshiriqlar tahlili"
+                    description={intl.formatMessage({ id: "Uy vazifasi doirasidagi topshiriqlar tahlili" })}
                     buttonLabel={"Orqaga"}
                     onButtonClick={() => router.push("/dashboard/assignments/homework")}
                     roles={["CENTER_ADMIN", "TEACHER"]}

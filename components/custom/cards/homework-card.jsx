@@ -43,9 +43,9 @@ const HomeworkCard = ({ item, mutate }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Vazifani o'chirish",
-        body: "Ushbu uy vazifasini o'chirib tashlamoqchimisiz?",
-        confirmText: "Ha, o'chirilsin",
+        title: intl.formatMessage({ id: "Vazifani o'chirish" }),
+        body: intl.formatMessage({ id: "Ushbu uy vazifasini o'chirib tashlamoqchimisiz?" }),
+        confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
         variant: "danger",
         onConfirm: async () =>
           await authAxios.delete(`homework-assignments/${item.id}/`),

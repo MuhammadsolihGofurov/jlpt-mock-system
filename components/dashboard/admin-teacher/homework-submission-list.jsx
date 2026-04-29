@@ -60,15 +60,15 @@ const HomeworkSubmissionList = () => {
 
             return {
                 "№": (page - 1) * 10 + (index + 1),
-                "Talaba": sub.student_display,
-                "Topshiriq": sub.assignment_title,
-                "Turi": sub.results?.resource_type,
-                "Vocab / Quiz": isMock ? (Object.values(sections).find(s => s.section_type === "VOCAB")?.score || 0) : sub.results?.total_score,
-                "Reading": isMock ? (Object.values(sections).find(s => s.section_type === "GRAMMAR_READING")?.score || 0) : "—",
-                "Listening": isMock ? (Object.values(sections).find(s => s.section_type === "LISTENING")?.score || 0) : "—",
-                "Jami Ball": Math.round(sub.score),
-                "Holat": (isMock ? sub.results?.jlpt_result?.passed : sub.results?.percentage >= 50) ? "O'tdi" : "Yiqildi",
-                "Sana": formatDate(sub.completed_at)
+                [intl.formatMessage({ id: "Talaba" })]: sub.student_display,
+                [intl.formatMessage({ id: "Topshiriq" })]: sub.assignment_title,
+                [intl.formatMessage({ id: "Turi" })]: sub.results?.resource_type,
+                [intl.formatMessage({ id: "Vocab / Quiz" })]: isMock ? (Object.values(sections).find(s => s.section_type === "VOCAB")?.score || 0) : sub.results?.total_score,
+                [intl.formatMessage({ id: "Reading" })]: isMock ? (Object.values(sections).find(s => s.section_type === "GRAMMAR_READING")?.score || 0) : "—",
+                [intl.formatMessage({ id: "Listening" })]: isMock ? (Object.values(sections).find(s => s.section_type === "LISTENING")?.score || 0) : "—",
+                [intl.formatMessage({ id: "Jami Ball" })]: Math.round(sub.score),
+                [intl.formatMessage({ id: "Holat" })]: (isMock ? sub.results?.jlpt_result?.passed : sub.results?.percentage >= 50) ? intl.formatMessage({ id: "Pass" }) : intl.formatMessage({ id: "Fail" }),
+                [intl.formatMessage({ id: "Sana" })]: formatDate(sub.completed_at)
             };
         });
 
@@ -82,11 +82,10 @@ const HomeworkSubmissionList = () => {
         const doc = new jsPDF("l", "mm", "a4"); // "l" - landscape (albom) ko'rinishi, ustunlar ko'p bo'lgani uchun
 
         doc.setFontSize(16);
-        doc.text("Uy vazifasi natijalari (Batafsil)", 14, 15);
+        doc.text(intl.formatMessage({ id: "Uy vazifasi natijalari (Batafsil)" }), 14, 15);
 
-        // Jadval sarlavhalari
         const tableHeaders = [
-            ['№', 'Talaba', 'Topshiriq turi', 'Vocab/Quiz', 'Reading', 'Listening', 'Jami', 'Holat', 'Sana']
+            ['№', intl.formatMessage({ id: "Talaba" }), intl.formatMessage({ id: "Topshiriq turi" }), intl.formatMessage({ id: "Vocab / Quiz" }), intl.formatMessage({ id: "Reading" }), intl.formatMessage({ id: "Listening" }), intl.formatMessage({ id: "Jami" }), intl.formatMessage({ id: "Holat" }), intl.formatMessage({ id: "Sana" })]
         ];
 
         const tableRows = data.results.map((sub, index) => {

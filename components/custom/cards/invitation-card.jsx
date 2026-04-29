@@ -28,7 +28,7 @@ const InvitationCard = ({ item }) => {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    toast.success("Kod nusxalandi!");
+    toast.success(intl.formatMessage({ id: "Kod nusxalandi!" }));
   };
 
   const formatDate = (dateStr) => {
@@ -53,9 +53,9 @@ const InvitationCard = ({ item }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Foydalanuvchini qabul qilish",
-        body: "Ushbu foydalanuvchini qabul qilmoqchimisiz? Bunda foydalanuvchi tizimga kirish imkoniyati mavjud bo'ladi.",
-        confirmText: "Ha",
+        title: intl.formatMessage({ id: "Foydalanuvchini qabul qilish" }),
+        body: intl.formatMessage({ id: "Ushbu foydalanuvchini qabul qilmoqchimisiz? Bunda foydalanuvchi tizimga kirish imkoniyati mavjud bo'ladi." }),
+        confirmText: intl.formatMessage({ id: "Ha" }),
         variant: "info",
         mutateKey: ["centers/invitations/list/", router.locale],
         onConfirm: async () => {
@@ -193,7 +193,7 @@ const InvitationCard = ({ item }) => {
               <ActionDropdown>
                 <DropdownItem
                   icon={ShieldCheck}
-                  label="Qabul qilish"
+                  label={intl.formatMessage({ id: "Qabul qilish" })}
                   onClick={() => handleActivate(item?.code)}
                 />
               </ActionDropdown>

@@ -60,11 +60,11 @@ const ExamCard = ({ item, currentExamType, exam_type }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: isOpen ? "Imtihonni yopish" : "Imtihonni ochish",
+        title: isOpen ? intl.formatMessage({ id: "Imtihonni yopish" }) : intl.formatMessage({ id: "Imtihonni ochish" }),
         body: isOpen
-          ? "Imtihonni yopsangiz, o'quvchilar testni boshlay olmaydilar."
-          : "Imtihonni ochsangiz, belgilangan guruh o'quvchilari testni topshirishlari mumkin bo'ladi.",
-        confirmText: isOpen ? "Ha, yopilsin" : "Ha, ochilsin",
+          ? intl.formatMessage({ id: "Imtihonni yopsangiz, o'quvchilar testni boshlay olmaydilar." })
+          : intl.formatMessage({ id: "Imtihonni ochsangiz, belgilangan guruh o'quvchilari testni topshirishlari mumkin bo'ladi." }),
+        confirmText: isOpen ? intl.formatMessage({ id: "Ha, yopilsin" }) : intl.formatMessage({ id: "Ha, ochilsin" }),
         variant: isOpen ? "danger" : "primary",
         onConfirm: async () => {
           return await authAxios.patch(`${currentExamType?.assignment}${item.id}/`, {
@@ -84,12 +84,12 @@ const ExamCard = ({ item, currentExamType, exam_type }) => {
       "CONFIRM_MODAL",
       {
         title: isPublished
-          ? "Natijalarni yashirish"
-          : "Natijalarni e'lon qilish",
+          ? intl.formatMessage({ id: "Natijalarni yashirish" })
+          : intl.formatMessage({ id: "Natijalarni e'lon qilish" }),
         body: isPublished
-          ? "Natijalarni yashirsangiz, o'quvchilar o'z ballarini ko'ra olmaydilar."
-          : "Natijalarni e'lon qilsangiz, barcha topshirgan o'quvchilarga natijalar ko'rinadi.",
-        confirmText: isPublished ? "Ha, yashirilsin" : "Ha, e'lon qilinsin",
+          ? intl.formatMessage({ id: "Natijalarni yashirsangiz, o'quvchilar o'z ballarini ko'ra olmaydilar." })
+          : intl.formatMessage({ id: "Natijalarni e'lon qilsangiz, barcha topshirgan o'quvchilarga natijalar ko'rinadi." }),
+        confirmText: isPublished ? intl.formatMessage({ id: "Ha, yashirilsin" }) : intl.formatMessage({ id: "Ha, e'lon qilinsin" }),
         variant: isPublished ? "warning" : "danger",
         onConfirm: async () => {
           return await authAxios.patch(`${currentExamType?.assignment}${item.id}/`, {
@@ -108,9 +108,9 @@ const ExamCard = ({ item, currentExamType, exam_type }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Imtihonni o'chirish",
-        body: "Ushbu imtihonni o'chirib tashlamoqchimisiz? Bunda barcha topshirilgan natijalar ham o'chib ketadi.",
-        confirmText: "Ha, o'chirilsin",
+        title: intl.formatMessage({ id: "Imtihonni o'chirish" }),
+        body: intl.formatMessage({ id: "Ushbu imtihonni o'chirib tashlamoqchimisiz? Bunda barcha topshirilgan natijalar ham o'chib ketadi." }),
+        confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
         variant: "danger",
         onConfirm: async () => {
           return await authAxios.delete(`${currentExamType?.assignment}${item.id}/`);
