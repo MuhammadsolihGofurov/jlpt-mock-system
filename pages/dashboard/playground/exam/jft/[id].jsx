@@ -64,7 +64,7 @@ const ExamPlaygroundPage = ({ customLoading }) => {
           variant: "danger",
           onConfirm: () => {
             setExamData(res.data);
-            // startSecurity();
+            startSecurity();
             attachSubmissionId(res?.data?.submission_id)
           },
         },
