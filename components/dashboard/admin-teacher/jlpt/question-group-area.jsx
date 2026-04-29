@@ -27,9 +27,9 @@ const GroupAndQuestionArea = ({ section, currentMockType }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Savollar guruhini o'chirish",
-        body: "Ushbu savollar guruhini o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
-        confirmText: "Ha, o'chirilsin",
+        title: intl.formatMessage({ id: "Savollar guruhini o'chirish" }),
+        body: intl.formatMessage({ id: "Ushbu savollar guruhini o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin." }),
+        confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
         variant: "danger",
         mutateKey: [`${currentMockType?.question_group}`, router.locale, section?.id],
         onConfirm: async () => {

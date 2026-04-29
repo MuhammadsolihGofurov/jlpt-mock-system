@@ -66,7 +66,7 @@ const AdminFormModal = ({ admin = null, centerId }) => {
       toast.update(toastId, {
         render:
           response?.data?.message ||
-          (isEdit ? "Admin yangilandi!" : "Admin qo'shildi!"),
+          (isEdit ? intl.formatMessage({ id: "Admin yangilandi!" }) : intl.formatMessage({ id: "Admin qo'shildi!" })),
         type: "success",
         isLoading: false,
         autoClose: 3000,
@@ -88,9 +88,9 @@ const AdminFormModal = ({ admin = null, centerId }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Adminni o'chirmoqchimisiz",
-        body: "Ushbu adminni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
-        confirmText: "Ha, o'chirilsin",
+        title: intl.formatMessage({ id: "Adminni o'chirmoqchimisiz" }),
+        body: intl.formatMessage({ id: "Ushbu adminni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin." }),
+        confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
         variant: "danger",
         mutateKey: ["owner-center/", router.locale],
         onConfirm: async () => {
@@ -123,15 +123,15 @@ const AdminFormModal = ({ admin = null, centerId }) => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
-            label="Ism"
+            label={intl.formatMessage({ id: "Ism" })}
             name="first_name"
             register={register}
             error={errors.first_name}
             placeholder="Ali"
-            rules={{ required: "Ism kiritilishi shart" }}
+            rules={{ required: intl.formatMessage({ id: "Ism kiritilishi shart" }) }}
           />
           <Input
-            label="Familiya"
+            label={intl.formatMessage({ id: "Familiya" })}
             name="last_name"
             register={register}
             error={errors.last_name}
@@ -140,26 +140,26 @@ const AdminFormModal = ({ admin = null, centerId }) => {
         </div>
 
         <Input
-          label="email"
+          label={intl.formatMessage({ id: "email" })}
           name="email"
           type="email"
           register={register}
           error={errors.email}
           placeholder="admin@center.com"
-          rules={{ required: "Email kiritilishi shart" }}
+          rules={{ required: intl.formatMessage({ id: "Email kiritilishi shart" }) }}
         />
 
         {!isEdit && (
           <Input
-            label={"Parol"}
+            label={intl.formatMessage({ id: "Parol" })}
             name="password"
             type="password"
             register={register}
             error={errors.password}
             placeholder="••••••••"
             rules={{
-              required: "Parol kiritilishi shart",
-              minLength: { value: 6, message: "Kamida 6 ta belgi" },
+              required: intl.formatMessage({ id: "Parol kiritilishi shart" }),
+              minLength: { value: 6, message: intl.formatMessage({ id: "Kamida 6 ta belgi" }) },
             }}
           />
         )}
@@ -192,10 +192,10 @@ const AdminFormModal = ({ admin = null, centerId }) => {
             >
               <Save size={20} />
               {isSubmitting
-                ? "Saqlanmoqda..."
+                ? intl.formatMessage({ id: "Saqlanmoqda..." })
                 : isEdit
-                  ? "Yangilash"
-                  : "Qo'shish"}
+                  ? intl.formatMessage({ id: "Yangilash" })
+                  : intl.formatMessage({ id: "Qo'shish" })}
             </button>
           </div>
         </div>

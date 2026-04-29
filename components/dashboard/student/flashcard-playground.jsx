@@ -224,9 +224,9 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
                     openModal(
                         "CONFIRM_MODAL",
                         {
-                            title: "Qoralamani tahrirlash",
-                            body: "Agar tasdiqlasangiz, qoralamani tahrirlaysiz, aks holda yangi flash kart yasaysiz.",
-                            confirmText: "Ha",
+                            title: intl.formatMessage({ id: "Qoralamani tahrirlash" }),
+                            body: intl.formatMessage({ id: "Agar tasdiqlasangiz, qoralamani tahrirlaysiz, aks holda yangi flash kart yasaysiz." }),
+                            confirmText: intl.formatMessage({ id: "Ha" }),
                             variant: "warning",
                             onConfirm: async () => {
                                 reset(parsed);
@@ -278,16 +278,16 @@ const FlashcardPlayground = ({ flashcard_data, cards }) => {
             openModal(
                 "CONFIRM_MODAL",
                 {
-                    title: "Flash kart o'chirish",
-                    body: "Ushbu flash kartni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
-                    confirmText: "Ha, o'chirilsin",
+                    title: intl.formatMessage({ id: "Flash kart o'chirish" }),
+                    body: intl.formatMessage({ id: "Ushbu flash kartni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin." }),
+                    confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
                     variant: "danger",
                     mutateKey: [`flashcard-sets/`, router.locale],
                     onConfirm: async () => {
                         try {
                             await authAxios.delete(`flashcards/${realId}/`);
                             remove(index);
-                            toast.success("O'chirildi");
+                            toast.success(intl.formatMessage({ id: "O'chirildi" }));
                         } catch (err) {
                             handleApiError(err);
                             throw err;

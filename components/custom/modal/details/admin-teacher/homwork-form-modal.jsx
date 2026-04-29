@@ -99,7 +99,7 @@ const HomeworkFormModal = ({ homework = null }) => {
   }, [homework, reset]);
 
   const onSubmit = async (formData) => {
-    const toastId = toast.loading("Saqlanmoqda...");
+    const toastId = toast.loading(intl.formatMessage({ id: "Saqlanmoqda..." }));
     try {
       const method = isEdit ? "patch" : "post";
       const url = isEdit
@@ -147,7 +147,7 @@ const HomeworkFormModal = ({ homework = null }) => {
           name="title"
           register={register}
           error={errors.title}
-          placeholder="Week 3 Homework"
+          placeholder={intl.formatMessage({ id: "Week 3 Homework" })}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

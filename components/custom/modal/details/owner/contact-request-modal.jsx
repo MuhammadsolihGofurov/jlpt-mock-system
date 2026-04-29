@@ -20,12 +20,11 @@ const ContactRequestStatusModal = ({ request = null }) => {
     const intl = useIntl();
     const router = useRouter();
 
-    // Status variantlari
     const statusOptions = [
-        { value: "PENDING", label: "Kutilmoqda (Pending)" },
-        { value: "CONTACTED", label: "Bog'lanildi (Contacted)" },
-        { value: "RESOLVED", label: "Hal qilindi (Resolved)" },
-        { value: "REJECTED", label: "Rad etildi (Rejected)" },
+        { value: "PENDING", label: intl.formatMessage({ id: "Kutilmoqda (Pending)" }) },
+        { value: "CONTACTED", label: intl.formatMessage({ id: "Bog'lanildi (Contacted)" }) },
+        { value: "RESOLVED", label: intl.formatMessage({ id: "Hal qilindi (Resolved)" }) },
+        { value: "REJECTED", label: intl.formatMessage({ id: "Rad etildi (Rejected)" }) },
     ];
 
     const {
@@ -96,12 +95,12 @@ const ContactRequestStatusModal = ({ request = null }) => {
                     rules={{ required: "Statusni tanlash majburiy" }}
                     render={({ field }) => (
                         <Select
-                            label="Yangi statusni tanlang"
+                            label={intl.formatMessage({ id: "Yangi statusni tanlang" })}
                             options={statusOptions}
                             value={field.value}
                             onChange={field.onChange}
                             error={errors.status?.message}
-                            placeholder="Statusni tanlang..."
+                            placeholder={intl.formatMessage({ id: "Statusni tanlang..." })}
                         />
                     )}
                 />
@@ -125,7 +124,7 @@ const ContactRequestStatusModal = ({ request = null }) => {
                         ) : (
                             <Save size={18} />
                         )}
-                        {isSubmitting ? "Saqlanmoqda..." : "Yangilash"}
+                        {isSubmitting ? intl.formatMessage({ id: "Saqlanmoqda..." }) : intl.formatMessage({ id: "Yangilash" })}
                     </button>
                 </div>
             </form>

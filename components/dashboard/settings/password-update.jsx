@@ -65,7 +65,7 @@ const PasswordUpdateForm = () => {
             {/* Eski Parol */}
             <div className="md:col-span-2">
               <Input
-                label="Eski parol"
+                label={intl.formatMessage({ id: "Eski parol" })}
                 name="old_password"
                 type="password"
                 register={register}
@@ -82,7 +82,7 @@ const PasswordUpdateForm = () => {
 
             {/* Yangi Parol */}
             <Input
-              label="Yangi parol"
+              label={intl.formatMessage({ id: "Yangi parol" })}
               name="new_password"
               type="password"
               register={register}
@@ -103,7 +103,7 @@ const PasswordUpdateForm = () => {
 
             {/* Parolni tasdiqlash */}
             <Input
-              label="Parolni tasdiqlash"
+              label={intl.formatMessage({ id: "Parolni tasdiqlash" })}
               name="confirm_password"
               type="password"
               register={register}

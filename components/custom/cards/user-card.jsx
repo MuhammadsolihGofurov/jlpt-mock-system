@@ -43,9 +43,9 @@ export const UserCard = ({ item }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Foydalanuvchini o'chirish",
-        body: "Ushbu foydalanuvchini o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
-        confirmText: "Ha, o'chirilsin",
+        title: intl.formatMessage({ id: "Foydalanuvchini o'chirish" }),
+        body: intl.formatMessage({ id: "Ushbu foydalanuvchini o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin." }),
+        confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
         variant: "danger",
         mutateKey: ["users/", router.locale],
         onConfirm: async () => {
@@ -147,7 +147,7 @@ export const UserCard = ({ item }) => {
               <ActionDropdown>
                 <DropdownItem
                   icon={Edit}
-                  label="Tahrirlash"
+                  label={intl.formatMessage({ id: "Tahrirlash" })}
                   onClick={() =>
                     openModal("USER_FORM", { user: item }, "middle")
                   }
@@ -155,7 +155,7 @@ export const UserCard = ({ item }) => {
                 <div className="h-[1px] bg-gray-100 mx-2 my-1" />
                 <DropdownItem
                   icon={Trash2}
-                  label="O'chirish"
+                  label={intl.formatMessage({ id: "O'chirish" })}
                   variant="danger"
                   onClick={() => handleDelete(item?.id)}
                 />

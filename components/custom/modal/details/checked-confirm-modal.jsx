@@ -79,8 +79,7 @@ const CheckedConfirmModal = ({
                         className="mt-1 w-5 h-5 accent-danger rounded border-gray-300 focus:ring-danger cursor-pointer"
                     />
                     <span className="text-sm text-left text-slate-600 leading-relaxed">
-                        Men yuqoridagi barcha ogohlantirishlarni o‘qib chiqdim, tushundim va imtihon qoidalariga rioya qilishga roziman.
-                        Qoidalarni buzish oqibatida imtihonim bekor bo‘lishini qabul qilaman.
+                        {intl.formatMessage({ id: "checked_confirm_checkbox_text" })}
                     </span>
                 </label>
             </div>

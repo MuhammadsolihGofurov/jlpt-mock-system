@@ -34,9 +34,9 @@ const QuizCard = ({ item, mutate }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Quizni o'chirish",
-        body: `Ushbu quizni butunlay o'chirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.`,
-        confirmText: "Ha",
+        title: intl.formatMessage({ id: "Quizni o'chirish" }),
+        body: intl.formatMessage({ id: "Ushbu quizni butunlay o'chirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi." }),
+        confirmText: intl.formatMessage({ id: "Ha" }),
         variant: "danger",
         onConfirm: async () => await authAxios.delete(`quizzes/${item.id}/`),
         mutateKey: [`quizzes/`, router.locale],
@@ -49,9 +49,9 @@ const QuizCard = ({ item, mutate }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Quizni aralashtirish",
-        body: `Ushbu quizni aralashtirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.`,
-        confirmText: "Ha",
+        title: intl.formatMessage({ id: "Quizni aralashtirish" }),
+        body: intl.formatMessage({ id: "Ushbu quizni aralashtirib tashlamoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi." }),
+        confirmText: intl.formatMessage({ id: "Ha" }),
         variant: "danger",
         onConfirm: async () => await authAxios.post(`quizzes/${item.id}/shuffle-options/`),
         mutateKey: [`quizzes/`, router.locale],

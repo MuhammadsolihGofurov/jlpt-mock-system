@@ -110,7 +110,7 @@ function QuizBuilderPage() {
 
   const handleOpenAddQuestion = () => {
     if (!activeQuizId) {
-      toast.info("Avval quiz ma'lumotlarini saqlang");
+      toast.info(intl.formatMessage({ id: "Avval quiz ma'lumotlarini saqlang" }));
       return;
     }
 
@@ -144,18 +144,22 @@ function QuizBuilderPage() {
     );
   };
 
-  const handleDeleteQuestion = async (questionId) => {
-    const ok = window.confirm("Savolni o'chirmoqchimisiz?");
-    if (!ok) return;
-
-    try {
-      await authAxios.delete(`quiz-questions/${questionId}/`);
-      await mutateQuestions();
-      toast.success("Savol o'chirildi");
-    } catch (err) {
-      handleApiError(err);
-      toast.error("Savolni o'chirishda xatolik");
-    }
+  const handleDeleteQuestion = (questionId) => {
+    openModal(
+      "CONFIRM_MODAL",
+      {
+        title: intl.formatMessage({ id: "Savolni o'chirmoqchimisiz?" }),
+        body: intl.formatMessage({ id: "Savolni o'chirmoqchimisiz?" }),
+        confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
+        variant: "danger",
+        onConfirm: async () => {
+          await authAxios.delete(`quiz-questions/${questionId}/`);
+          await mutateQuestions();
+          toast.success(intl.formatMessage({ id: "Savol o'chirildi" }));
+        },
+      },
+      "small",
+    );
   };
 
   return (
@@ -170,10 +174,10 @@ function QuizBuilderPage() {
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
             <h1 className="text-2xl font-black text-heading">
-              {isNewQuiz ? "Yangi Quiz Yaratish" : "Quiz Builder"}
+              {isNewQuiz ? intl.formatMessage({ id: "Yangi Quiz Yaratish" }) : "Quiz Builder"}
             </h1>
             <p className="text-sm text-muted font-medium">
-              Har bir savolni alohida modalda qo'shing. Bu ko'p rasm/audio bilan ishlashda ancha yengil.
+              {intl.formatMessage({ id: "Har bir savolni alohida modalda qo'shing. Bu ko'p rasm/audio bilan ishlashda ancha yengil." })}
             </p>
           </div>
 
@@ -183,14 +187,14 @@ function QuizBuilderPage() {
               onClick={() => router.push("/dashboard/mocks/quiz")}
               className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold"
             >
-              Orqaga
+              {intl.formatMessage({ id: "Orqaga" })}
             </button>
             <button
               type="button"
               onClick={handleOpenAddQuestion}
               className="px-4 py-2.5 rounded-xl bg-primary text-white font-black flex items-center gap-2"
             >
-              <Plus size={16} /> Savol qo'shish
+              <Plus size={16} /> {intl.formatMessage({ id: "Savol qo'shish" })}
             </button>
           </div>
         </div>
@@ -198,14 +202,14 @@ function QuizBuilderPage() {
         <form onSubmit={handleSubmit(onSubmitQuiz)} className="p-6 rounded-3xl border border-slate-100 bg-white space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="Quiz nomi"
+              label={intl.formatMessage({ id: "Quiz nomi" })}
               name="title"
               register={register}
               error={errors.title}
-              placeholder="Quiz nomini kiriting"
+              placeholder={intl.formatMessage({ id: "Quiz nomini kiriting" })}
             />
             <Input
-              label="Standart vaqt (sekund)"
+              label={intl.formatMessage({ id: "Standart vaqt (sekund)" })}
               name="default_question_duration"
               type="number"
               register={register}
@@ -215,20 +219,20 @@ function QuizBuilderPage() {
           </div>
 
           <Textarea
-            label="Tavsif"
+            label={intl.formatMessage({ id: "Tavsif" })}
             name="description"
             register={register}
             rows={3}
             error={errors.description}
-            placeholder="Quiz haqida qisqa tavsif"
+            placeholder={intl.formatMessage({ id: "Quiz haqida qisqa tavsif" })}
           />
 
           <div className="max-w-sm">
             <Select
-              label="Holat"
+              label={intl.formatMessage({ id: "Holat" })}
               options={[
-                { value: true, label: "Faol" },
-                { value: false, label: "Noaktiv" },
+                { value: true, label: intl.formatMessage({ id: "Faol" }) },
+                { value: false, label: intl.formatMessage({ id: "Noaktiv" }) },
               ]}
               value={watch("is_active")}
               onChange={(val) => setValue("is_active", val)}
@@ -243,22 +247,22 @@ function QuizBuilderPage() {
               className="bg-heading hover:bg-primary text-white px-6 py-3 rounded-xl font-black flex items-center gap-2 disabled:opacity-50"
             >
               <Save size={16} />
-              {isSubmitting ? "Saqlanmoqda..." : "Quizni saqlash"}
+              {isSubmitting ? intl.formatMessage({ id: "Saqlanmoqda..." }) : intl.formatMessage({ id: "Quizni saqlash" })}
             </button>
           </div>
         </form>
 
         <div className="p-6 rounded-3xl border border-slate-100 bg-white">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-black text-heading">Savollar ({questions.length})</h2>
+            <h2 className="text-lg font-black text-heading">{intl.formatMessage({ id: "Savollar" })} ({questions.length})</h2>
           </div>
 
           {!activeQuizId && (
-            <p className="text-sm text-muted">Savol qo'shish uchun avval quizni saqlang.</p>
+            <p className="text-sm text-muted">{intl.formatMessage({ id: "Savol qo'shish uchun avval quizni saqlang." })}</p>
           )}
 
           {activeQuizId && questions.length === 0 && !questionsLoading && (
-            <p className="text-sm text-muted">Hozircha savollar yo'q.</p>
+            <p className="text-sm text-muted">{intl.formatMessage({ id: "Hozircha savollar yo'q." })}</p>
           )}
 
           {activeQuizId && questions.length > 0 && (
@@ -268,7 +272,7 @@ function QuizBuilderPage() {
                   <div className="min-w-0">
                     <h3 className="font-black text-heading truncate">#{q.order} {q.text}</h3>
                     <p className="text-xs text-slate-500 font-medium mt-1">
-                      Ball: {q.points} | Variantlar: {Array.isArray(q.options) ? q.options.length : 0}
+                      {intl.formatMessage({ id: "Ball" })}: {q.points} | {intl.formatMessage({ id: "Variantlar" })}: {Array.isArray(q.options) ? q.options.length : 0}
                     </p>
                   </div>
 

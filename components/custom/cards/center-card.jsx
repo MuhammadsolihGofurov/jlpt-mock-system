@@ -31,9 +31,9 @@ const CenterCard = ({ center, onEdit, onDelete }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Markazni o'chirish",
-        body: "Ushbu o'quv markazini o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
-        confirmText: "Ha, o'chirilsin",
+        title: intl.formatMessage({ id: "Markazni o'chirish" }),
+        body: intl.formatMessage({ id: "Ushbu o'quv markazini o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin." }),
+        confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
         variant: "danger",
         mutateKey: ["owner-centers/", router.locale],
         onConfirm: async () => {
@@ -48,9 +48,9 @@ const CenterCard = ({ center, onEdit, onDelete }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Markazni aktivlashtirish",
-        body: "Ushbu o'quv markazini aktivlashtirmoqchimisiz? Bunda elektron pochta orqali tizimga kira olish imkoniyati mavjud bo'ladi.",
-        confirmText: "Ha",
+        title: intl.formatMessage({ id: "Markazni aktivlashtirish" }),
+        body: intl.formatMessage({ id: "Ushbu o'quv markazini aktivlashtirmoqchimisiz? Bunda elektron pochta orqali tizimga kira olish imkoniyati mavjud bo'ladi." }),
+        confirmText: intl.formatMessage({ id: "Ha" }),
         variant: "info",
         mutateKey: ["owner-centers/", router.locale],
         onConfirm: async () => {
@@ -65,9 +65,9 @@ const CenterCard = ({ center, onEdit, onDelete }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Markazni bloklash",
-        body: "Ushbu o'quv markazini bloklamoqchimisiz? Bunda elektron pochta orqali tizimga kira olmaydi.",
-        confirmText: "Ha",
+        title: intl.formatMessage({ id: "Markazni bloklash" }),
+        body: intl.formatMessage({ id: "Ushbu o'quv markazini bloklamoqchimisiz? Bunda elektron pochta orqali tizimga kira olmaydi." }),
+        confirmText: intl.formatMessage({ id: "Ha" }),
         variant: "danger",
         mutateKey: ["owner-centers/", router.locale],
         onConfirm: async () => {
@@ -106,7 +106,7 @@ const CenterCard = ({ center, onEdit, onDelete }) => {
         <ActionDropdown>
           <DropdownItem
             icon={UserPlus}
-            label="Admin qo'shish"
+            label={intl.formatMessage({ id: "Admin qo'shish" })}
             variant="blue"
             onClick={() =>
               openModal("ADMIN_FORM", { centerId: center?.id }, "middle")
@@ -114,20 +114,20 @@ const CenterCard = ({ center, onEdit, onDelete }) => {
           />
           <DropdownItem
             icon={Edit2}
-            label="Tahrirlash"
+            label={intl.formatMessage({ id: "Tahrirlash" })}
             variant="blue"
             onClick={() => openModal("centerForm", { center }, "middle")}
           />
           {center?.status !== "ACTIVE" ? (
             <DropdownItem
               icon={ShieldCheck}
-              label="Aktivlashtirish"
+              label={intl.formatMessage({ id: "Aktivlashtirish" })}
               onClick={() => handleActivate(center?.id)}
             />
           ) : (
             <DropdownItem
               icon={Ban}
-              label="Bloklash"
+              label={intl.formatMessage({ id: "Bloklash" })}
               variant="danger"
               onClick={() => handleBlock(center?.id)}
             />
@@ -135,7 +135,7 @@ const CenterCard = ({ center, onEdit, onDelete }) => {
           <div className="h-[1px] bg-gray-100 mx-2 my-1" />
           <DropdownItem
             icon={Trash2}
-            label="O'chirish"
+            label={intl.formatMessage({ id: "O'chirish" })}
             variant="danger"
             onClick={() => handleDelete(center?.id)}
           />

@@ -6,8 +6,8 @@ export const moreInit = (list) => {
 export const moreToggle = (
 	btn,
 	list,
-	beforeText = 'Показать еще',
-	afterText = 'Скрыть'
+	beforeText = 'Show more',
+	afterText = 'Hide'
 ) => {
 	const span = btn.querySelector('span')
 	btn.querySelector('span')

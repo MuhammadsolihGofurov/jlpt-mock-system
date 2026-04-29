@@ -57,9 +57,9 @@ const GroupMembersModal = ({ group }) => {
     openModal(
       "CONFIRM_MODAL",
       {
-        title: "Foydalanuvchini chiqarish",
-        body: "Ushbu foydalanuvchini guruhdan chiqarib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
-        confirmText: "Ha",
+        title: intl.formatMessage({ id: "Foydalanuvchini chiqarish" }),
+        body: intl.formatMessage({ id: "Ushbu foydalanuvchini guruhdan chiqarib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin." }),
+        confirmText: intl.formatMessage({ id: "Ha" }),
         variant: "danger",
         mutateKey: [`groups/${group.id}/members/`, router.locale],
         onConfirm: async () => {
@@ -133,12 +133,12 @@ const GroupMembersModal = ({ group }) => {
               control={control}
               render={({ field }) => (
                 <Select
-                  label="Talabalarni tanlang"
+                  label={intl.formatMessage({ id: "Talabalarni tanlang" })}
                   isMulti={true}
                   options={studentOptions}
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder="Ism bo'yicha qidirish..."
+                  placeholder={intl.formatMessage({ id: "Ism bo'yicha qidirish..." })}
                 />
               )}
             />
@@ -149,7 +149,7 @@ const GroupMembersModal = ({ group }) => {
                 className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-black shadow-md disabled:opacity-50"
               >
                 <Save size={18} />
-                Saqlash
+                {intl.formatMessage({ id: "Saqlash" })}
               </button>
             </div>
           </div>
@@ -204,7 +204,7 @@ const GroupMembersModal = ({ group }) => {
           <div className="text-center py-10 bg-slate-50/50 rounded-[2rem] border border-dashed border-slate-200">
             <Users size={40} className="mx-auto text-slate-300 mb-2" />
             <p className="text-slate-500 font-medium">
-              Guruhda hozircha a'zolar yo'q
+              {intl.formatMessage({ id: "Guruhda hozircha a'zolar yo'q" })}
             </p>
           </div>
         )}

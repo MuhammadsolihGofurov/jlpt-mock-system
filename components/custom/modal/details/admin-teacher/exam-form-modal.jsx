@@ -159,21 +159,21 @@ const ExamFormModal = ({ exam = null, currentExamType, exam_type }) => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <Input
-          label="Imtihon nomi"
+          label={intl.formatMessage({ id: "Imtihon nomi" })}
           name="title"
           register={register}
           error={errors.title}
-          placeholder="JLPT N5 Final Mock"
+          placeholder={intl.formatMessage({ id: "JLPT N5 Final Mock" })}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Controller
             name="mock_test"
             control={control}
-            rules={{ required: "Mock test tanlash majburiy" }}
+            rules={{ required: intl.formatMessage({ id: "Mock test tanlash majburiy" }) }}
             render={({ field }) => (
               <Select
-                label="Mock Test (Shablon)"
+                label={intl.formatMessage({ id: "Mock Test (Shablon)" })}
                 options={mockOptions}
                 value={field.value}
                 onChange={field.onChange}
@@ -184,7 +184,7 @@ const ExamFormModal = ({ exam = null, currentExamType, exam_type }) => {
           />
 
           <Input
-            label="Boshlanish vaqti"
+            label={intl.formatMessage({ id: "Boshlanish vaqti" })}
             name="estimated_start_time"
             type="datetime-local"
             register={register}
@@ -197,7 +197,7 @@ const ExamFormModal = ({ exam = null, currentExamType, exam_type }) => {
           control={control}
           render={({ field }) => (
             <Select
-              label="Guruhlarni biriktirish"
+              label={intl.formatMessage({ id: "Guruhlarni biriktirish" })}
               isMulti={true}
               options={groupOptions}
               value={field.value}

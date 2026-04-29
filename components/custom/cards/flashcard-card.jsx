@@ -24,9 +24,9 @@ const FlashcardDeckCard = ({ deck }) => {
         openModal(
             "CONFIRM_MODAL",
             {
-                title: "Flash kart o'chirish",
-                body: "Ushbu flash kartni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin.",
-                confirmText: "Ha, o'chirilsin",
+                title: intl.formatMessage({ id: "Flash kart o'chirish" }),
+                body: intl.formatMessage({ id: "Ushbu flash kartni o'chirib tashlamoqchimisiz? Bunda barcha bog'langan ma'lumotlar ham yo'qolishi mumkin." }),
+                confirmText: intl.formatMessage({ id: "Ha, o'chirilsin" }),
                 variant: "danger",
                 mutateKey: [`flashcard-sets/`, router.locale],
                 onConfirm: async () => {
@@ -51,7 +51,7 @@ const FlashcardDeckCard = ({ deck }) => {
 
             if (!cards || cards.length === 0) {
                 toast.update(toastId, {
-                    render: "Kardlar topilmadi!",
+                    render: intl.formatMessage({ id: "Kardlar topilmadi!" }),
                     type: "error",
                     isLoading: false,
                     autoClose: 3000,
@@ -112,7 +112,7 @@ const FlashcardDeckCard = ({ deck }) => {
                 <ActionDropdown>
                     <DropdownItem
                         icon={Download}
-                        label="Yuklab olish"
+                        label={intl.formatMessage({ id: "Yuklab olish" })}
                         variant="blue"
                         onClick={() => handleDownload(deck.id, deck.title)}
                     />
@@ -120,14 +120,14 @@ const FlashcardDeckCard = ({ deck }) => {
                         <>
                             <DropdownItem
                                 icon={Edit2}
-                                label="Tahrirlash"
+                                label={intl.formatMessage({ id: "Tahrirlash" })}
                                 variant="blue"
                                 onClick={() => router.push(`/dashboard/flashcards/edit/${deck.id}`)}
                             />
                             <div className="h-[1px] bg-gray-100 mx-2 my-1" />
                             <DropdownItem
                                 icon={Trash2}
-                                label="O'chirish"
+                                label={intl.formatMessage({ id: "O'chirish" })}
                                 variant="danger"
                                 onClick={() => handleDelete(deck?.id)}
                             />
