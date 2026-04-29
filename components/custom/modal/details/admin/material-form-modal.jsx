@@ -18,18 +18,6 @@ const MaterialFormModal = ({ material = null }) => {
   const intl = useIntl();
   const { category } = router.query;
 
-  // 1. Guruhlar ro'yxatini olish (materialni biriktirish uchun)
-  const { data: groupsData } = useSWR(
-    ["groups/", router.locale],
-    (url, locale) =>
-      fetcher(
-        `${url}?page=all`,
-        { headers: { "Accept-Language": locale } },
-        {},
-        true,
-      ),
-  );
-
   // const { data: categoriesData } = useSWR(
   //   ["material-categories/", router.locale],
   //   (url, locale) =>
@@ -40,12 +28,6 @@ const MaterialFormModal = ({ material = null }) => {
   //       true,
   //     ),
   // );
-
-  const groupOptions =
-    groupsData?.map((g) => ({
-      value: g.id,
-      label: g.name,
-    })) || [];
 
   // const categoryOptions =
   //   categoriesData?.map((g) => ({
@@ -71,8 +53,8 @@ const MaterialFormModal = ({ material = null }) => {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: material || {
-      is_public: true,
-      group_ids: [],
+      name: "",
+      file_type: "",
     },
   });
 
@@ -81,8 +63,6 @@ const MaterialFormModal = ({ material = null }) => {
       reset({
         name: material.name,
         file_type: material.file_type,
-        is_public: material.is_public,
-        group_ids: material.groups?.map((g) => g.id) || [],
         // category_id: material?.category?.id
       });
     }
@@ -97,17 +77,11 @@ const MaterialFormModal = ({ material = null }) => {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("file_type", data.file_type);
-      formData.append("is_public", data.is_public);
       formData.append("category_id", category);
 
       // Agar yangi fayl tanlangan bo'lsa
       if (data.file && data.file[0]) {
         formData.append("file", data.file[0]);
-      }
-
-      // Group IDs massivini jo'natish
-      if (data.group_ids && data.group_ids.length > 0) {
-        data.group_ids.forEach((id) => formData.append("group_ids", id));
       }
 
       const method = isEdit ? "patch" : "post";
@@ -234,44 +208,6 @@ const MaterialFormModal = ({ material = null }) => {
             <p className="text-xs text-red-500 font-bold">
               {errors.file.message}
             </p>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Controller
-            name="is_public"
-            control={control}
-            render={({ field }) => (
-              <Select
-                label="Kirish huquqi"
-                options={[
-                  { value: true, label: "Hamma uchun (Public)" },
-                  { value: false, label: "Faqat tanlangan guruhlar" },
-                ]}
-                value={field.value}
-                onChange={field.onChange}
-                error={errors.is_public?.message}
-              />
-            )}
-          />
-
-          {!isPublic && (
-            <Controller
-              name="group_ids"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  label="Guruhlarni biriktirish"
-                  isMulti={true}
-                  options={groupOptions}
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="Guruhni tanlang"
-                  error={errors.group_ids?.message}
-                  isLabel={false}
-                />
-              )}
-            />
           )}
         </div>
 
