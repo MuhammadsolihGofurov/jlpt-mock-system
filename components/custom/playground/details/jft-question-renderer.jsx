@@ -368,7 +368,7 @@ export const JFTQuestionRenderer = ({
                                         <img
                                             src={q.image}
                                             alt={`Question ${q.question_number}`}
-                                            className="mt-3 w-full rounded-xl border border-slate-100 object-contain"
+                                            className="mt-3 mb-5 max-h-[45vh] w-auto mx-auto block rounded-xl border border-slate-100 object-contain"
                                         />
                                     )}
 
