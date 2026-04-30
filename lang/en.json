@@ -1019,5 +1019,10 @@
     "Uy vazifasi doirasidagi topshiriqlar tahlili": "Analysis of homework assignments",
     "Ushbu imtihon bo'yicha hali hech qanday natija mavjud emas": "No results available for this exam yet.",
     "Roulette": "Roulette",
-    "Ortga qaytish": "Go Back"
+    "Ortga qaytish": "Go Back",
+    "Termin ko'rsatiladi → Ta'rifni topish": "Term is shown → Find the definition",
+    "Ta'rif ko'rsatiladi → Terminni topish": "Definition is shown → Find the term",
+    "Furigana ko'rsatiladi → Terminni topish": "Furigana is shown → Find the term",
+    "Ta'rif va Furigana → Terminni topish": "Definition and Furigana → Find the term",
+    "Furigana va Ta'rif → Terminni topish": "Furigana and Definition → Find the term"
 }

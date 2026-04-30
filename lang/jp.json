@@ -1019,5 +1019,10 @@
   "Uy vazifasi doirasidagi topshiriqlar tahlili": "宿題の課題分析",
   "Ushbu imtihon bo'yicha hali hech qanday natija mavjud emas": "この試験に関する結果はまだありません。",
   "Roulette": "ルーレット",
-  "Ortga qaytish": "戻る"
+  "Ortga qaytish": "戻る",
+  "Termin ko'rsatiladi → Ta'rifni topish": "用語を表示 → 意味を答える",
+  "Ta'rif ko'rsatiladi → Terminni topish": "意味を表示 → 用語を答える",
+  "Furigana ko'rsatiladi → Terminni topish": "ふりがなを表示 → 用語を答える",
+  "Ta'rif va Furigana → Terminni topish": "意味とふりがな → 用語を答える",
+  "Furigana va Ta'rif → Terminni topish": "ふりがなと意味 → 用語を答える"
 }

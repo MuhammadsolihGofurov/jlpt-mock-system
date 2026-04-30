@@ -1020,5 +1020,10 @@
   "Uy vazifasi doirasidagi topshiriqlar tahlili": "Uy vazifasi doirasidagi topshiriqlar tahlili",
   "Ushbu imtihon bo'yicha hali hech qanday natija mavjud emas": "Ushbu imtihon bo'yicha hali hech qanday natija mavjud emas.",
   "Roulette": "Rulet",
-  "Ortga qaytish": "Ortga qaytish"
+  "Ortga qaytish": "Ortga qaytish",
+  "Termin ko'rsatiladi → Ta'rifni topish":"Termin ko'rsatiladi → Ta'rifni topish",
+  "Ta'rif ko'rsatiladi → Terminni topish":"Ta'rif ko'rsatiladi → Terminni topish",
+  "Furigana ko'rsatiladi → Terminni topish":"Furigana ko'rsatiladi → Terminni topish",
+  "Ta'rif va Furigana → Terminni topish":"Ta'rif va Furigana → Terminni topish",
+  "Furigana va Ta'rif → Terminni topish":"Furigana va Ta'rif → Terminni topish"
 }

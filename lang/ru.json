@@ -1019,5 +1019,10 @@
   "Uy vazifasi doirasidagi topshiriqlar tahlili": "Analysis of homework assignments",
   "Ushbu imtihon bo'yicha hali hech qanday natija mavjud emas": "Результатов по этому экзамену пока нет.",
   "Roulette": "Рулетка",
-  "Ortga qaytish": "Назад"
+  "Ortga qaytish": "Назад",
+  "Termin ko'rsatiladi → Ta'rifni topish": "Показывается термин → Найти определение",
+  "Ta'rif ko'rsatiladi → Terminni topish": "Показывается определение → Найти термин",
+  "Furigana ko'rsatiladi → Terminni topish": "Показывается фуригана → Найти термин",
+  "Ta'rif va Furigana → Terminni topish": "Определение и фуригана → Найти термин",
+  "Furigana va Ta'rif → Terminni topish": "Фуригана и определение → Найти термин"
 }

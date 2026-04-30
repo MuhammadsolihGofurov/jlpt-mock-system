@@ -59,12 +59,11 @@ const FlashcardPracticeModal = ({ id }) => {
                             label="Savol turi"
                             options={[
                                 { value: "SELECT", label: "Savol turini tanlang..." },
-                                // { value: "MIXED", label: "Aralash (Mixed)" },
-                                { value: "TERM", label: "Termin ko'rsatiladi" },
-                                { value: "DEFINITION", label: "Ta'rif ko'rsatiladi" },
-                                { value: "FURIGANA", label: "Furigana ko'rsatiladi" },
-                                { value: "DEFINITION_FURIGANA", label: "Ta'rif va Furigana ko'rsatiladi" },
-                                { value: "FURIGANA_DEFINITION", label: "Furigana va Ta'rif ko'rsatiladi" }
+                                { value: "TERM", label: "Termin ko'rsatiladi → Ta'rifni topish" },
+                                { value: "DEFINITION", label: "Ta'rif ko'rsatiladi → Terminni topish" },
+                                { value: "FURIGANA", label: "Furigana ko'rsatiladi → Terminni topish" },
+                                { value: "DEFINITION_FURIGANA", label: "Ta'rif va Furigana → Terminni topish" },
+                                { value: "FURIGANA_DEFINITION", label: "Furigana va Ta'rif → Terminni topish" }
                             ]}
                             {...field}
                         />

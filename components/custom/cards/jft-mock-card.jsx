@@ -130,11 +130,9 @@ const JftCard = ({ item }) => {
                     <Layers size={24} />
                 </div>
 
-                <Link href={makedHref}>
-                    <h3 className="text-lg font-black text-heading line-clamp-2 min-h-[56px] leading-tight hover:text-primary transition-colors cursor-pointer">
-                        {item.title}
-                    </h3>
-                </Link>
+                <h3 className="text-lg font-black text-heading line-clamp-2 min-h-[56px] leading-tight hover:text-primary transition-colors cursor-pointer">
+                    {item.title}
+                </h3>
             </div>
 
             <div className="space-y-3 flex-1">
@@ -183,13 +181,12 @@ const JftCard = ({ item }) => {
                                 )
                                 : isPublished ? intl.formatMessage({ id: "Nashrdan olish" }) : intl.formatMessage({ id: "Nashr qilish" })
                         }
-                        className={`p-3 rounded-2xl transition-all active:scale-90 ${
-                            blockUnpublish
+                        className={`p-3 rounded-2xl transition-all active:scale-90 ${blockUnpublish
                                 ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                                 : isPublished
                                     ? "bg-slate-900 text-white hover:bg-slate-800"
                                     : "bg-primary text-white hover:bg-primary-dark shadow-lg shadow-orange-100"
-                        }`}
+                            }`}
                     >
                         {isPublished ? <RotateCcw size={18} /> : <Send size={18} />}
                     </button>

@@ -191,7 +191,7 @@ const GroupMembersModal = ({ group }) => {
 
                 {member?.role !== "CENTER_ADMIN" && (
                   <button
-                    onClick={() => handleDeleteMember(member.id)}
+                    onClick={() => handleDeleteMember(member?.member_id)}
                     className="p-2.5 text-slate-300 hover:text-danger hover:bg-red-50 rounded-xl transition-all"
                   >
                     <Trash2 size={18} />
