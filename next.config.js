@@ -10,7 +10,6 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 });
 
 const nextConfig = {
-  turbopack: {},
   reactStrictMode: true,
   i18n: {
     defaultLocale: "uz",
