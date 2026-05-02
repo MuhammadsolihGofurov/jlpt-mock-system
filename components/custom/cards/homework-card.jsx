@@ -174,7 +174,7 @@ const HomeworkCard = ({ item, mutate }) => {
         {isStudent && (
           <Link
             // Agar vaqt o'tgan bo'lsa Link bosilmasligi uchun pointer-events-none qo'shamiz
-            href={isExpired ? "#" : `/dashboard/playground/homework/${item?.id}`}
+            href={isExpired ? "#" : `/dashboard/playground/exam/quiz/${item?.id}`}
             className={`w-full font-semibold py-4 rounded-[1.5rem] transition-all flex items-center justify-center gap-2 text-sm shadow-sm active:scale-95 
             ${isExpired
                 ? "bg-slate-200 text-slate-400 cursor-not-allowed pointer-events-none"
