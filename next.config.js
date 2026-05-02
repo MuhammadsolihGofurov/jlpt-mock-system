@@ -1,14 +1,4 @@
 /** @type {import('next').NextConfig} */
-const withPWA = require("@ducanh2912/next-pwa").default({
-  dest: "public",
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === "development",
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
-});
-
 const nextConfig = {
   reactStrictMode: true,
   i18n: {
@@ -21,28 +11,18 @@ const nextConfig = {
     },
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "api.mikan.uz",
-      },
-      {
-        protocol: "https",
-        hostname: "s3.eu-north-1.amazonaws.com",
-      },
-    ],
+    domains: ["api.mikan.uz", "s3.eu-north-1.amazonaws.com"],
   },
   env: {
+    // like base url
     API: "",
   },
   async rewrites() {
-    return [
-      {
-        source: "/api/v1/:path*",
-        destination: "https://api.mikan.uz/api/v1/:path*",
-      },
-    ];
+    return [{
+      source: "/api/v1/:path*",
+      destination: "https://api.mikan.uz/api/v1/:path*",
+    }, ];
   },
 };
 
-module.exports = withPWA(nextConfig);
+module.exports = nextConfig;
