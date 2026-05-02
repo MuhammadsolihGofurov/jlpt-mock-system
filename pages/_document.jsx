@@ -8,7 +8,26 @@ class MyDocument extends Document {
 
     return (
       <Html lang={currentLocale}>
-        <Head></Head>
+        <Head>
+          {/* Mobil — sahifani to'g'ri o'lchamda ko'rsatish */}
+          <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+
+          {/* PWA — Manifest */}
+          <link rel="manifest" href="/manifest.json" />
+
+          {/* PWA — Tema rangi (browser toolbar rangi) */}
+          <meta name="theme-color" content="#ffffff" />
+
+          {/* PWA — iOS Safari uchun (Apple o'z standartlaridan foydalanadi) */}
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+          <meta name="apple-mobile-web-app-title" content="Mikan" />
+          <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+          {/* PWA — Windows Tile (Microsoft Store / taskbar) */}
+          <meta name="msapplication-TileColor" content="#ffffff" />
+          <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+        </Head>
         <body>
           <Main />
           <noscript
