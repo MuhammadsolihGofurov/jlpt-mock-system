@@ -7,7 +7,7 @@ class MyDocument extends Document {
       this.props.__NEXT_DATA__.locale || nextConfig.i18n.defaultLocale;
 
     return (
-      <Html lang={currentLocale}>
+      <Html lang={currentLocale} data-scroll-behavior="smooth">
         <Head></Head>
         <body>
           <Main />
