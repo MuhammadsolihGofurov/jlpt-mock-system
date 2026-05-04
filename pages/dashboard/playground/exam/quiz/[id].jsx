@@ -18,7 +18,6 @@ import {
 import { authAxios } from "@/utils/axios";
 import { handleApiError } from "@/utils/handle-error";
 import { toast } from "react-toastify";
-import { useModal } from "@/context/modal-context";
 import { QuizExamPlayground } from "@/components/custom/playground";
 
 const QuizPlaygroundPage = ({ customLoading }) => {
@@ -28,7 +27,6 @@ const QuizPlaygroundPage = ({ customLoading }) => {
   const [examData, setExamData] = useState(null);
   const [activeQuizId, setActiveQuizId] = useState(null);
   const [isStarting, setIsStarting] = useState(false);
-  const { openModal } = useModal();
 
   const { data: assignmentInfo, isLoading } = useSWR(
     assignmentId ? [`homework-assignments/${assignmentId}/`, router.locale] : null,
@@ -48,22 +46,9 @@ const QuizPlaygroundPage = ({ customLoading }) => {
         item_id: quiz.id,
       });
 
-      openModal(
-        "CHECKED_CONFIRM_MODAL",
-        {
-          title: intl.formatMessage({ id: "Quizni boshlash" }),
-          body: intl.formatMessage({ id: "Quiz qo'llanmasi" }),
-          confirmText: intl.formatMessage({ id: "Tushundim va quizni boshlayman" }),
-          variant: "danger",
-          onConfirm: () => {
-            setExamData({ ...res.data, quizTitle: quiz.title });
-          },
-        },
-        "middle",
-      );
+      setExamData({ ...res.data, quizTitle: quiz.title });
     } catch (error) {
-      const msg = handleApiError(error);
-      toast.error(msg);
+      handleApiError(error);
     } finally {
       setIsStarting(false);
       setActiveQuizId(null);
