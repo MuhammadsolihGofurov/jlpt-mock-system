@@ -4,6 +4,7 @@ import { authAxios } from "@/utils/axios";
 import { useIntl } from "react-intl";
 import { Timer, Flag, Maximize2, ChevronRight, CheckCircle2, XCircle } from "lucide-react";
 import { useSelector } from "react-redux";
+import { toMediaUrl } from "@/utils/mediaUrl";
 
 const QuizExamPlayground = ({ examData, onFinish }) => {
     const intl = useIntl();
@@ -262,7 +263,7 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                             {/* Rasm */}
                             {currentQuestion?.image && (
                                 <img
-                                    src={currentQuestion.image}
+                                    src={toMediaUrl(currentQuestion.image)}
                                     alt={`Savol ${currentIndex + 1}`}
                                     className="mb-6 max-h-[45vh] w-auto mx-auto block rounded-2xl border border-slate-100 object-contain"
                                 />
@@ -296,6 +297,9 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                                     const isSelected = currentResult?.idx === oIdx && currentResult?.idx !== null;
                                     const isCorrectOption = currentResult?.correctIdx === oIdx;
                                     const isWrong = isSelected && !currentResult?.isCorrect;
+                                    const optionText = typeof option === "string" ? option : option?.text || "";
+                                    const optionImageUrl =
+                                        typeof option === "object" && option?.image ? toMediaUrl(option.image) : null;
 
                                     let optionStyle = "border-slate-100 bg-white hover:border-slate-300 cursor-pointer";
                                     let labelStyle = "border-slate-200 text-slate-400 bg-slate-50";
@@ -325,7 +329,16 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                                                 {optionLabel}
                                             </span>
                                             <span className="font-medium text-sm text-slate-700 flex-1">
-                                                {typeof option === "string" ? option : option?.text || ""}
+                                                {optionImageUrl ? (
+                                                    <img
+                                                        src={optionImageUrl}
+                                                        alt={optionText || `Option ${optionLabel}`}
+                                                        className="max-h-24 w-auto object-contain rounded-lg border border-slate-100 bg-white"
+                                                        loading="lazy"
+                                                    />
+                                                ) : (
+                                                    optionText
+                                                )}
                                             </span>
                                             {isCorrectOption && currentResult && (
                                                 <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />

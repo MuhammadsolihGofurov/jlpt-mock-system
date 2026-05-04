@@ -41,3 +41,6 @@ public/swe-worker-*.js
 
 # Claude Code
 .claude/
+
+# old pages
+pages/dashboard/playground/homework/[id]-old.jsx
