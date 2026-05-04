@@ -49,21 +49,28 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
     const timerPercent = (timeLeft / duration) * 100;
     const isLowTime = timeLeft <= 5 && timeLeft > 0;
 
+    const checkSingleQuestion = useCallback(async (questionId, selectedIndex) => {
+        const payload = {
+            submission_id: examData.submission_id,
+            question_id: questionId,
+        };
+        // Backend endpoint has changed: selected_index can be omitted for "no answer" checks.
+        if (typeof selectedIndex === "number") payload.selected_index = selectedIndex;
+        const res = await authAxios.post("/submissions/check-single-question/", payload);
+        return res.data;
+    }, [examData?.submission_id]);
+
     const handleSelectOption = async (questionId, optionIndex) => {
         if (isAnswered || isChecking || isTimedOut) return;
         setIsChecking(true);
         try {
-            const res = await authAxios.post("/submissions/check-single-question/", {
-                submission_id: examData.submission_id,
-                question_id: questionId,
-                selected_index: optionIndex,
-            });
+            const data = await checkSingleQuestion(questionId, optionIndex);
             setAnswers((prev) => ({
                 ...prev,
                 [questionId]: {
                     idx: optionIndex,
-                    isCorrect: res.data.is_correct,
-                    correctIdx: res.data.correct_option_index,
+                    isCorrect: data.is_correct,
+                    correctIdx: data.correct_option_index,
                 },
             }));
         } catch {
@@ -73,12 +80,69 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
         }
     };
 
+    // Agar vaqt tugasa va user javob tanlamagan bo'lsa ham, check-single qilib correct javobni olib qo'yamiz.
+    useEffect(() => {
+        const qId = currentQuestion?.id;
+        if (!qId) return;
+        if (timeLeft !== 0) return;
+        if (answers[qId] || isChecking || isSubmitting) return;
+
+        let cancelled = false;
+        (async () => {
+            setIsChecking(true);
+            try {
+                const data = await checkSingleQuestion(qId);
+                if (cancelled) return;
+                setAnswers((prev) => ({
+                    ...prev,
+                    [qId]: {
+                        idx: null,
+                        isCorrect: data.is_correct,
+                        correctIdx: data.correct_option_index,
+                    },
+                }));
+            } catch {
+                // Timeout bo'lganda ham endpoint xato bersa, user flow'ni to'xtatmaymiz.
+            } finally {
+                if (!cancelled) setIsChecking(false);
+            }
+        })();
+
+        return () => { cancelled = true; };
+    }, [timeLeft, currentQuestion?.id, answers, isChecking, isSubmitting, checkSingleQuestion]);
+
     const handleNext = useCallback(async () => {
         if (isLastQuestion) {
             setIsSubmitting(true);
             try {
+                // MUHIM: yakunlashdan oldin hamma savollar check-single orqali tekshirilib chiqilishi kerak.
+                // User hech narsa tanlamagan savollarda selected_index yuborilmaydi.
+                await Promise.all(
+                    (questions || []).map(async (q) => {
+                        if (!q?.id) return;
+                        if (answers[q.id]) return;
+                        try {
+                            const data = await checkSingleQuestion(q.id);
+                            setAnswers((prev) => ({
+                                ...prev,
+                                [q.id]: prev[q.id] || {
+                                    idx: null,
+                                    isCorrect: data.is_correct,
+                                    correctIdx: data.correct_option_index,
+                                },
+                            }));
+                        } catch {
+                            // Agar backend eski bo'lsa va selected_index talab qilsa, bu yerda xato bo'lishi mumkin.
+                            // Lekin asosiy maqsad: yangilangan endpoint bilan 0 ta answer holatini qo'llab-quvvatlash.
+                        }
+                    })
+                );
+
                 await authAxios.post("/submissions/submit-homework/", {
                     submission_id: examData.submission_id,
+                    // Endpoint yangilandi: final submit'da ham bo'sh answers yuboriladi,
+                    // backend check-single orqali yig'ilgan submission.answers dan grade qiladi.
+                    answers: {},
                 });
                 toast.success(intl.formatMessage({ id: "Quiz muvaffaqiyatli yakunlandi!" }));
                 if (onFinish) onFinish(false);
@@ -92,7 +156,7 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
             setCurrentIndex((prev) => prev + 1);
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
-    }, [isLastQuestion, examData, onFinish, intl]);
+    }, [isLastQuestion, answers, examData?.submission_id, onFinish, intl, questions, checkSingleQuestion, isSubmitting]);
 
     const userInitial = user?.full_name?.[0] || user?.first_name?.[0] || "U";
 
@@ -229,7 +293,7 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {currentQuestion?.options?.map((option, oIdx) => {
                                     const optionLabel = ["A", "B", "C", "D"][oIdx] || oIdx + 1;
-                                    const isSelected = currentResult?.idx === oIdx;
+                                    const isSelected = currentResult?.idx === oIdx && currentResult?.idx !== null;
                                     const isCorrectOption = currentResult?.correctIdx === oIdx;
                                     const isWrong = isSelected && !currentResult?.isCorrect;
 

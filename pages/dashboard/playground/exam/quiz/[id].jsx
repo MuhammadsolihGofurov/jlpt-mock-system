@@ -48,8 +48,7 @@ const QuizPlaygroundPage = ({ customLoading }) => {
 
       setExamData({ ...res.data, quizTitle: quiz.title });
     } catch (error) {
-      const msg = handleApiError(error);
-      toast.error(msg);
+      handleApiError(error);
     } finally {
       setIsStarting(false);
       setActiveQuizId(null);
