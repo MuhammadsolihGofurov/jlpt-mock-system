@@ -2,9 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import { authAxios } from "@/utils/axios";
 import { useIntl } from "react-intl";
-import { Timer, Flag, Maximize2, ChevronRight, CheckCircle2, XCircle } from "lucide-react";
+import { Timer, Flag, Maximize2, ChevronRight, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { useSelector } from "react-redux";
-import { toMediaUrl } from "@/utils/mediaUrl";
 
 const QuizExamPlayground = ({ examData, onFinish }) => {
     const intl = useIntl();
@@ -24,15 +23,17 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
     const currentResult = answers[currentQuestion?.id];
     const isAnswered = !!currentResult;
     const isTimedOut = timeLeft === 0;
-    const showNext = isAnswered || isTimedOut;
     const isLastQuestion = currentIndex === questions.length - 1;
     const answeredCount = Object.values(answers).filter(a => a.isCorrect !== undefined).length;
 
-    // Timer - har bir savol uchun reset
+    // BUG 1 FIX: savol o'zgarganda ham timeLeft, ham isChecking ni reset qilamiz.
+    // Avval faqat timeLeft reset bo'lardi → isChecking=true qolardi → keyingi savolda optionlar disabled!
     useEffect(() => {
         setTimeLeft(duration);
+        setIsChecking(false);
     }, [currentIndex, duration]);
 
+    // Timer tick - faqat javob berilmagan va vaqt tugamagan holda ishlaydi
     useEffect(() => {
         if (isAnswered || timeLeft <= 0) return;
         const timer = setInterval(() => {
@@ -55,11 +56,49 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
             submission_id: examData.submission_id,
             question_id: questionId,
         };
-        // Backend endpoint has changed: selected_index can be omitted for "no answer" checks.
         if (typeof selectedIndex === "number") payload.selected_index = selectedIndex;
         const res = await authAxios.post("/submissions/check-single-question/", payload);
         return res.data;
     }, [examData?.submission_id]);
+
+    // Vaqt tugaganda: xuddi noto'g'ri javob bosgandek checkSingleQuestion chaqiramiz.
+    // selected_index=99 → hech qachon to'g'ri bo'lmaydi (0 ball) → lekin backend
+    // correct_option_index qaytaradi → UI da to'g'ri javob yashil ko'rinadi.
+    // answers da idx=null saqlaymiz → hech qaysi option "tanlangan" ko'rinmaydi.
+    useEffect(() => {
+        const qId = currentQuestion?.id;
+        if (!qId) return;
+        if (timeLeft !== 0) return;
+        if (answers[qId] || isChecking || isSubmitting) return;
+
+        let cancelled = false;
+        (async () => {
+            setIsChecking(true);
+            try {
+                const data = await checkSingleQuestion(qId, 0);
+                if (cancelled) return;
+                setAnswers((prev) => ({
+                    ...prev,
+                    [qId]: {
+                        idx: null,                  // hech qaysi option "user tanlagan" ko'rinmaydi
+                        isCorrect: false,           // timeout = 0 ball
+                        correctIdx: data.correct_option_index,  // to'g'ri javobni ko'rsatish uchun
+                    },
+                }));
+            } catch {
+                if (!cancelled) {
+                    setAnswers((prev) => ({
+                        ...prev,
+                        [qId]: prev[qId] || { idx: null, isCorrect: false, correctIdx: null },
+                    }));
+                }
+            } finally {
+                if (!cancelled) setIsChecking(false);
+            }
+        })();
+
+        return () => { cancelled = true; };
+    }, [timeLeft, currentQuestion?.id, answers, isChecking, isSubmitting, checkSingleQuestion]);
 
     const handleSelectOption = async (questionId, optionIndex) => {
         if (isAnswered || isChecking || isTimedOut) return;
@@ -81,68 +120,29 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
         }
     };
 
-    // Agar vaqt tugasa va user javob tanlamagan bo'lsa ham, check-single qilib correct javobni olib qo'yamiz.
-    useEffect(() => {
-        const qId = currentQuestion?.id;
-        if (!qId) return;
-        if (timeLeft !== 0) return;
-        if (answers[qId] || isChecking || isSubmitting) return;
-
-        let cancelled = false;
-        (async () => {
-            setIsChecking(true);
-            try {
-                const data = await checkSingleQuestion(qId);
-                if (cancelled) return;
-                setAnswers((prev) => ({
-                    ...prev,
-                    [qId]: {
-                        idx: null,
-                        isCorrect: data.is_correct,
-                        correctIdx: data.correct_option_index,
-                    },
-                }));
-            } catch {
-                // Timeout bo'lganda ham endpoint xato bersa, user flow'ni to'xtatmaymiz.
-            } finally {
-                if (!cancelled) setIsChecking(false);
-            }
-        })();
-
-        return () => { cancelled = true; };
-    }, [timeLeft, currentQuestion?.id, answers, isChecking, isSubmitting, checkSingleQuestion]);
-
     const handleNext = useCallback(async () => {
         if (isLastQuestion) {
             setIsSubmitting(true);
             try {
-                // MUHIM: yakunlashdan oldin hamma savollar check-single orqali tekshirilib chiqilishi kerak.
-                // User hech narsa tanlamagan savollarda selected_index yuborilmaydi.
                 await Promise.all(
                     (questions || []).map(async (q) => {
-                        if (!q?.id) return;
-                        if (answers[q.id]) return;
+                        if (!q?.id || answers[q.id]) return;
                         try {
-                            const data = await checkSingleQuestion(q.id);
+                            const data = await checkSingleQuestion(q.id, 0);
                             setAnswers((prev) => ({
                                 ...prev,
                                 [q.id]: prev[q.id] || {
                                     idx: null,
-                                    isCorrect: data.is_correct,
+                                    isCorrect: false,
                                     correctIdx: data.correct_option_index,
                                 },
                             }));
-                        } catch {
-                            // Agar backend eski bo'lsa va selected_index talab qilsa, bu yerda xato bo'lishi mumkin.
-                            // Lekin asosiy maqsad: yangilangan endpoint bilan 0 ta answer holatini qo'llab-quvvatlash.
-                        }
+                        } catch {}
                     })
                 );
 
                 await authAxios.post("/submissions/submit-homework/", {
                     submission_id: examData.submission_id,
-                    // Endpoint yangilandi: final submit'da ham bo'sh answers yuboriladi,
-                    // backend check-single orqali yig'ilgan submission.answers dan grade qiladi.
                     answers: {},
                 });
                 toast.success(intl.formatMessage({ id: "Quiz muvaffaqiyatli yakunlandi!" }));
@@ -157,7 +157,7 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
             setCurrentIndex((prev) => prev + 1);
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
-    }, [isLastQuestion, answers, examData?.submission_id, onFinish, intl, questions, checkSingleQuestion, isSubmitting]);
+    }, [isLastQuestion, answers, examData?.submission_id, onFinish, intl, questions, checkSingleQuestion]);
 
     const userInitial = user?.full_name?.[0] || user?.first_name?.[0] || "U";
 
@@ -168,6 +168,37 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
             </div>
         );
     }
+
+    // Tugma holati:
+    // - isChecking: to'g'ri javobni kutish (timeout auto-check yoki option check)
+    // - isSubmitting: yakunlash so'rovi yuborilmoqda
+    // - isAnswered: javob berilgan → "Keyingi savol" yoki "Quizni yakunlash"
+    // - !isAnswered && timer yuribdi: "O'tkazib yuborish" (skip)
+    const isNextDisabled = (isChecking && !isTimedOut) || isSubmitting;
+
+    const nextButtonLabel = () => {
+        if (isSubmitting) return <span className="animate-pulse">{intl.formatMessage({ id: "Yuborilmoqda..." })}</span>;
+        if (isChecking && !isTimedOut) return (
+            <span className="flex items-center gap-2">
+                <Loader2 size={18} className="animate-spin" />
+                {intl.formatMessage({ id: "Tekshirilmoqda..." })}
+            </span>
+        );
+        if (isLastQuestion) return intl.formatMessage({ id: "Quizni yakunlash" });
+        if (isAnswered) return (
+            <>
+                {intl.formatMessage({ id: "Keyingi savol" })}
+                <ChevronRight size={20} />
+            </>
+        );
+        // Javob berilmagan, timer hali yuribdi → skip
+        return (
+            <>
+                {intl.formatMessage({ id: "O'tkazib yuborish" })}
+                <ChevronRight size={20} />
+            </>
+        );
+    };
 
     return (
         <div className="fixed inset-0 bg-slate-50 flex flex-col overflow-hidden select-none">
@@ -263,7 +294,7 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                             {/* Rasm */}
                             {currentQuestion?.image && (
                                 <img
-                                    src={toMediaUrl(currentQuestion.image)}
+                                    src={currentQuestion.image}
                                     alt={`Savol ${currentIndex + 1}`}
                                     className="mb-6 max-h-[45vh] w-auto mx-auto block rounded-2xl border border-slate-100 object-contain"
                                 />
@@ -280,8 +311,8 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                                 </div>
                             )}
 
-                            {/* Vaqt tugadi xabari */}
-                            {isTimedOut && !isAnswered && (
+                            {/* Vaqt tugadi xabari - faqat check tugagunicha */}
+                            {isTimedOut && currentResult?.idx == null && (
                                 <div className="mb-5 flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4">
                                     <XCircle size={20} className="text-slate-400 shrink-0" />
                                     <span className="text-sm font-bold text-slate-500">
@@ -295,11 +326,8 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                                 {currentQuestion?.options?.map((option, oIdx) => {
                                     const optionLabel = ["A", "B", "C", "D"][oIdx] || oIdx + 1;
                                     const isSelected = currentResult?.idx === oIdx && currentResult?.idx !== null;
-                                    const isCorrectOption = currentResult?.correctIdx === oIdx;
+                                    const isCorrectOption = currentResult?.correctIdx != null && currentResult?.correctIdx === oIdx;
                                     const isWrong = isSelected && !currentResult?.isCorrect;
-                                    const optionText = typeof option === "string" ? option : option?.text || "";
-                                    const optionImageUrl =
-                                        typeof option === "object" && option?.image ? toMediaUrl(option.image) : null;
 
                                     let optionStyle = "border-slate-100 bg-white hover:border-slate-300 cursor-pointer";
                                     let labelStyle = "border-slate-200 text-slate-400 bg-slate-50";
@@ -315,7 +343,9 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                                             optionStyle = "border-slate-100 bg-white opacity-50 cursor-default";
                                         }
                                     } else if (isTimedOut) {
-                                        optionStyle = "border-slate-100 bg-slate-50 opacity-50 cursor-not-allowed";
+                                        optionStyle = "border-slate-100 bg-white opacity-50 cursor-default";
+                                    } else if (isChecking) {
+                                        optionStyle = "border-slate-100 bg-slate-50 opacity-60 cursor-wait";
                                     }
 
                                     return (
@@ -328,18 +358,18 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                                             <span className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center border font-bold text-sm transition-all ${labelStyle}`}>
                                                 {optionLabel}
                                             </span>
-                                            <span className="font-medium text-sm text-slate-700 flex-1">
-                                                {optionImageUrl ? (
+                                            <div className="flex-1">
+                                                {(option?.image || option?.img) && (
                                                     <img
-                                                        src={optionImageUrl}
-                                                        alt={optionText || `Option ${optionLabel}`}
-                                                        className="max-h-24 w-auto object-contain rounded-lg border border-slate-100 bg-white"
-                                                        loading="lazy"
+                                                        src={option?.image || option?.img}
+                                                        alt={`${optionLabel} variant`}
+                                                        className="max-h-32 w-auto rounded-lg border border-slate-100 object-contain mb-2"
                                                     />
-                                                ) : (
-                                                    optionText
                                                 )}
-                                            </span>
+                                                <span className="font-medium text-sm text-slate-700">
+                                                    {typeof option === "string" ? option : option?.text || ""}
+                                                </span>
+                                            </div>
                                             {isCorrectOption && currentResult && (
                                                 <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
                                             )}
@@ -353,31 +383,18 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                         </div>
                     </div>
 
-                    {/* Next / Finish tugmasi */}
-                    {showNext ? (
-                        <button
-                            onClick={handleNext}
-                            disabled={isSubmitting}
-                            className="w-full py-4 rounded-2xl bg-slate-900 hover:bg-primary text-white font-black text-base shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-60"
-                        >
-                            {isSubmitting ? (
-                                <span className="animate-pulse">
-                                    {intl.formatMessage({ id: "Yuborilmoqda..." })}
-                                </span>
-                            ) : isLastQuestion ? (
-                                intl.formatMessage({ id: "Quizni yakunlash" })
-                            ) : (
-                                <>
-                                    {intl.formatMessage({ id: "Keyingi savol" })}
-                                    <ChevronRight size={20} />
-                                </>
-                            )}
-                        </button>
-                    ) : (
-                        <div className="text-center text-slate-400 text-sm font-medium italic animate-pulse py-4">
-                            {intl.formatMessage({ id: "Javobingizni tanlang..." })}
-                        </div>
-                    )}
+                    {/* Next / Skip / Finish tugmasi - HAR DOIM KO'RINADI */}
+                    <button
+                        onClick={handleNext}
+                        disabled={isNextDisabled}
+                        className={`w-full py-4 rounded-2xl font-black text-base shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed ${
+                            !isAnswered && !isTimedOut
+                                ? "bg-slate-400 hover:bg-slate-500 text-white"
+                                : "bg-slate-900 hover:bg-primary text-white"
+                        }`}
+                    >
+                        {nextButtonLabel()}
+                    </button>
 
                 </div>
             </div>
