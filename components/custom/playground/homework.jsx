@@ -10,6 +10,8 @@ const HomeworkPlayground = ({ data, onFinish, onBack }) => {
     const questions = itemData?.questions || [];
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState({});
+    const answersRef = useRef(answers);
+    answersRef.current = answers;
     const intl = useIntl();
     const [isChecking, setIsChecking] = useState(false);
     const [timeLeft, setTimeLeft] = useState(itemData?.default_question_duration || 30);
@@ -76,6 +78,43 @@ const HomeworkPlayground = ({ data, onFinish, onBack }) => {
         return () => stopAllSounds();
     }, [currentIndex]);
 
+    // Time ran out without a selection: ask backend to reveal the correct option
+    // (selected_index omitted — persisted as JSON null, scored wrong on submit).
+    useEffect(() => {
+        if (timeLeft !== 0 || !currentQuestion?.id || !data?.submission_id) return;
+        const qid = currentQuestion.id;
+        if (answersRef.current[qid]) return;
+
+        let cancelled = false;
+        (async () => {
+            setIsChecking(true);
+            try {
+                const res = await authAxios.post("/submissions/check-single-question/", {
+                    submission_id: data.submission_id,
+                    question_id: qid,
+                });
+                if (cancelled) return;
+                setAnswers((prev) => ({
+                    ...prev,
+                    [qid]: {
+                        idx: res.data.selected_index,
+                        isCorrect: res.data.is_correct,
+                        correctIdx: res.data.correct_option_index,
+                        noSelection: res.data.no_selection_sent,
+                    },
+                }));
+            } catch {
+                if (!cancelled) toast.error("Xato yuz berdi");
+            } finally {
+                if (!cancelled) setIsChecking(false);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [timeLeft, currentQuestion?.id, data?.submission_id]);
+
     const handleSelectOption = async (questionId, optionIndex) => {
         if (answers[questionId] || isChecking || timeLeft === 0) return;
         setIsChecking(true);
@@ -93,6 +132,7 @@ const HomeworkPlayground = ({ data, onFinish, onBack }) => {
                     idx: optionIndex,
                     isCorrect: res.data.is_correct,
                     correctIdx: res.data.correct_option_index,
+                    noSelection: res.data.no_selection_sent,
                 }
             }));
         } catch (error) {
