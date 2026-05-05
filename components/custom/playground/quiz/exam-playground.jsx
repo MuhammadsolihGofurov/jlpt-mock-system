@@ -15,9 +15,27 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState({});
+    // Refs mirror state so async effects/callbacks always read the latest value
+    // without including the state in dependency arrays (prevents stale-closure
+    // races and self-cancellation of in-flight requests).
+    const answersRef = React.useRef(answers);
+    answersRef.current = answers;
     const [timeLeft, setTimeLeft] = useState(duration);
     const [isChecking, setIsChecking] = useState(false);
+    const isCheckingRef = React.useRef(false);
+    isCheckingRef.current = isChecking;
+    // Synchronous "request-in-flight" gate. setIsChecking is async, so two fast
+    // clicks could both pass the guard before isChecking flips. This ref flips
+    // synchronously inside the click handler and blocks the second call.
+    const requestInFlightRef = React.useRef(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isSubmittingRef = React.useRef(false);
+    isSubmittingRef.current = isSubmitting;
+    // Tracks which question's timer countdown is currently authoritative. When
+    // navigating forward we update this synchronously together with setTimeLeft,
+    // so the timeout effect can detect "this timeLeft=0 belongs to the previous
+    // question" and refuse to fire for a freshly-mounted next question.
+    const timerOwnerIdRef = React.useRef(null);
 
     const currentQuestion = questions[currentIndex];
     const currentResult = answers[currentQuestion?.id];
@@ -26,12 +44,23 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
     const isLastQuestion = currentIndex === questions.length - 1;
     const answeredCount = Object.values(answers).filter(a => a.isCorrect !== undefined).length;
 
-    // BUG 1 FIX: savol o'zgarganda ham timeLeft, ham isChecking ni reset qilamiz.
-    // Avval faqat timeLeft reset bo'lardi → isChecking=true qolardi → keyingi savolda optionlar disabled!
+    // Initialize / refresh the timer owner during render so the timeout effect
+    // can compare against currentQuestion?.id without depending on a useEffect
+    // that runs *after* commit.
+    if (timerOwnerIdRef.current == null) {
+        timerOwnerIdRef.current = currentQuestion?.id || null;
+    }
+
+    // Reset the timer if the underlying quiz prop's duration changes mid-session
+    // (e.g. parent swaps to a different quiz). Initial mount is handled by the
+    // useState(duration) initializer; per-question reset is done synchronously
+    // inside handleNext/goToQuestion, never here, to avoid a render where
+    // currentIndex has already advanced but timeLeft is still 0 from the prior
+    // question (which used to spuriously fire the timeout effect for the next
+    // question, auto-revealing its answer and disabling its options).
     useEffect(() => {
         setTimeLeft(duration);
-        setIsChecking(false);
-    }, [currentIndex, duration]);
+    }, [duration]);
 
     // Timer tick - faqat javob berilmagan va vaqt tugamagan holda ishlaydi
     useEffect(() => {
@@ -61,21 +90,36 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
         return res.data;
     }, [examData?.submission_id]);
 
-    // Vaqt tugaganda: xuddi noto'g'ri javob bosgandek checkSingleQuestion chaqiramiz.
-    // selected_index=99 → hech qachon to'g'ri bo'lmaydi (0 ball) → lekin backend
-    // correct_option_index qaytaradi → UI da to'g'ri javob yashil ko'rinadi.
+    // Vaqt tugaganda: selected_index YO'Q holda checkSingleQuestion chaqiramiz.
+    // selected_index omitted → backend null saqlaydi → grading: 0 ball (hech qachon to'g'ri emas).
+    // Backend correct_option_index qaytaradi → UI da to'g'ri javob yashil ko'rinadi.
     // answers da idx=null saqlaymiz → hech qaysi option "tanlangan" ko'rinmaydi.
+    //
+    // IMPORTANT: isChecking and isSubmitting are intentionally read via refs, NOT
+    // listed as deps. Including them as deps would cause React to re-run the effect
+    // cleanup the moment setIsChecking(true) is called, setting cancelled=true and
+    // silently aborting the in-flight request before it can store correctIdx.
+    //
+    // Defense-in-depth: also require timerOwnerIdRef.current === qId. When the
+    // student advances past a timed-out question, the next render briefly has
+    // currentQuestion = newQ but timeLeft = 0 (the old value). Without this
+    // ownership check the effect would fire for the brand-new question, hit
+    // the API without selected_index, and pre-reveal/disable the next question
+    // before the student has even seen it.
     useEffect(() => {
         const qId = currentQuestion?.id;
         if (!qId) return;
         if (timeLeft !== 0) return;
-        if (answers[qId] || isChecking || isSubmitting) return;
+        if (timerOwnerIdRef.current !== qId) return;
+        if (answersRef.current[qId] || isCheckingRef.current || isSubmittingRef.current) return;
 
         let cancelled = false;
+        requestInFlightRef.current = true;
         (async () => {
             setIsChecking(true);
             try {
-                const data = await checkSingleQuestion(qId, 0);
+                // selected_index omitted intentionally: backend stores null → always 0 points.
+                const data = await checkSingleQuestion(qId);
                 if (cancelled) return;
                 setAnswers((prev) => ({
                     ...prev,
@@ -93,15 +137,23 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                     }));
                 }
             } finally {
+                requestInFlightRef.current = false;
                 if (!cancelled) setIsChecking(false);
             }
         })();
 
+        // Only cancel when the question itself changes (student moves forward).
         return () => { cancelled = true; };
-    }, [timeLeft, currentQuestion?.id, answers, isChecking, isSubmitting, checkSingleQuestion]);
+    }, [timeLeft, currentQuestion?.id, checkSingleQuestion]);
 
     const handleSelectOption = async (questionId, optionIndex) => {
-        if (isAnswered || isChecking || isTimedOut) return;
+        // requestInFlightRef + answersRef block multi-clicks that fire before
+        // React has had a chance to flip isChecking/isAnswered. The state-based
+        // checks remain for the common (single-click) path UX guards.
+        if (isAnswered || isTimedOut) return;
+        if (requestInFlightRef.current) return;
+        if (answersRef.current[questionId]) return;
+        requestInFlightRef.current = true;
         setIsChecking(true);
         try {
             const data = await checkSingleQuestion(questionId, optionIndex);
@@ -116,6 +168,7 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
         } catch {
             toast.error(intl.formatMessage({ id: "Yuborishda xato yuz berdi" }));
         } finally {
+            requestInFlightRef.current = false;
             setIsChecking(false);
         }
     };
@@ -124,22 +177,28 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
         if (isLastQuestion) {
             setIsSubmitting(true);
             try {
-                await Promise.all(
-                    (questions || []).map(async (q) => {
-                        if (!q?.id || answers[q.id]) return;
-                        try {
-                            const data = await checkSingleQuestion(q.id, 0);
-                            setAnswers((prev) => ({
-                                ...prev,
-                                [q.id]: prev[q.id] || {
-                                    idx: null,
-                                    isCorrect: false,
-                                    correctIdx: data.correct_option_index,
-                                },
-                            }));
-                        } catch {}
-                    })
-                );
+                // Skip olib tashlangani uchun bu nuqtada barcha savollar
+                // javoblangan/timeout bo'lgan bo'lishi kerak — quyidagi loop
+                // shunchaki defensive: agar kelajakdagi o'zgarishlar tufayli
+                // qandaydir savol javobsiz qolib ketsa, backendga null yozib
+                // qo'yamiz (0 ball). Sequential ishlaymiz — parallel chaqiriqlar
+                // backendning non-atomic submission.answers yozuvini buzishi mumkin.
+                const snapshot = answersRef.current;
+                for (const q of (questions || [])) {
+                    if (!q?.id || snapshot[q.id] || answersRef.current[q.id]) continue;
+                    try {
+                        // selected_index omitted intentionally: backend stores null → 0 points.
+                        const data = await checkSingleQuestion(q.id);
+                        setAnswers((prev) => ({
+                            ...prev,
+                            [q.id]: prev[q.id] || {
+                                idx: null,
+                                isCorrect: false,
+                                correctIdx: data.correct_option_index,
+                            },
+                        }));
+                    } catch {}
+                }
 
                 await authAxios.post("/submissions/submit-homework/", {
                     submission_id: examData.submission_id,
@@ -154,10 +213,21 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                 setIsSubmitting(false);
             }
         } else {
-            setCurrentIndex((prev) => prev + 1);
+            // Reset timer / checking state SYNCHRONOUSLY in the same React batch
+            // as setCurrentIndex. Doing this in a follow-up useEffect leaves a
+            // render where currentIndex has advanced but timeLeft is still 0 from
+            // the previous question, which makes the timeout effect spuriously
+            // fire for the new question (auto-revealing its answer + disabling
+            // its options).
+            const nextIdx = currentIndex + 1;
+            const nextQ = questions[nextIdx];
+            timerOwnerIdRef.current = nextQ?.id || null;
+            setCurrentIndex(nextIdx);
+            setTimeLeft(duration);
+            setIsChecking(false);
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
-    }, [isLastQuestion, answers, examData?.submission_id, onFinish, intl, questions, checkSingleQuestion]);
+    }, [isLastQuestion, currentIndex, duration, examData?.submission_id, onFinish, intl, questions, checkSingleQuestion]);
 
     const userInitial = user?.full_name?.[0] || user?.first_name?.[0] || "U";
 
@@ -169,32 +239,31 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
         );
     }
 
-    // Tugma holati:
-    // - isChecking: to'g'ri javobni kutish (timeout auto-check yoki option check)
-    // - isSubmitting: yakunlash so'rovi yuborilmoqda
-    // - isAnswered: javob berilgan → "Keyingi savol" yoki "Quizni yakunlash"
-    // - !isAnswered && timer yuribdi: "O'tkazib yuborish" (skip)
-    const isNextDisabled = (isChecking && !isTimedOut) || isSubmitting;
+    // Skip olib tashlandi: o'quvchi har bir savol uchun JAVOB tanlashi yoki
+    // VAQT TUGASHINI kutishi shart. Tugma faqat natija yozilgandan keyin (ya'ni
+    // currentResult mavjud — qo'lda javob yoki timeout API qaytgan) yonadi.
+    // Bu Skip orqali yuzaga kelgan poyga shartlarini butunlay yo'q qiladi:
+    // navigatsiya doim isAnswered=true holatida ro'y beradi, demak keyingi savol
+    // hech qachon "eski timeLeft=0" yoki "javob in-flight" holatini meros olmaydi.
+    const isNextDisabled = !isAnswered || isChecking || isSubmitting;
 
     const nextButtonLabel = () => {
         if (isSubmitting) return <span className="animate-pulse">{intl.formatMessage({ id: "Yuborilmoqda..." })}</span>;
-        if (isChecking && !isTimedOut) return (
+        if (isChecking) return (
             <span className="flex items-center gap-2">
                 <Loader2 size={18} className="animate-spin" />
                 {intl.formatMessage({ id: "Tekshirilmoqda..." })}
             </span>
         );
+        if (!isAnswered) {
+            // Javob berilmagan: o'quvchi yo variantni tanlashi, yo timer
+            // tugashini kutishi kerak. Tugma o'chirilgan ko'rinishda turadi.
+            return intl.formatMessage({ id: "Javobingizni tanlang..." });
+        }
         if (isLastQuestion) return intl.formatMessage({ id: "Quizni yakunlash" });
-        if (isAnswered) return (
-            <>
-                {intl.formatMessage({ id: "Keyingi savol" })}
-                <ChevronRight size={20} />
-            </>
-        );
-        // Javob berilmagan, timer hali yuribdi → skip
         return (
             <>
-                {intl.formatMessage({ id: "O'tkazib yuborish" })}
+                {intl.formatMessage({ id: "Keyingi savol" })}
                 <ChevronRight size={20} />
             </>
         );
@@ -383,12 +452,13 @@ const QuizExamPlayground = ({ examData, onFinish }) => {
                         </div>
                     </div>
 
-                    {/* Next / Skip / Finish tugmasi - HAR DOIM KO'RINADI */}
+                    {/* Next / Finish tugmasi - HAR DOIM KO'RINADI, faqat
+                        natija mavjud bo'lganda bosish mumkin (Skip yo'q) */}
                     <button
                         onClick={handleNext}
                         disabled={isNextDisabled}
                         className={`w-full py-4 rounded-2xl font-black text-base shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed ${
-                            !isAnswered && !isTimedOut
+                            !isAnswered
                                 ? "bg-slate-400 hover:bg-slate-500 text-white"
                                 : "bg-slate-900 hover:bg-primary text-white"
                         }`}
