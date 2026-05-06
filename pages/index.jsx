@@ -23,7 +23,7 @@ const IndexPage = ({ info }) => {
         <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900 overflow-x-hidden">
             <Seo
                 title={info?.seo_title || "Mikan — JLPT va Yapon tili imtihonlariga tayyorlov platformasi"}
-                description={info?.meta_description || "Yapon tili darajangizni JLPT va IELTS mock testlari orqali innovatsion tahlil qiling. O'quv markazlari va talabalar uchun professional ekotizim."}
+                description={info?.meta_description || "Yapon tili darajangizni JLPT va JFT mock testlari orqali innovatsion tahlil qiling. O'quv markazlari va talabalar uchun professional ekotizim."}
                 keywords={info?.keywords || "JLPT testlari, yapon tili imtihoni, JLPT N2 tayyorgarlik, JLPT mock test Uzbekistan, Mikan platformasi, yapon tili kurslari, jltp imtihonlari, flash kartlar, jlptga tayyorlanish, mikan uz, mikan, yapon tilim JLPT imtihoni, jlpt"}
             />
 
